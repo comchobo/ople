@@ -14,7 +14,7 @@
     button { cursor:pointer; border:1px solid var(--line); background:white; border-radius:3px; min-height:44px; padding:9px 14px; line-height:1.4; }
     button:hover { background:var(--soft); border-color:#999; }
     button:disabled { cursor:default; opacity:.45; }
-    button:focus-visible,a:focus-visible,summary:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+    button:focus-visible,a:focus-visible,summary:focus-visible,.timeline-viewport:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
     a { color:inherit; text-underline-offset:4px; }
     h1,h2,h3,p { margin:0; }
     h1 { font-size:30px; line-height:1.35; letter-spacing:-1px; font-weight:650; }
@@ -90,10 +90,10 @@
     .board-heading > button { flex-shrink:0; font-size:12px; padding:9px 10px; }
     .board-heading h1 { font-size:26px; margin:4px 0 8px; }
     .tabs { display:grid; grid-template-columns:repeat(3,1fr); border-bottom:1px solid #333; margin-bottom:24px; }
-    .tabs button { border:0; border-radius:0; background:white; color:#777; padding:13px 3px; }
+    .tabs button { border:0; border-radius:0; background:white; color:var(--muted); padding:13px 3px; }
     .tabs button[aria-selected="true"] { color:#222; font-weight:650; box-shadow:inset 0 -3px #222; }
     .plan-heading { display:flex; align-items:flex-start; gap:8px; margin-bottom:8px; }
-    .plan-heading h2 { flex:1; padding-top:5px; }
+    .plan-heading h2 { flex:1; min-width:0; overflow-wrap:anywhere; padding-top:5px; }
     .plan-description { color:#555; font-size:14px; margin-bottom:20px; white-space:pre-wrap; overflow-wrap:anywhere; }
     .plan-kind { font-size:12px; color:var(--muted); margin-bottom:5px; }
     .timeline-label { display:flex; justify-content:space-between; align-items:center; font-size:12px; padding:14px 0; border-top:1px solid var(--line); }
@@ -111,7 +111,7 @@
     .piece.selected .piece-edit { right:15px; }
     .piece.selected { border:2px solid #222; z-index:3; background:#ddd; touch-action:none; }
     .piece.selected .piece-main { cursor:grab; }
-    .resize-handle { position:absolute; top:-4px; bottom:-4px; width:22px; background:#fff; border:1px solid #333; touch-action:none; z-index:4; padding:0; min-height:0; }
+    .resize-handle { position:absolute; top:-4px; bottom:-4px; width:24px; background:#fff; border:1px solid #333; touch-action:none; z-index:4; padding:0; min-height:0; }
     .resize-handle::after { content:""; position:absolute; top:13px; bottom:13px; left:9px; width:2px; background:#777; }
     .resize-handle.start { left:-8px; }
     .resize-handle.end { right:-8px; }
@@ -172,7 +172,7 @@
     const app = document.querySelector('#app');
     const sheet = document.querySelector('#sheet');
     let stored = {};
-    try { stored = JSON.parse(localStorage.getItem(STORAGE) || '{}'); } catch { /* Empty or unavailable storage. */ }
+    try { stored = JSON.parse(localStorage.getItem(STORAGE) || '{}') || {}; } catch { /* Empty or unavailable storage. */ }
     let user = stored.user === true;
     let board = Array.isArray(stored.board) && stored.board.length === 3 ? stored.board : null;
     let createdAt = stored.createdAt || '';
@@ -267,14 +267,21 @@
       return `<header class="site-header"><a class="brand" href="#intro" data-action="intro" aria-label="Ople 제품 소개">Ople</a>
         <div class="header-links">${user ? button(userIcon,'account','icon-button','aria-label="내 계정" title="내 계정"') : button('로그인','login','text-button')}</div></header>`;
     }
-    function render() {
+    function render(focusAction) {
+      const focused = app.contains(document.activeElement) ? document.activeElement.closest('[data-action]') : null;
+      const action = focusAction || focused?.dataset.action;
+      const id = focused?.dataset.id;
       app.className = view === 'intro' ? 'intro' : '';
       const content = { intro:introView, prepare:prepareView, interview:interviewView, complete:completeView, generating:generatingView, board:boardView }[view] || introView;
       app.innerHTML = header() + `<main id="main">${content()}</main>`;
       if (view === 'board') updateSaveStatus();
+      if (action) {
+        const target = Array.from(app.querySelectorAll('[data-action]')).find(element => element.dataset.action === action && element.dataset.id === id);
+        (target || document.querySelector('main h1'))?.focus({ preventScroll:true });
+      }
     }
     function introView() {
-      return `<section class="intro-section intro-hero"><span class="eyebrow">오디세이 플래너</span>
+      return `<section class="intro-section intro-hero">
         <h1 tabindex="-1">앞으로 5년,<br>세 가지 계획으로 살펴보기</h1>
         <p>AI와의 음성 인터뷰로 생각을 정리하고,<br>서로 다른 삶의 계획을 비교·수정합니다.</p>
         ${button('시작하기','start','primary wide')}</section>
@@ -296,7 +303,7 @@
     }
     function steps(current) { return `<nav class="steps" aria-label="진행 단계"><ol>${['인터뷰','계획 생성','검토·수정'].map((label,index) => `<li${current === index + 1 ? ' aria-current="step"' : ''}><span class="step-number">${index + 1}</span><span>${label}</span></li>`).join('')}</ol></nav>`; }
     function prepareView() {
-      return `${steps(1)}<section class="prepare"><span class="eyebrow">음성 인터뷰 준비</span><h1 tabindex="-1">질문을 보고<br>편하게 답해주세요</h1><p class="muted">현재 생활과 바람, 계획에 필요한 여건을 이야기합니다. 정리된 답변일 필요는 없습니다.</p>
+      return `${steps(1)}<section class="prepare"><h1 tabindex="-1">질문을 보고<br>편하게 답해주세요</h1><p class="muted">현재 생활과 바람, 계획에 필요한 여건을 이야기합니다. 정리된 답변일 필요는 없습니다.</p>
         <ol><li>질문은 화면에서 확인합니다.</li><li>마이크 아이콘을 누르면 녹음이 시작됩니다.</li><li>일시정지 아이콘으로 멈추고, 재생 아이콘으로 이어 녹음합니다.</li><li>종이비행기 아이콘을 눌러 답변을 제출합니다.</li></ol>
         ${button('인터뷰 시작','begin','primary wide space')}</section>`;
     }
@@ -331,7 +338,7 @@
     function boardView() {
       if (!board) return '<h1>계획이 없습니다</h1>';
       const plan = board[activePlan];
-      return `<section class="board-heading"><div><span class="eyebrow">오디세이 플래너</span><h1 tabindex="-1">나의 5년 계획</h1><p class="small muted">${esc(createdAt)}에 만든 계획</p></div>${button('새 계획 만들기','new-plan')}</section>
+      return `<section class="board-heading"><div><h1 tabindex="-1">나의 5년 계획</h1><p class="small muted">${esc(createdAt)}에 만든 계획</p></div>${button('새 계획 만들기','new-plan')}</section>
         <div class="tabs" role="tablist" aria-label="세 가지 계획">${board.map((_,i) => button(`계획 ${i + 1}`,`tab-${i}`,'',`role="tab" id="tab-${i}" aria-controls="plan-panel" aria-selected="${activePlan === i}" tabindex="${activePlan === i ? 0 : -1}"`)).join('')}</div>
         <section id="plan-panel" role="tabpanel" aria-labelledby="tab-${activePlan}"><p class="plan-kind">${esc(plan.kind)}</p><div class="plan-heading"><h2>${esc(plan.title)}</h2>${button(editIcon,'edit-plan','icon-button','aria-label="계획 제목과 설명 수정"')}</div><p class="plan-description">${esc(plan.description)}</p>
         <div class="timeline-label"><strong>5년 타임라인</strong><span>시작 시점 · 기간</span></div>
@@ -414,10 +421,10 @@
         case 'new-plan': confirmNewPlan(); break;
         case 'confirm-new': closeSheet(); navigate('prepare'); break;
         case 'begin': startInterview(); break;
-        case 'record': recordState = 'recording'; render(); break;
-        case 'pause': recordState = 'paused'; render(); break;
+        case 'record': recordState = 'recording'; render('pause'); break;
+        case 'pause': recordState = 'paused'; render('record'); break;
         case 'rerecord': openSheet('다시 녹음할까요?', `<p class="sheet-copy">이 질문의 기존 녹음을 지우고 다시 시작합니다.</p><div class="sheet-footer">${button('취소','close-sheet')}${button('다시 시작','confirm-rerecord','primary')}</div>`); break;
-        case 'confirm-rerecord': closeSheet(); seconds = 0; recordState = 'idle'; interviewError = false; render(); break;
+        case 'confirm-rerecord': closeSheet(); seconds = 0; recordState = 'idle'; interviewError = false; render('record'); break;
         case 'submit-answer': case 'retry-answer': submitAnswer(); break;
         case 'exit-interview': openSheet('인터뷰를 나갈까요?', `<p class="sheet-copy">진행 중인 인터뷰는 저장되지 않습니다.${board ? ' 기존 계획은 유지됩니다.' : ''}</p><div class="sheet-footer">${button('계속하기','close-sheet')}${button('나가기','confirm-exit','primary')}</div>`); break;
         case 'confirm-exit': closeSheet(); navigate(board ? 'board' : 'prepare'); break;
@@ -511,6 +518,7 @@
     }, { passive:false });
     function endDrag() { clearTimeout(longPressTimer); if (drag?.changed) persist(); drag = null; setTimeout(() => { suppressClick = false; },100); }
     document.addEventListener('pointerup',endDrag); document.addEventListener('pointercancel',endDrag);
+    window.addEventListener('blur',endDrag);
     window.addEventListener('pagehide', () => { try { writeStorage(); } catch { /* Save state remains visible on next edit. */ } });
     render();
   </script>
