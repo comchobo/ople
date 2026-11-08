@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FFFDF5">
+  <meta name="description" content="OPLE 오플 — 나에게 가능한 세 가지 삶을 그려보는 라이프 디자인 프로토타입">
+  <title>OPLE 오플 · 나의 가능한 미래</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div id="phone">
+    <header id="header"></header>
+    <aside id="storage-error" hidden role="alert"><span>저장하지 못했어요. 내용은 이 화면에 남아 있어요.</span><button id="retry-storage">다시 저장</button></aside>
+    <main id="app" tabindex="-1" aria-busy="true"><p class="loading">나의 가능성을 펼치는 중…</p></main>
+    <div id="toast" role="status" aria-live="polite"></div>
+  </div>
+  <dialog id="modal" aria-labelledby="modal-title"></dialog>
+</body>
+</html>
