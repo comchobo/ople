@@ -47,7 +47,7 @@ services:
     profiles: [test]
     build:
       context: .
-      dockerfile: frontend/Dockerfile.e2e
+      dockerfile: e2e/Dockerfile
     init: true
     ipc: host
 
