@@ -1,7 +1,7 @@
 [project]
-name = "odyssey-backend"
+name = "ople-backend"
 version = "0.1.0"
-description = "Ople life design journal API"
+description = "Ople API"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.115,<1",
@@ -25,6 +25,7 @@ package = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]
 
 [tool.ruff]
 target-version = "py313"
@@ -33,16 +34,4 @@ line-length = 100
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
 
-[tool.importlinter]
-root_packages = ["routers", "services", "schemas", "models", "utils", "agents"]
-
-[[tool.importlinter.contracts]]
-name = "Backend layer direction"
-type = "layers"
-layers = [
-    "routers",
-    "services",
-    "schemas",
-    "models",
-    "utils",
-]
+# Restore import-linter contracts when product packages replace the temporary module.

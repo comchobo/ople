@@ -6,7 +6,6 @@ COPY backend/pyproject.toml backend/uv.lock ./
 RUN uv sync --frozen
 
 COPY backend/ .
-COPY agents/ ./agents/
 
 EXPOSE 8000
 
