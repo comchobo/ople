@@ -17,13 +17,13 @@ jobs:
         run: docker compose build
       - name: Start PostgreSQL
         run: docker compose up -d --wait db
-      - name: Backend and agents checks
+      - name: Backend checks
         run: |
           docker compose run --rm --no-deps backend sh -ec '
             uv run ruff check .
             uv run ruff format --check .
             uv run ty check
-            uv run pytest tests agents/tests
+            uv run pytest tests
             uv run lint-imports
           '
       - name: Frontend checks

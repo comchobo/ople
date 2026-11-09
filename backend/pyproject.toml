@@ -1,5 +1,5 @@
 [project]
-name = "odyssey-backend"
+name = "ople-backend"
 version = "0.1.0"
 description = "Ople life design journal API"
 requires-python = ">=3.13"
@@ -34,7 +34,7 @@ line-length = 100
 select = ["E", "F", "I", "UP", "B"]
 
 [tool.importlinter]
-root_packages = ["routers", "services", "schemas", "models", "utils", "agents"]
+root_packages = ["routers", "services", "schemas", "models", "utils"]
 
 [[tool.importlinter.contracts]]
 name = "Backend layer direction"

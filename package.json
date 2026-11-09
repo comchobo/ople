@@ -1,5 +1,5 @@
 {
-  "name": "odyssey-planner-tooling",
+  "name": "ople-tooling",
   "private": true,
   "packageManager": "pnpm@10.34.9",
   "engines": {

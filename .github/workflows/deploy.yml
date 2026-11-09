@@ -18,11 +18,11 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=accept-new "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" <<'EOF'
           set -e
-          mkdir -p /home/ubuntu/odyssey
-          cd /home/ubuntu/odyssey
+          mkdir -p /home/ubuntu/ople
+          cd /home/ubuntu/ople
           if [ ! -d .git ]; then
             git init
-            git remote add origin https://github.com/juhongyi/codyssey-hackathon.git
+            git remote add origin https://github.com/comchobo/ople.git
           fi
           git fetch origin && git reset --hard origin/main
           [ -f .env ] || cp .env.example .env
