@@ -1,5 +1,5 @@
 [project]
-name = "odyssey-backend"
+name = "ople-backend"
 version = "0.1.0"
 description = "Ople life design journal API"
 requires-python = ">=3.13"

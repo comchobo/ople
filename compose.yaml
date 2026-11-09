@@ -3,15 +3,15 @@ services:
     image: postgres:17-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-odyssey}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-odyssey}
-      POSTGRES_DB: ${POSTGRES_DB:-odyssey}
+      POSTGRES_USER: ${POSTGRES_USER:-ople}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ople}
+      POSTGRES_DB: ${POSTGRES_DB:-ople}
     ports:
       - "5432:5432"
     volumes:
-      - odyssey-db-data:/var/lib/postgresql/data
+      - ople-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-odyssey} -d ${POSTGRES_DB:-odyssey}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ople} -d ${POSTGRES_DB:-ople}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -22,7 +22,7 @@ services:
       dockerfile: backend/Dockerfile
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-odyssey}:${POSTGRES_PASSWORD:-odyssey}@db:5432/${POSTGRES_DB:-odyssey}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-ople}:${POSTGRES_PASSWORD:-ople}@db:5432/${POSTGRES_DB:-ople}
       CODYSSEY_API_BASE_URL: ${CODYSSEY_API_BASE_URL:-https://copa.codyssey.kr}
       CODYSSEY_API_KEY: ${CODYSSEY_API_KEY:-}
       INTERVIEWER_LLM_MODEL: ${INTERVIEWER_LLM_MODEL:-claude-haiku-4}
@@ -65,4 +65,5 @@ services:
     ipc: host
 
 volumes:
-  odyssey-db-data:
+  ople-db-data:
+    name: ople-db-data
