@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
-  testDir: process.env.E2E_TEST_DIR || "../e2e",
+  testDir: ".",
   fullyParallel: true,
   retries: 0,
   reporter: "list",
@@ -12,6 +12,7 @@ export default defineConfig({
   ],
   webServer: {
     command: "pnpm start -H 0.0.0.0",
+    cwd: "../frontend",
     url: "http://127.0.0.1:3000",
     reuseExistingServer: false,
   },

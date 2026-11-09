@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  outputFileTracingRoot: __dirname,
   experimental: { proxyTimeout: 240_000 },
   async rewrites() {
     return [
