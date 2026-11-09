@@ -2,7 +2,7 @@ pre-commit:
   parallel: true
   commands:
     backend:
-      glob: "{backend,agents}/**/*.py"
+      glob: "backend/**/*.py"
       run: |
         docker compose exec -T backend sh -ec '
           uv run ruff check .
@@ -21,7 +21,7 @@ pre-push:
           uv run ruff check .
           uv run ruff format --check .
           uv run ty check
-          uv run pytest tests agents/tests
+          uv run pytest tests
           uv run lint-imports
         '
     frontend:

@@ -34,7 +34,7 @@ line-length = 100
 select = ["E", "F", "I", "UP", "B"]
 
 [tool.importlinter]
-root_packages = ["routers", "services", "schemas", "models", "utils", "agents"]
+root_packages = ["routers", "services", "schemas", "models", "utils"]
 
 [[tool.importlinter.contracts]]
 name = "Backend layer direction"
