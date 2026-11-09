@@ -363,7 +363,6 @@
       return `<section class="board-heading"><div><h1 tabindex="-1">나의 5년 계획</h1><p class="small muted">${esc(createdAt)}에 만든 계획</p></div>${button('새 계획 만들기','new-plan')}</section>
         <div class="tabs" role="tablist" aria-label="세 가지 계획">${board.map((_,i) => button(`계획 ${i + 1}`,`tab-${i}`,'',`role="tab" id="tab-${i}" aria-controls="plan-panel" aria-selected="${activePlan === i}" tabindex="${activePlan === i ? 0 : -1}"`)).join('')}</div>
         <section id="plan-panel" role="tabpanel" aria-labelledby="tab-${activePlan}"><p class="plan-kind">${esc(plan.kind)}</p><div class="plan-heading"><h2>${esc(plan.title)}</h2>${button(editIcon,'edit-plan','icon-button','aria-label="계획 제목과 설명 수정"')}</div><p class="plan-description">${esc(plan.description)}</p>
-        <section class="art-entry"><h3>매일 보고 싶은 나의 미래</h3><p class="small muted">이 계획을 SNS 피드나 휴대폰 배경화면으로 만들어보세요.</p>${button('AI로 이미지 만들기','open-artwork','wide')}</section>
         <div class="timeline-label"><strong>5년 타임라인</strong><span>시작 시점 · 기간</span></div>
         <div class="timeline-viewport" id="timeline-viewport" tabindex="0" aria-label="5년 활동 타임라인"><div id="timeline-track"><div class="timeline-years">${timelineDates().map(date => `<span>${date}</span>`).join('')}</div>
         ${plan.pieces.map(piece => `<div class="timeline-row"><div class="piece ${selected === piece.id ? 'selected' : ''}" data-id="${esc(piece.id)}" style="left:${piece.start / 60 * 100}%;width:${piece.duration / 60 * 100}%" title="${esc(piece.title)} · ${Math.floor(piece.start / 12) + 1}년차 시작 · ${piece.duration}개월">
@@ -374,6 +373,7 @@
         ${button('+ 조각 추가','add-piece','wide add-piece','aria-label="조각 추가"')}
         <section class="rating-section"><div class="row between"><h3>나의 자기평가</h3>${button(Object.keys(plan.scores).length ? '평가 수정' : '평가하기','ratings','small')}</div><p class="small muted">선택 사항 · AI 점수가 아닌 직접 입력한 평가입니다.</p>
         <div class="rating-grid">${Object.entries(ratingLabels).map(([key,label]) => `<div class="rating-value"><span>${label} ${plan.scores[key] == null ? '미평가' : `${plan.scores[key]} / 10`}</span><div class="rating-meter"><span style="width:${(plan.scores[key] || 0) * 10}%"></span></div></div>`).join('')}</div></section>
+        <section class="art-entry"><h3>매일 보고 싶은 나의 미래</h3><p class="small muted">이 계획을 SNS 피드나 휴대폰 배경화면으로 만들어보세요.</p>${button('AI로 이미지 만들기','open-artwork','wide')}</section>
         <div id="save-status" class="save-error" role="status"></div></section>
         <footer class="site-footer"><a href="https://ople.ink">ople.ink</a>${button('로그아웃','logout','text-button')}</footer>`;
     }
