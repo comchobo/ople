@@ -3,6 +3,8 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { expect, type Locator, type Page, test } from "@playwright/test";
 
+const STORAGE = "ople-tablet-planners-v1";
+
 test.beforeEach(async ({ page }) => {
   await page.route("**/tablet-prototype", (route) =>
     route.fulfill({
@@ -22,9 +24,32 @@ async function bounds(locator: Locator) {
   return box;
 }
 
-async function createPlan(page: Page) {
-  await page.getByRole("button", { name: "시작하기", exact: true }).click();
+async function login(page: Page) {
+  await page.getByRole("button", { name: "로그인", exact: true }).click();
   await page.getByRole("button", { name: "Google로 계속하기" }).click();
+  await expect(
+    page.getByRole("heading", { name: "내 플래너", exact: true }),
+  ).toBeVisible();
+}
+
+async function answerInterview(page: Page) {
+  for (let index = 0; index < 3; index++) {
+    await page.getByRole("button", { name: "답변 시작", exact: true }).click();
+    await page.getByRole("button", { name: "일시정지", exact: true }).click();
+    await page.getByRole("button", { name: "답변 제출", exact: true }).click();
+  }
+  await expect(
+    page.getByRole("button", { name: "플래너 생성", exact: true }),
+  ).toBeVisible();
+}
+
+async function createPlan(page: Page, number = 1) {
+  if (await page.getByRole("button", { name: "로그인", exact: true }).count()) {
+    await login(page);
+  }
+  await page
+    .getByRole("button", { name: "새 플래너 만들기", exact: true })
+    .click();
   await expectFrame(page);
   const preparationSteps = await bounds(page.locator(".steps"));
   await page.getByRole("button", { name: "인터뷰 시작", exact: true }).click();
@@ -32,20 +57,16 @@ async function createPlan(page: Page) {
   const recorder = await bounds(page.locator(".record-panel"));
   expect(question.x + question.width).toBeLessThan(recorder.x);
   await expectFrame(page);
-  for (let index = 0; index < 3; index++) {
-    await page.getByRole("button", { name: "답변 시작", exact: true }).click();
-    await page.getByRole("button", { name: "일시정지", exact: true }).click();
-    await page.getByRole("button", { name: "답변 제출", exact: true }).click();
-  }
+  await answerInterview(page);
   const summary = await bounds(page.locator(".complete .notice"));
   expect(await bounds(page.locator(".steps"))).toEqual(preparationSteps);
   const frame = await bounds(page.locator("#app"));
   expect(
     Math.abs(summary.x + summary.width / 2 - frame.x - frame.width / 2),
   ).toBeLessThan(2);
-  await page.getByRole("button", { name: "계획 생성", exact: true }).click();
+  await page.getByRole("button", { name: "플래너 생성", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "나의 5년 계획", exact: true }),
+    page.getByRole("heading", { name: `나의 플래너 ${number}`, exact: true }),
   ).toBeVisible();
 }
 
@@ -87,13 +108,13 @@ test("tablet-first frame and two-column screens retain the full interview flow",
   ]) {
     await page.setViewportSize(viewport);
     await expectFrame(page);
-    await page.getByRole("tab", { name: "계획 2", exact: true }).click();
+    await page.getByRole("tab", { name: "Plan B", exact: true }).click();
     await expect(
-      page.getByRole("tab", { name: "계획 2", exact: true }),
+      page.getByRole("tab", { name: "Plan B", exact: true }),
     ).toBeFocused();
     await page.keyboard.press("ArrowRight");
     await expect(
-      page.getByRole("tab", { name: "계획 3", exact: true }),
+      page.getByRole("tab", { name: "Plan C", exact: true }),
     ).toHaveAttribute("aria-selected", "true");
   }
 });
@@ -137,12 +158,15 @@ test("plan edits, new pieces and self-evaluation survive reload", async ({
     .poll(() =>
       page.evaluate(
         () =>
-          JSON.parse(localStorage.getItem("ople-prototype-v0") || "{}").board[0]
-            .scores.resources,
+          JSON.parse(localStorage.getItem("ople-tablet-planners-v1") || "{}")
+            .planners[0].plans[0].scores.resources,
       ),
     )
     .toBe(8);
   await page.reload();
+  await page
+    .getByRole("button", { name: "나의 플래너 1 열기", exact: true })
+    .click();
   await expect(
     page.getByRole("heading", { name: "태블릿에서 세운 계획" }),
   ).toBeVisible();
@@ -165,8 +189,8 @@ test("long-press dragging and resizing use the tablet track width", async ({
     .poll(() =>
       page.evaluate(
         () =>
-          JSON.parse(localStorage.getItem("ople-prototype-v0") || "{}").board[0]
-            .pieces[0].start,
+          JSON.parse(localStorage.getItem("ople-tablet-planners-v1") || "{}")
+            .planners[0].plans[0].pieces[0].start,
       ),
     )
     .toBe(6);
@@ -184,8 +208,8 @@ test("long-press dragging and resizing use the tablet track width", async ({
     .poll(() =>
       page.evaluate(
         () =>
-          JSON.parse(localStorage.getItem("ople-prototype-v0") || "{}").board[0]
-            .pieces[0].duration,
+          JSON.parse(localStorage.getItem("ople-tablet-planners-v1") || "{}")
+            .planners[0].plans[0].pieces[0].duration,
       ),
     )
     .toBe(18);
@@ -219,8 +243,8 @@ test("touch long press moves a piece while ordinary swipes scroll its pane", asy
     .poll(() =>
       page.evaluate(
         () =>
-          JSON.parse(localStorage.getItem("ople-prototype-v0") || "{}").board[0]
-            .pieces[0].start,
+          JSON.parse(localStorage.getItem("ople-tablet-planners-v1") || "{}")
+            .planners[0].plans[0].pieces[0].start,
       ),
     )
     .toBe(6);
@@ -258,4 +282,191 @@ test("touch long press moves a piece while ordinary swipes scroll its pane", asy
     .toBeGreaterThan(0);
   await expect(page.locator(".piece.selected")).toHaveCount(0);
   await expect(page.getByRole("dialog")).not.toBeVisible();
+});
+
+test("multiple planners retain independent plans, names and creation order", async ({
+  page,
+}) => {
+  await createPlan(page);
+  await page.getByRole("button", { name: "계획 제목과 설명 수정" }).click();
+  await page
+    .getByLabel("제목", { exact: true })
+    .fill("첫 번째 플래너의 계획 A");
+  await page.getByRole("button", { name: "적용", exact: true }).click();
+  await page.getByRole("tab", { name: "Plan B", exact: true }).click();
+  await page.getByRole("button", { name: "계획 제목과 설명 수정" }).click();
+  await page
+    .getByLabel("제목", { exact: true })
+    .fill("첫 번째 플래너의 계획 B");
+  await page.getByRole("button", { name: "적용", exact: true }).click();
+  await page.getByRole("button", { name: "조각 추가", exact: true }).click();
+  await page
+    .getByLabel("제목", { exact: true })
+    .fill("첫 플래너에만 있는 조각");
+  await page.getByRole("button", { name: "적용", exact: true }).click();
+  await page.getByRole("button", { name: "평가하기", exact: true }).click();
+  await page.getByLabel("자원", { exact: true }).fill("9");
+  await page.getByRole("button", { name: "평가 저장", exact: true }).click();
+  await createPlan(page, 2);
+  await expect(
+    page.getByRole("heading", {
+      name: "일을 이어가며 생활의 여유 만들기",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await page.getByRole("tab", { name: "Plan B", exact: true }).click();
+  await expect(page.locator(".timeline-row")).toHaveCount(6);
+  await expect(page.locator(".rating-value").first()).toContainText("미평가");
+  await page.getByRole("button", { name: "플래너 목록", exact: true }).click();
+  const items = page
+    .getByRole("list", { name: "저장한 플래너" })
+    .getByRole("listitem");
+  await expect(items).toHaveCount(2);
+  await expect(items.first()).toContainText("나의 플래너 2");
+  await page
+    .getByRole("button", { name: "나의 플래너 1 이름 변경", exact: true })
+    .click();
+  await page.getByLabel("플래너 이름", { exact: true }).fill("이직과 생활");
+  await page.getByRole("button", { name: "이름 저장", exact: true }).click();
+  await page
+    .getByRole("button", { name: "이직과 생활 열기", exact: true })
+    .click();
+  await expect(
+    page.getByRole("tab", { name: "Plan A", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
+  await expect(
+    page.getByRole("heading", { name: "첫 번째 플래너의 계획 A", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("tab", { name: "Plan B", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "첫 번째 플래너의 계획 B", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".timeline-row")).toHaveCount(7);
+  await expect(page.locator(".rating-value").first()).toContainText("9 / 10");
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "내 플래너", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "나의 플래너 2 열기", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", {
+      name: "일을 이어가며 생활의 여유 만들기",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "로그아웃", exact: true }).click();
+  await login(page);
+  await expect(items).toHaveCount(2);
+  await expect(
+    page.getByRole("button", { name: "이직과 생활 열기", exact: true }),
+  ).toBeVisible();
+});
+
+test("deleting planners requires confirmation and handles an empty collection", async ({
+  page,
+}) => {
+  await createPlan(page);
+  await createPlan(page, 2);
+  await page.getByRole("button", { name: "플래너 목록", exact: true }).click();
+  await page
+    .getByRole("button", { name: "나의 플래너 1 삭제", exact: true })
+    .click();
+  await page.getByRole("button", { name: "취소", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "나의 플래너 1 열기", exact: true }),
+  ).toBeVisible();
+  for (const name of ["나의 플래너 2", "나의 플래너 1"]) {
+    await page
+      .getByRole("button", { name: `${name} 삭제`, exact: true })
+      .click();
+    await page
+      .getByRole("button", { name: "플래너 삭제", exact: true })
+      .click();
+  }
+  await expect(
+    page.getByRole("heading", { name: "아직 플래너가 없습니다", exact: true }),
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        (key) => JSON.parse(localStorage.getItem(key) || "{}").planners.length,
+        STORAGE,
+      ),
+    )
+    .toBe(0);
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "아직 플래너가 없습니다", exact: true }),
+  ).toBeVisible();
+  await createPlan(page, 3);
+});
+
+test("abandoned interviews and cancelled generation do not append planners", async ({
+  page,
+}) => {
+  await createPlan(page);
+  await page
+    .getByRole("button", { name: "새 플래너 만들기", exact: true })
+    .click();
+  await page.getByRole("button", { name: "인터뷰 시작", exact: true }).click();
+  await page.getByRole("button", { name: "내 플래너", exact: true }).click();
+  await page.getByRole("button", { name: "계속하기", exact: true }).click();
+  await expect(page.locator(".question")).toBeVisible();
+  await page.getByRole("button", { name: "나가기", exact: true }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "나가기", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "내 플래너", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "새 플래너 만들기", exact: true })
+    .click();
+  await page.getByRole("button", { name: "인터뷰 시작", exact: true }).click();
+  await answerInterview(page);
+  await page.getByRole("button", { name: "플래너 생성", exact: true }).click();
+  await page.getByRole("button", { name: "내 플래너", exact: true }).click();
+  await page.waitForTimeout(1600);
+  await expect(
+    page.getByRole("list", { name: "저장한 플래너" }).getByRole("listitem"),
+  ).toHaveCount(1);
+  await expect
+    .poll(() =>
+      page.evaluate(
+        (key) => JSON.parse(localStorage.getItem(key) || "{}").planners.length,
+        STORAGE,
+      ),
+    )
+    .toBe(1);
+});
+
+test("legacy storage stays untouched and is not imported", async ({ page }) => {
+  const legacy = JSON.stringify({
+    user: true,
+    board: [{}, {}, {}],
+    createdAt: "2026. 1. 1.",
+  });
+  await page.evaluate(
+    (value) => localStorage.setItem("ople-prototype-v0", value),
+    legacy,
+  );
+  await page.reload();
+  await login(page);
+  await expect(
+    page.getByRole("heading", { name: "아직 플래너가 없습니다", exact: true }),
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        (key) => JSON.parse(localStorage.getItem(key) || "{}").planners.length,
+        STORAGE,
+      ),
+    )
+    .toBe(0);
+  expect(
+    await page.evaluate(() => localStorage.getItem("ople-prototype-v0")),
+  ).toBe(legacy);
 });
