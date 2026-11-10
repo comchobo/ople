@@ -25,6 +25,8 @@ async function bounds(locator: Locator) {
 async function createPlan(page: Page) {
   await page.getByRole("button", { name: "시작하기", exact: true }).click();
   await page.getByRole("button", { name: "Google로 계속하기" }).click();
+  await expectFrame(page);
+  const preparationSteps = await bounds(page.locator(".steps"));
   await page.getByRole("button", { name: "인터뷰 시작", exact: true }).click();
   const question = await bounds(page.locator(".question"));
   const recorder = await bounds(page.locator(".record-panel"));
@@ -35,6 +37,12 @@ async function createPlan(page: Page) {
     await page.getByRole("button", { name: "일시정지", exact: true }).click();
     await page.getByRole("button", { name: "답변 제출", exact: true }).click();
   }
+  const summary = await bounds(page.locator(".complete .notice"));
+  expect(await bounds(page.locator(".steps"))).toEqual(preparationSteps);
+  const frame = await bounds(page.locator("#app"));
+  expect(
+    Math.abs(summary.x + summary.width / 2 - frame.x - frame.width / 2),
+  ).toBeLessThan(2);
   await page.getByRole("button", { name: "계획 생성", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "나의 5년 계획", exact: true }),
@@ -43,6 +51,7 @@ async function createPlan(page: Page) {
 
 async function expectFrame(page: Page) {
   const frame = await bounds(page.locator("#app"));
+  expect(frame.width).toBe(Math.min(page.viewportSize()?.width || 0, 1194));
   expect(frame.width).toBeLessThanOrEqual(1194);
   expect(frame.height).toBeLessThanOrEqual(834);
   expect(
@@ -67,12 +76,10 @@ test("tablet-first frame and two-column screens retain the full interview flow",
   const details = await bounds(page.locator(".details-pane"));
   expect(timeline.width / details.width).toBeGreaterThan(1.8);
   expect(timeline.x).toBeLessThan(details.x);
-  const artworkButton = await bounds(
+  await expect(
     page.getByRole("button", { name: "AI로 이미지 만들기" }),
-  );
-  expect(artworkButton.y + artworkButton.height).toBeLessThanOrEqual(
-    details.y + details.height,
-  );
+  ).toHaveCount(0);
+  await expect(page.getByText("매일 보고 싶은 나의 미래")).toHaveCount(0);
   await expect(page.locator(".timeline-row")).toHaveCount(6);
   for (const viewport of [
     { width: 1024, height: 768 },
@@ -251,48 +258,4 @@ test("touch long press moves a piece while ordinary swipes scroll its pane", asy
     .toBeGreaterThan(0);
   await expect(page.locator(".piece.selected")).toHaveCount(0);
   await expect(page.getByRole("dialog")).not.toBeVisible();
-});
-
-test("artwork settings and bounded preview export both original PNG sizes", async ({
-  page,
-}) => {
-  await createPlan(page);
-  await page.getByRole("button", { name: "AI로 이미지 만들기" }).click();
-  await page
-    .getByLabel("원하는 분위기", { exact: false })
-    .fill("차분한 파란색");
-  await page
-    .getByRole("button", { name: "이미지 만들기", exact: true })
-    .click();
-  await expect(page.locator("#art-preview")).toBeVisible();
-  await expectFrame(page);
-  const preview = await bounds(page.locator(".art-preview-pane"));
-  const settings = await bounds(page.locator(".art-settings-pane"));
-  expect(preview.x).toBeLessThan(settings.x);
-  for (const [format, height] of [
-    ["feed", 1350],
-    ["wallpaper", 1920],
-  ] as const) {
-    await page.getByLabel("어디에 사용할까요?").selectOption(format);
-    await expect(page.locator("#art-preview")).toHaveAttribute("width", "1080");
-    await expect(page.locator("#art-preview")).toHaveAttribute(
-      "height",
-      String(height),
-    );
-    const canvas = await bounds(page.locator("#art-preview"));
-    expect(canvas.height).toBeLessThanOrEqual(400);
-    const downloadPromise = page.waitForEvent("download");
-    await page.getByRole("button", { name: "PNG 저장", exact: true }).click();
-    const download = await downloadPromise;
-    expect(download.suggestedFilename()).toBe(`ople-plan-1-${format}.png`);
-    expect(await download.failure()).toBeNull();
-    const stream = await download.createReadStream();
-    assert(stream, "Expected a downloaded PNG");
-    const chunks = [];
-    for await (const chunk of stream) chunks.push(chunk);
-    const png = Buffer.concat(chunks);
-    expect(png.subarray(1, 4).toString()).toBe("PNG");
-    expect(png.readUInt32BE(16)).toBe(1080);
-    expect(png.readUInt32BE(20)).toBe(height);
-  }
 });

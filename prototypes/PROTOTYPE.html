@@ -62,11 +62,11 @@
     .steps li { display:flex; align-items:center; justify-content:center; gap:8px; padding:12px 4px; border:1px solid var(--line); background:var(--soft); font-size:13px; white-space:nowrap; }
     .steps li[aria-current="step"] { background:var(--ink); border-color:var(--ink); color:white; font-weight:650; }
     .step-number { font-size:16px; font-weight:650; }
-    .prepare { max-width:65ch; margin:36px auto; }
-    .prepare h1 { margin-bottom:18px; }
-    .prepare ol { padding-left:21px; margin:24px 0; }
-    .prepare li { padding:5px 0; }
-    .prepare .primary { width:auto; min-width:240px; }
+    .prepare main > section { max-width:640px; margin:36px auto; }
+    .prepare main > section h1 { margin-bottom:18px; }
+    .prepare main > section ol { padding-left:21px; margin:24px 0; }
+    .prepare main > section li { padding:5px 0; }
+    .prepare main > section .primary { width:auto; min-width:240px; }
     .interview-head { grid-column:1 / -1; margin-bottom:28px; }
     .progress { display:flex; gap:5px; margin-top:16px; }
     .progress span { height:3px; background:#e5e5e5; flex:1; }
@@ -85,8 +85,9 @@
     .audio-button svg { width:22px; height:22px; }
     .audio-button.main-control { width:72px; height:72px; }
     .audio-button.main-control svg { width:28px; height:28px; }
-    .complete main > h1,.complete main > p,.complete .notice,.complete main > .primary { max-width:65ch; }
-    .complete main > .primary { width:auto; min-width:240px; }
+    .complete main > h1,.complete main > p,.complete .notice { width:min(100%,640px); margin-inline:auto; }
+    .complete main > h1,.complete main > p { text-align:center; }
+    .complete main > .primary { display:block; width:240px; margin-inline:auto; }
     .busy { padding-top:48px; max-width:65ch; }
     .busy h1 { font-size:26px; margin-bottom:16px; }
     .board main { display:flex; flex-direction:column; overflow:hidden; padding-bottom:0; }
@@ -159,23 +160,6 @@
     #toast { position:fixed; bottom:22px; left:50%; transform:translateX(-50%); max-width:calc(100% - 40px); width:max-content; background:#222; color:white; padding:10px 16px; font-size:13px; z-index:20; pointer-events:none; }
     #toast:empty { display:none; }
     svg { width:15px; height:15px; vertical-align:middle; fill:none; stroke:currentColor; stroke-width:1.5; }
-    .art-entry { margin-top:20px; padding-top:16px; border-top:1px solid #ddd; }
-    .art-entry p { margin:8px 0 12px; }
-    .artwork main { display:flex; flex-direction:column; overflow:hidden; }
-    .artwork-heading { display:flex; justify-content:space-between; align-items:center; gap:20px; margin-bottom:24px; flex-shrink:0; }
-    .artwork-layout { flex:1; min-height:0; display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr); gap:32px; }
-    .art-preview-pane,.art-settings-pane { min-width:0; min-height:0; overflow:auto; padding:0 8px 20px 0; scrollbar-color:#aaa var(--soft); scrollbar-width:thin; }
-    .art-preview-pane { text-align:center; }
-    .art-preview-pane details { text-align:left; font-size:13px; margin-top:16px; }
-    .art-preview { display:block; width:auto; height:auto; max-width:100%; max-height:min(400px,50dvh); margin:16px auto; border:1px solid #ddd; }
-    .art-options { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:16px 0; }
-    .art-option { padding:8px; min-width:0; font-size:12px; }
-    .art-option[aria-pressed="true"] { border:2px solid #222; padding:7px; }
-    .art-option canvas { display:block; width:100%; height:auto; margin-bottom:8px; }
-    .art-actions { display:flex; flex-wrap:wrap; gap:8px; margin:20px 0; }
-    .art-actions button { flex:1; }
-    .art-status { margin:32px 0; padding:32px 24px; border-block:1px solid #ddd; }
-    #art-error { color:#922c25; }
     @media (prefers-reduced-motion:no-preference) { dialog[open] { animation:modal-in .15s ease-out; } @keyframes modal-in { from { transform:translateY(8px); opacity:0; } to { transform:translateY(0); opacity:1; } } }
   </style>
 </head>
@@ -208,15 +192,6 @@
     let selected = null, saveState = '저장됨';
     let simulatedError = false, storageFailure = false, interviewError = false, generationToken = 0;
     let returnFocus = null, toastTimer, saveTimer, questionTimer;
-    let artBusy = false, artToken = 0;
-    const artStyles = [
-      { name:'종이와 잉크', background:'#f5f1e8', ink:'#292c28', accent:'#8b4b32', panel:'#e8e1d3', font:'serif' },
-      { name:'푸른 여백', background:'#eaf1fa', ink:'#173451', accent:'#245a8d', panel:'#d4e1f0', font:'sans-serif' },
-      { name:'밤의 기록', background:'#202d2a', ink:'#f0f2dd', accent:'#d5e390', panel:'#34463f', font:'serif' },
-      { name:'살구빛 하루', background:'#f8e8df', ink:'#543328', accent:'#974a31', panel:'#efd2bf', font:'sans-serif' },
-      { name:'보랏빛 문장', background:'#eeebf7', ink:'#3d3457', accent:'#68518c', panel:'#ddd5ee', font:'serif' },
-      { name:'단정한 흑백', background:'#fafafa', ink:'#202020', accent:'#444444', panel:'#e8e8e8', font:'sans-serif' }
-    ];
     const uid = () => globalThis.crypto?.randomUUID?.() || `piece-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const esc = (value) => String(value ?? '').replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char]));
     const button = (label, action, cls = '', extra = '') => `<button type="button" class="${cls}" data-action="${action}" ${extra}>${label}</button>`;
@@ -295,7 +270,6 @@
     }
     function navigate(next) {
       clearTimeout(questionTimer);
-      if (view === 'artwork' && next !== 'artwork') { artToken++; artBusy = false; }
       generationToken++; view = next; selected = null;
       render();
       document.querySelector('main h1')?.focus({ preventScroll:true });
@@ -309,10 +283,9 @@
       const action = focusAction || focused?.dataset.action;
       const id = focused?.dataset.id;
       app.className = view;
-      const content = { intro:introView, prepare:prepareView, interview:interviewView, complete:completeView, generating:generatingView, board:boardView, artwork:artworkView }[view] || introView;
+      const content = { intro:introView, prepare:prepareView, interview:interviewView, complete:completeView, generating:generatingView, board:boardView }[view] || introView;
       app.innerHTML = header() + `<main id="main">${content()}</main>`;
-      if (view === 'artwork' && document.querySelector('#art-preview')) paintArtwork();
-      if (view === 'board' || view === 'artwork') updateSaveStatus();
+      if (view === 'board') updateSaveStatus();
       if (action) {
         const target = Array.from(app.querySelectorAll('[data-action]')).find(element => element.dataset.action === action && element.dataset.id === id);
         (target || document.querySelector('main h1'))?.focus({ preventScroll:true });
@@ -390,143 +363,8 @@
         <aside class="details-pane" aria-label="계획 설명과 자기평가" tabindex="0"><p class="plan-kind">${esc(plan.kind)}</p><div class="plan-heading"><h2>${esc(plan.title)}</h2>${button(editIcon,'edit-plan','icon-button','aria-label="계획 제목과 설명 수정"')}</div><p class="plan-description">${esc(plan.description)}</p>
         <section class="rating-section"><div class="row between"><h3>나의 자기평가</h3>${button(Object.keys(plan.scores).length ? '평가 수정' : '평가하기','ratings','small')}</div><p class="small muted">선택 사항 · AI 점수가 아닌 직접 입력한 평가입니다.</p>
         <div class="rating-grid">${Object.entries(ratingLabels).map(([key,label]) => `<div class="rating-value"><span>${label} ${plan.scores[key] == null ? '미평가' : `${plan.scores[key]} / 10`}</span><div class="rating-meter"><span style="width:${(plan.scores[key] || 0) * 10}%"></span></div></div>`).join('')}</div></section>
-        <section class="art-entry"><h3>매일 보고 싶은 나의 미래</h3><p class="small muted">이 계획을 SNS 피드나 휴대폰 배경화면으로 만들어보세요.</p>${button('AI로 이미지 만들기','open-artwork','wide')}</section>
         <div id="save-status" class="save-error" role="status"></div></aside></section>
         <footer class="site-footer"><a href="https://ople.ink">ople.ink</a>${button('로그아웃','logout','text-button')}</footer>`;
-    }
-
-    function artworkSettings() {
-      const plan = board[activePlan];
-      if (!plan.artwork || typeof plan.artwork !== 'object') plan.artwork = {};
-      const settings = plan.artwork;
-      settings.format = settings.format === 'wallpaper' ? 'wallpaper' : 'feed';
-      settings.prompt = typeof settings.prompt === 'string' ? settings.prompt.slice(0,200) : '';
-      settings.round = Number.isSafeInteger(settings.round) && settings.round >= 0 ? settings.round : 0;
-      settings.selected = [0,1,2].includes(settings.selected) ? settings.selected : 0;
-      return settings;
-    }
-    function artworkView() {
-      const plan = board[activePlan], settings = artworkSettings();
-      const ready = settings.generated && !artBusy && plan.pieces.length;
-      return `<header class="artwork-heading"><h1 tabindex="-1">나의 미래를 이미지로</h1>${button('계획으로 돌아가기','back-artwork')}</header>
-        <div class="artwork-layout"><section class="art-preview-pane" aria-label="이미지 미리보기" tabindex="0">
-        ${ready ? `<h3>선택한 이미지</h3><p id="art-dimensions" class="small muted">${settings.format === 'feed' ? '1080 × 1350' : '1080 × 1920 · 상단 시계 여백 포함'} · PNG</p>
-        <canvas id="art-preview" class="art-preview" role="img" aria-label="${esc(plan.title)} 이미지 미리보기. 아래에 이미지에 담긴 계획이 있습니다."></canvas>
-        <div class="art-actions">${button('PNG 저장','download-artwork','primary')}</div>
-        <details><summary>이미지에 담긴 계획 보기</summary><ul>${plan.pieces.map(piece => `<li>${esc(piece.title)} · ${esc(piecePeriod(piece))}</li>`).join('')}</ul></details>` : `<div class="art-status" role="status" aria-live="polite">${artBusy ? '계획의 흐름을 읽고 세 가지 스타일을 구성하고 있어요…' : '오른쪽에서 형식과 분위기를 고르면 이곳에 이미지가 표시됩니다.'}</div>`}</section>
-        <section class="art-settings-pane" aria-label="이미지 생성 설정" tabindex="0"><h2>${esc(plan.title)}</h2><p class="small muted space">AI 디자인 생성 시뮬레이션 · 실제 AI를 호출하지 않습니다.<br>분위기·색상 키워드를 반영한 스타일을 제안합니다.</p>
-        <form id="artwork-form"><label class="field" for="art-format">어디에 사용할까요?</label>
-        <select id="art-format" ${artBusy ? 'disabled' : ''}><option value="feed" ${settings.format === 'feed' ? 'selected' : ''}>SNS 피드 · 4:5</option><option value="wallpaper" ${settings.format === 'wallpaper' ? 'selected' : ''}>폰 배경화면 · 9:16</option></select>
-        <label class="field" for="art-prompt">원하는 분위기 <span class="muted">(선택)</span></label>
-        <input id="art-prompt" maxlength="200" value="${esc(settings.prompt)}" placeholder="예: 차분한 파란색으로, 매일 보고 싶게" ${artBusy ? 'disabled' : ''}>
-        <p class="small muted">파란색·따뜻한·보라·어두운·미니멀 등의 키워드를 시도해보세요. 요청 문구는 이미지에 넣지 않습니다.</p>
-        <div class="art-actions"><button type="submit" class="primary" ${artBusy || !plan.pieces.length ? 'disabled' : ''}>${artBusy ? '이미지 만드는 중…' : settings.generated ? '다시 만들기' : '이미지 만들기'}</button></div></form>
-        ${!plan.pieces.length ? '<p role="status">이미지로 만들 계획 조각이 없습니다. 계획으로 돌아가 조각을 추가해주세요.</p>' : ''}
-        ${ready ? `<h3>마음에 드는 스타일을 골라보세요</h3><div class="art-options" role="group" aria-label="디자인 시안">${artVariants(settings).map((style,index) => button(`<canvas id="art-thumb-${index}" aria-hidden="true"></canvas>${esc(style.name)}`,'select-artwork','art-option',`data-id="${index}" aria-pressed="${settings.selected === index}"`)).join('')}</div>` : ''}
-        <p id="art-error" role="alert"></p><div id="save-status" class="save-error" role="status"></div><p class="small muted">마지막 요청과 선택은 이 브라우저에 기억합니다. 계획을 수정하면 이미지에도 반영됩니다.</p></section></div>`;
-    }
-    function artVariants(settings) {
-      const match = settings.prompt.match(/파랑|파란|푸른|blue|따뜻|살구|코랄|warm|보라|purple|어두|밤|dark|미니멀|흑백|minimal/i);
-      const keyword = match?.[0] || '';
-      const base = /파랑|파란|푸른|blue/i.test(keyword) ? 1 : /따뜻|살구|코랄|warm/i.test(keyword) ? 3 : /보라|purple/i.test(keyword) ? 4 : /어두|밤|dark/i.test(keyword) ? 2 : /미니멀|흑백|minimal/i.test(keyword) ? 5 : 0;
-      return Array.from({length:3}, (_,index) => artStyles[index === 0 ? base : (base + 1 + (settings.round + (index - 1) * 2) % 5) % artStyles.length]);
-    }
-    function piecePeriod(piece) {
-      const month = value => `${Math.floor(value / 12) + 1}년차 ${value % 12 + 1}개월`;
-      return `${month(piece.start)} — ${month(piece.start + piece.duration - 1)}`;
-    }
-    function wrapArtText(context, text, width) {
-      const lines = []; let line = '';
-      for (const char of String(text)) {
-        if (char === '\n') { lines.push(line); line = ''; continue; }
-        if (line && context.measureText(line + char).width > width) { lines.push(line); line = char; }
-        else line += char;
-      }
-      lines.push(line); return lines;
-    }
-    function drawArtwork(canvas, plan, settings, style) {
-      canvas.width = 1080; canvas.height = settings.format === 'wallpaper' ? 1920 : 1350;
-      const context = canvas.getContext('2d');
-      if (!context) throw new Error('Canvas unavailable');
-      context.fillStyle = style.background; context.fillRect(0,0,canvas.width,canvas.height);
-      const left = 84, width = 912, top = settings.format === 'wallpaper' ? 380 : 100;
-      const setFont = (size, bold = false) => { context.font = `${bold ? '600' : '400'} ${size}px ${style.font}`; };
-      let titleSize = 64, titleLines;
-      do { setFont(titleSize,true); titleLines = wrapArtText(context,plan.title,width); if (titleLines.length <= 3 || titleSize <= 28) break; titleSize -= 2; } while (true);
-      context.fillStyle = style.ink;
-      titleLines.forEach((line,index) => context.fillText(line,left,top + titleSize + index * titleSize * 1.3));
-      const startY = top + titleLines.length * titleSize * 1.3 + 100;
-      context.fillStyle = style.accent; setFont(24);
-      context.fillText(`나의 5년 계획   /   ${timelineDates()[0]} — ${timelineDates()[4]}`,left,startY - 36);
-      const sorted = [...plan.pieces].sort((a,b) => a.start - b.start);
-      const available = canvas.height - startY - 100;
-      let size = 32, rows, total;
-      do {
-        setFont(size,true);
-        rows = sorted.map(piece => ({piece, lines:wrapArtText(context,piece.title,width - 48)}));
-        total = rows.reduce((sum,row) => sum + row.lines.length * size * 1.3 + size * 2.6,0);
-        if (total <= available || size <= 0.25) break;
-        size *= 0.9;
-      } while (true);
-      const gap = Math.min(20,Math.max(0,(available - total) / Math.max(1,rows.length)));
-      let y = startY;
-      rows.forEach(({piece,lines}) => {
-        const height = lines.length * size * 1.3 + size * 2.6;
-        context.fillStyle = style.panel; context.fillRect(left,y,width,height);
-        context.fillStyle = style.ink; setFont(size,true);
-        lines.forEach((line,index) => context.fillText(line,left + 24,y + size * 1.4 + index * size * 1.3));
-        context.fillStyle = style.accent; setFont(size * 0.68);
-        context.fillText(piecePeriod(piece),left + 24,y + height - size * 0.7);
-        y += height + gap;
-      });
-      context.fillStyle = style.accent; setFont(20); context.fillText('Ople · 내가 그려보는 미래',left,canvas.height - 44);
-    }
-    function paintArtwork() {
-      const plan = board[activePlan], settings = artworkSettings(), styles = artVariants(settings);
-      try {
-        styles.forEach((style,index) => drawArtwork(document.querySelector(`#art-thumb-${index}`),plan,settings,style));
-        drawArtwork(document.querySelector('#art-preview'),plan,settings,styles[settings.selected]);
-      } catch {
-        document.querySelector('#art-error').textContent = '이미지를 그리지 못했습니다. 다시 만들기를 눌러주세요.';
-        document.querySelector('[data-action="download-artwork"]').disabled = true;
-      }
-    }
-    function generateArtwork() {
-      if (artBusy || !board[activePlan].pieces.length) return;
-      const settings = artworkSettings();
-      settings.format = document.querySelector('#art-format').value;
-      settings.prompt = document.querySelector('#art-prompt').value.trim();
-      if (settings.generated) settings.round++;
-      artBusy = true; const token = ++artToken; render();
-      setTimeout(() => {
-        if (token !== artToken || view !== 'artwork') return;
-        artBusy = false; settings.generated = true; settings.selected = 0;
-        persist(); render();
-      },1100);
-    }
-    function downloadArtwork() {
-      const canvas = document.querySelector('#art-preview'), target = document.querySelector('[data-action="download-artwork"]');
-      if (!canvas || target.disabled) return;
-      target.disabled = true;
-      const error = document.querySelector('#art-error');
-      const filename = `ople-plan-${activePlan + 1}-${artworkSettings().format}.png`;
-      const fail = () => { target.disabled = false; error.textContent = 'PNG를 저장하지 못했습니다. PNG 저장을 다시 눌러주세요.'; };
-      try {
-        canvas.toBlob(blob => {
-          if (!blob) { fail(); return; }
-          let url;
-          try {
-            url = URL.createObjectURL(blob);
-            const link = document.createElement('a'); link.href = url;
-            link.download = filename;
-            document.body.append(link); link.click(); link.remove();
-            document.querySelector('#art-error')?.replaceChildren();
-            toast('PNG 파일을 준비했습니다. 다운로드를 확인해주세요.');
-            target.disabled = false;
-          } catch { fail(); }
-          finally { if (url) setTimeout(() => URL.revokeObjectURL(url),60000); }
-        },'image/png');
-      } catch { fail(); }
     }
 
     function openSheet(title, content) {
@@ -582,10 +420,6 @@
       const action = target.dataset.action, id = target.dataset.id;
       if (action.startsWith('tab-')) { activePlan = Number(action.slice(4)); selected = null; render(); document.querySelector(`#tab-${activePlan}`).focus(); return; }
       switch (action) {
-        case 'open-artwork': navigate('artwork'); break;
-        case 'back-artwork': navigate('board'); break;
-        case 'select-artwork': artworkSettings().selected = Number(id); persist(); render(); break;
-        case 'download-artwork': downloadArtwork(); break;
         case 'intro': closeSheet(); navigate('intro'); break;
         case 'start': if (user) { if (board) confirmNewPlan(); else navigate('prepare'); } else loginSheet(); break;
         case 'login': loginSheet(); break;
@@ -622,7 +456,6 @@
     }
     document.addEventListener('submit', event => {
       const form = event.target;
-      if (form.id === 'artwork-form') { event.preventDefault(); generateArtwork(); return; }
       if (!['piece-form','plan-form','ratings-form'].includes(form.id)) return;
       event.preventDefault(); const data = new FormData(form);
       if (form.id === 'piece-form') {
@@ -642,13 +475,6 @@
       if (event.target.matches('#ratings-form input')) { document.querySelector(`#output-${event.target.name}`).textContent = `${event.target.value} / 10`; }
     });
     document.addEventListener('change', event => {
-      if (event.target.id === 'art-format') {
-        const settings = artworkSettings(); settings.format = event.target.value; persist();
-        if (document.querySelector('#art-preview')) {
-          paintArtwork();
-          document.querySelector('#art-dimensions').textContent = `${settings.format === 'feed' ? '1080 × 1350' : '1080 × 1920 · 상단 시계 여백 포함'} · PNG`;
-        }
-      }
       if (event.target.id === 'piece-start') { const duration = document.querySelector('#piece-duration'); duration.max = 60 - Number(event.target.value); duration.value = Math.min(Number(duration.value),Number(duration.max)); }
     });
     document.addEventListener('keydown', event => {
