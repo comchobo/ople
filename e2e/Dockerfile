@@ -7,6 +7,5 @@ COPY frontend/package.json frontend/pnpm-lock.yaml ./frontend/
 RUN pnpm -C frontend install --frozen-lockfile
 COPY frontend/ ./frontend/
 COPY e2e/ ./e2e/
-COPY prototypes/ ./prototypes/
 RUN pnpm -C frontend build
 CMD ["pnpm", "test:e2e"]
