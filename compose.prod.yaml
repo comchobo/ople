@@ -41,7 +41,7 @@ services:
       - "443:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
-      - ./PROTOTYPE.html:/srv/prototype.html:ro
+      - ./tmp:/srv:ro
       - ople-caddy-data:/data
       - ople-caddy-config:/config
     depends_on:

@@ -1,7 +1,7 @@
 ople.ink {
 	handle /prototype {
 		root * /srv
-		rewrite * /prototype.html
+		rewrite * /PROTOTYPE.html
 		file_server
 	}
 
