@@ -1,8 +1,10 @@
-// TEMP: 리뉴얼 스켈레톤. 실제 구현 시 교체/삭제.
+import { IntroView } from "../components/intro-view";
 export default function Home() {
-  return (
-    <main>
-      <h1>Ople</h1>
-    </main>
+  const now = new Date();
+  const dates = Array.from(
+    { length: 5 },
+    (_, index) =>
+      `${now.getFullYear() + index}.${String(now.getMonth() + 1).padStart(2, "0")}`,
   );
+  return <IntroView dates={dates} />;
 }

@@ -1,17 +1,17 @@
-// TEMP: 리뉴얼 스켈레톤. 실제 구현 시 교체/삭제.
 import type { Metadata } from "next";
+import { AppShell } from "../components/app-shell";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "Ople",
-};
+export const metadata: Metadata = { title: "Ople — 오디세이 플래너" };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        <AppShell>{children}</AppShell>
+      </body>
     </html>
   );
 }
