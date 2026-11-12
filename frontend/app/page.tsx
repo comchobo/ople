@@ -1,3 +1,7 @@
+"use client";
+
+import { useStartActions } from "../components/common/AppShell";
+import StartButton from "../components/common/StartButton";
 import TimelineExample from "./timeline-example";
 import UsageSteps from "./usage-steps";
 
@@ -20,6 +24,7 @@ const plans = [
 ];
 
 export default function Home() {
+  const startActions = useStartActions();
   return (
     <main className="page-content grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)] overflow-hidden p-0">
       <section
@@ -29,18 +34,14 @@ export default function Home() {
         <div>
           <h1 className="mb-[18px] text-[36px]">
             앞으로 5년,
-            <br />
-            세 가지 계획으로 살펴보기
+            <br />세 가지 계획으로 살펴보기
           </h1>
           <p className="mb-6 max-w-[65ch] text-[#555]">
             AI와의 음성 인터뷰로 생각을 정리하고,
             <br />
             서로 다른 삶의 계획을 비교·수정합니다.
           </p>
-          {/* 로그인·플래너 진입 동작은 후속 단계에서 연결합니다. */}
-          <button type="button" className="primary min-w-[200px]">
-            시작하기
-          </button>
+          <StartButton {...startActions} className="primary min-w-[200px]" />
         </div>
         <section
           className="mt-7 border-t border-(--line) pt-(--space-6)"
@@ -79,7 +80,15 @@ export default function Home() {
       </section>
       <div className="min-h-0 min-w-0 overflow-y-auto border-l border-(--line) p-7 [scrollbar-color:#aaa_var(--soft)] [scrollbar-width:thin]">
         <TimelineExample />
-        <UsageSteps />
+        <UsageSteps
+          startButton={
+            <StartButton
+              {...startActions}
+              className="primary wide space"
+              aria-label="하단에서 시작하기"
+            />
+          }
+        />
       </div>
     </main>
   );

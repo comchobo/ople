@@ -1,43 +1,89 @@
-import { renderToStaticMarkup } from "react-dom/server";
-import { expect, it } from "vitest";
+import { act } from "react";
+import { create, type ReactTestRenderer } from "react-test-renderer";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+
+import AppShell from "../components/common/AppShell";
 
 import Home from "./page";
 
-it("renders the introduction title and description", () => {
-  const html = renderToStaticMarkup(<Home />);
+const { push } = vi.hoisted(() => ({ push: vi.fn() }));
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
 
-  expect(html).toContain("앞으로 5년,<br/>세 가지 계획으로 살펴보기");
-  expect(html).toContain(
-    "AI와의 음성 인터뷰로 생각을 정리하고,<br/>서로 다른 삶의 계획을 비교·수정합니다.",
-  );
+let renderer: ReactTestRenderer | undefined;
+
+beforeEach(() => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  vi.stubGlobal("self", globalThis);
+  push.mockClear();
 });
 
-it("renders a start button", () => {
-  const html = renderToStaticMarkup(<Home />);
-
-  expect(html).toMatch(/<button\b[^>]*type="button"[^>]*>시작하기<\/button>/);
+afterEach(async () => {
+  await act(async () => renderer?.unmount());
+  renderer = undefined;
+  vi.unstubAllGlobals();
 });
 
-it("explains the three planning directions in A, B, C order", () => {
-  const html = renderToStaticMarkup(<Home />);
+it.each([0, 1])(
+  "비로그인 상태에서 시작하기 버튼 %i는 로그인 모달을 연다",
+  async (index) => {
+    const showModal = vi.fn();
+    const showAccountModal = vi.fn();
+    await act(async () => {
+      renderer = create(
+        <AppShell>
+          <Home />
+        </AppShell>,
+        {
+          createNodeMock: (element) => {
+            if (element.type !== "dialog") return null;
+            const props = element.props as { "aria-labelledby"?: string };
+            return {
+              showModal:
+                props["aria-labelledby"] === "login-title"
+                  ? showModal
+                  : showAccountModal,
+            };
+          },
+        },
+      );
+    });
+    if (!renderer) throw new Error("소개 화면이 렌더링되지 않았습니다.");
+    const buttons = renderer.root
+      .findAllByType("button")
+      .filter((button) => button.children.join("") === "시작하기");
+    expect(buttons).toHaveLength(2);
+    await act(async () => buttons[index].props.onClick());
+    expect(showModal).toHaveBeenCalledTimes(1);
+    expect(showAccountModal).not.toHaveBeenCalled();
+    expect(
+      renderer.root.findByProps({ "aria-labelledby": "login-title" }).type,
+    ).toBe("dialog");
+    expect(push).not.toHaveBeenCalled();
+  },
+);
 
-  expect(html).toContain("왜 세 가지 계획인가요?");
-  expect(html).toMatch(
-    /Plan A.*현재 방향을 발전시키면.*Plan B.*다른 방향을 탐색하면.*Plan C.*원하는 삶에서 출발하면/,
-  );
-});
-
-it("shows a Plan A timeline with five year markers and four activities", () => {
-  const html = renderToStaticMarkup(<Home />);
-
-  expect(html).toContain("Plan A · 결과 예시");
-  expect(html.match(/<time\b/g)).toHaveLength(5);
-  for (const activity of [
-    "일 · 전문 역량 넓히기",
-    "창작 · 주말 제작 모임",
-    "관계 · 정기적인 만남",
-    "휴식 · 한 달 지역 살기",
-  ]) {
-    expect(html).toContain(activity);
-  }
-});
+it.each([0, 1])(
+  "로그인 상태에서 시작하기 버튼 %i는 /planners로 이동한다",
+  async (index) => {
+    const showModal = vi.fn();
+    await act(async () => {
+      renderer = create(
+        <AppShell isLoggedIn>
+          <Home />
+        </AppShell>,
+        {
+          createNodeMock: (element) =>
+            element.type === "dialog" ? { showModal } : null,
+        },
+      );
+    });
+    if (!renderer) throw new Error("소개 화면이 렌더링되지 않았습니다.");
+    const buttons = renderer.root
+      .findAllByType("button")
+      .filter((button) => button.children.join("") === "시작하기");
+    expect(buttons).toHaveLength(2);
+    await act(async () => buttons[index].props.onClick());
+    expect(push).toHaveBeenCalledExactlyOnceWith("/planners");
+    expect(showModal).not.toHaveBeenCalled();
+  },
+);

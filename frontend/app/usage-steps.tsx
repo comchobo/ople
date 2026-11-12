@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 const steps = [
   {
     title: "음성으로 답하기",
@@ -13,7 +15,11 @@ const steps = [
   },
 ];
 
-export default function UsageSteps() {
+export default function UsageSteps({
+  startButton,
+}: {
+  startButton: ReactNode;
+}) {
   return (
     <section
       className="mt-7 border-t border-(--line) pt-(--space-6)"
@@ -38,13 +44,7 @@ export default function UsageSteps() {
           </li>
         ))}
       </ol>
-      <button
-        type="button"
-        className="primary wide space"
-        aria-label="하단에서 시작하기"
-      >
-        시작하기
-      </button>
+      {startButton}
     </section>
   );
 }
