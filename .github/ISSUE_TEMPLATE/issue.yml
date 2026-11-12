@@ -1,6 +1,6 @@
 name: 범용 이슈
 description: 버그 신고, 기능 요청, 개선 제안, 질문을 남깁니다.
-title: "[유형] 간단한 제목"
+title: "간단한 제목"
 labels: []
 body:
   - type: dropdown
