@@ -18,6 +18,9 @@
 
   body {
     margin: 0;
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
     background: var(--canvas);
     color: var(--ink);
     font:
@@ -112,6 +115,27 @@
 }
 
 @layer components {
+  .app-shell {
+    width: min(100%, 1194px);
+    height: min(100dvh, 834px);
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--paper);
+    border: 1px solid var(--line);
+  }
+
+  .page-content {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    padding: 28px;
+    overflow: auto;
+    scrollbar-color: #aaa var(--soft);
+    scrollbar-width: thin;
+  }
+
   .small {
     font-size: 12px;
   }
