@@ -60,7 +60,11 @@ export function monthLabel(start: string, month: number) {
 
 export function createdLabel(value: string) {
   return new Intl.DateTimeFormat("ko-KR", {
-    dateStyle: "medium",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
     timeZone: "Asia/Seoul",
   }).format(new Date(value));
 }

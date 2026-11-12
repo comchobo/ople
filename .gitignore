@@ -235,3 +235,4 @@ playwright-report/
 
 # Local Compose resource isolation
 /tmp/compose.worktree.yaml
+/tmp/ui-comparison/

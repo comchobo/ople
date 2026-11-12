@@ -47,7 +47,20 @@ beforeEach(async () => {
     .mockResolvedValueOnce({ recording_max_seconds: 300 })
     .mockResolvedValueOnce(initial);
   await act(async () => {
-    renderer = create(<InterviewScreen id="session" />);
+    renderer = create(<InterviewScreen id="session" />, {
+      createNodeMock: (node) =>
+        node.type === "dialog"
+          ? {
+              open: false,
+              showModal() {
+                this.open = true;
+              },
+              close() {
+                this.open = false;
+              },
+            }
+          : null,
+    });
   });
 });
 afterEach(async () => {
@@ -60,7 +73,7 @@ afterEach(async () => {
 const send = () =>
   renderer.root
     .findAllByType("button")
-    .find((node) => node.children.join("") === "답변 전송");
+    .find((node) => node.props["aria-label"] === "답변 제출");
 
 it("reconciles a lost successful response rather than repeatedly resending to an old question", async () => {
   vi.mocked(api)
@@ -78,7 +91,7 @@ it("reconciles a lost successful response rather than repeatedly resending to an
   expect(recorder.reset).toHaveBeenCalledOnce();
   expect(
     renderer.root
-      .findAllByType("h2")
+      .findAllByType("h1")
       .some((node) => node.children.join("") === "다음 질문"),
   ).toBe(true);
 });
@@ -96,4 +109,20 @@ it("preserves the recording when the server has not advanced after a processing 
       .findAllByProps({ role: "alert" })
       .some((node) => node.children.join("").includes("처리 실패")),
   ).toBe(true);
+});
+
+it("confirms rerecording in a modal and preserves audio when cancelled", async () => {
+  const rerecord = renderer.root
+    .findAllByType("button")
+    .find((node) => node.props["aria-label"] === "다시 녹음");
+  await act(async () => {
+    rerecord?.props.onClick();
+  });
+  const dialog = renderer.root.findByType("dialog");
+  expect(recorder.reset).not.toHaveBeenCalled();
+  await act(async () => {
+    dialog.props.onCancel({ preventDefault() {} });
+  });
+  expect(recorder.reset).not.toHaveBeenCalled();
+  expect(api).toHaveBeenCalledTimes(2);
 });

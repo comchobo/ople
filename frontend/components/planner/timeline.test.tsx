@@ -128,3 +128,37 @@ it("discards interrupted movement on Escape or pointer cancellation", async () =
   });
   expect(save).not.toHaveBeenCalled();
 });
+
+it("keeps the gesture target exposed for a one-month piece", async () => {
+  await act(async () => {
+    renderer.update(
+      <Timeline
+        pieces={[{ ...piece, duration: 1 }]}
+        start="2026-11"
+        disabled={false}
+        edit={edit}
+        save={save}
+      />,
+    );
+  });
+  expect(
+    renderer.root
+      .findAllByType("button")
+      .some((node) => String(node.props["aria-label"]).endsWith("편집 아이콘")),
+  ).toBe(false);
+  await act(async () => {
+    down();
+    vi.advanceTimersByTime(500);
+  });
+  await act(async () => {
+    body().props.onPointerMove({ clientX: 14, clientY: 0 });
+  });
+  await act(async () => {
+    body().props.onPointerUp();
+  });
+  expect(save).toHaveBeenCalledExactlyOnceWith({
+    ...piece,
+    start_month: 3,
+    duration: 1,
+  });
+});
