@@ -14,13 +14,15 @@ export function SiteHeader({
 }) {
   return (
     <header className="flex h-[70px] shrink-0 items-center justify-between border-b border-[#d4d4d4] px-7">
-      <Link
-        className={`text-[24px] font-[750] tracking-[-1px] no-underline ${focusClass}`}
-        href="/"
-        aria-label="Ople 제품 소개"
-      >
-        Ople
-      </Link>
+      <h2>
+        <Link
+          className={`block text-[24px] font-[750] tracking-[-1px] no-underline ${focusClass}`}
+          href="/"
+          aria-label="Ople 제품 소개"
+        >
+          Ople
+        </Link>
+      </h2>
       <nav
         className="flex items-center gap-1 text-[13px]"
         aria-label="공통 탐색"
