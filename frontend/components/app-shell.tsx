@@ -8,9 +8,11 @@ import {
   useEffect,
   useState,
 } from "react";
-import { type AuthAdapter, anonymousAuth } from "../lib/auth";
 import { AccountDialog, LoginDialog } from "./auth-dialogs";
+import type { AuthAdapter } from "./auth-types";
 import { SiteHeader } from "./site-header";
+
+const anonymousAuth: AuthAdapter = { user: null };
 
 const ShellContext = createContext<{ start: () => void } | null>(null);
 

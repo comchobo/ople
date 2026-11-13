@@ -7,5 +7,3 @@ export interface AuthAdapter {
   user: AuthUser | null;
   logout?: () => Promise<void>;
 }
-
-export const anonymousAuth: AuthAdapter = { user: null };

@@ -1,6 +1,6 @@
 import { UserRound } from "lucide-react";
 import Link from "next/link";
-import type { AuthUser } from "../lib/auth";
+import type { AuthUser } from "./auth-types";
 import { focusClass, iconButtonClass, textButtonClass } from "./ui-styles";
 
 export function SiteHeader({

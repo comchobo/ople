@@ -1,8 +1,8 @@
 import type { ComponentProps } from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import type { AuthAdapter } from "../lib/auth";
 import { AppShell } from "./app-shell";
+import type { AuthAdapter } from "./auth-types";
 import { IntroView } from "./intro-view";
 
 vi.mock("next/link", () => ({

@@ -1,4 +1,4 @@
-import type { AuthUser } from "../lib/auth";
+import type { AuthUser } from "./auth-types";
 import { Modal } from "./modal";
 import { buttonClass, primaryButtonClass } from "./ui-styles";
 
