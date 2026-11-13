@@ -8,6 +8,8 @@ import {
   useRef,
 } from "react";
 
+import { buttonClass } from "./ui-styles";
+
 function keepFocusWithin(event: KeyboardEvent<HTMLDialogElement>) {
   if (event.key !== "Tab" || event.defaultPrevented) return;
   const controls = Array.from(
@@ -51,7 +53,7 @@ export function Modal({
   return (
     <dialog
       ref={ref}
-      className="sheet"
+      className="m-auto max-h-[min(786px,calc(100dvh-48px))] w-[560px] max-w-[calc(100%-48px)] overscroll-contain rounded-[7px] border border-[#999] bg-white p-0 text-[#222] backdrop:bg-black/30 motion-safe:transition-[opacity,translate] motion-safe:duration-150 motion-safe:ease-out motion-safe:starting:translate-y-2 motion-safe:starting:opacity-0"
       aria-labelledby={titleId}
       onKeyDown={(event) => {
         keepFocusWithin(event);
@@ -76,10 +78,15 @@ export function Modal({
           onClose();
       }}
     >
-      <div className="sheet-inner">
-        <div className="sheet-header">
-          <h2 id={titleId}>{title}</h2>
-          <button type="button" onClick={onClose}>
+      <div className="p-6">
+        <div className="mb-5 flex items-center justify-between">
+          <h2
+            className="text-[20px] leading-[1.45] font-[650] tracking-[-0.5px]"
+            id={titleId}
+          >
+            {title}
+          </h2>
+          <button className={buttonClass} type="button" onClick={onClose}>
             닫기
           </button>
         </div>

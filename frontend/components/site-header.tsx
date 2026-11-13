@@ -1,6 +1,7 @@
 import { UserRound } from "lucide-react";
 import Link from "next/link";
 import type { AuthUser } from "../lib/auth";
+import { focusClass, iconButtonClass, textButtonClass } from "./ui-styles";
 
 export function SiteHeader({
   user,
@@ -12,19 +13,29 @@ export function SiteHeader({
   onAccount: () => void;
 }) {
   return (
-    <header className="site-header">
-      <Link className="brand" href="/" aria-label="Ople 제품 소개">
+    <header className="flex h-[70px] shrink-0 items-center justify-between border-b border-[#d4d4d4] px-7">
+      <Link
+        className={`text-[24px] font-[750] tracking-[-1px] no-underline ${focusClass}`}
+        href="/"
+        aria-label="Ople 제품 소개"
+      >
         Ople
       </Link>
-      <nav className="header-links" aria-label="공통 탐색">
+      <nav
+        className="flex items-center gap-1 text-[13px]"
+        aria-label="공통 탐색"
+      >
         {user ? (
           <>
-            <Link className="text-button" href="/planners">
+            <Link
+              className={`inline-flex min-h-11 items-center p-2 underline ${focusClass}`}
+              href="/planners"
+            >
               내 플래너
             </Link>
             <button
               type="button"
-              className="icon-button"
+              className={iconButtonClass}
               aria-label="내 계정"
               title="내 계정"
               onClick={onAccount}
@@ -33,7 +44,7 @@ export function SiteHeader({
             </button>
           </>
         ) : (
-          <button type="button" className="text-button" onClick={onLogin}>
+          <button type="button" className={textButtonClass} onClick={onLogin}>
             로그인
           </button>
         )}

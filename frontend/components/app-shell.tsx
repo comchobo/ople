@@ -72,7 +72,7 @@ export function AppShell({
 
   return (
     <ShellContext value={{ start }}>
-      <div className={pathname === "/" ? "app-frame intro" : "app-frame"}>
+      <div className="app-frame m-auto flex h-[min(100dvh,834px)] w-[min(100%,1194px)] flex-col overflow-hidden border border-[#d4d4d4] bg-white">
         <SiteHeader
           user={user}
           onLogin={() => setDialog("login")}
@@ -81,7 +81,12 @@ export function AppShell({
             setDialog("account");
           }}
         />
-        <main id="main">{children}</main>
+        <main
+          id="main"
+          className={`min-h-0 flex-1 [scrollbar-color:#aaa_#f3f3f3] [scrollbar-width:thin] ${pathname === "/" ? "overflow-hidden p-0" : "overflow-auto p-7"}`}
+        >
+          {children}
+        </main>
       </div>
       {dialog === "login" && <LoginDialog onClose={() => setDialog(null)} />}
       {dialog === "account" && user && (
