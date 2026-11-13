@@ -1,5 +1,5 @@
-// TEMP: 리뉴얼 스켈레톤. 실제 구현 시 교체/삭제.
 import type { Metadata } from "next";
+import SiteHeader from "../components/site-header/site-header";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -11,7 +11,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        <SiteHeader isSignedIn={false} />
+        {children}
+      </body>
     </html>
   );
 }
