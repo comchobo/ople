@@ -5,6 +5,7 @@ import {
   createContext,
   type ReactNode,
   useContext,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -38,11 +39,27 @@ export default function AppShell({
   const router = useRouter();
   const loginDialog = useRef<HTMLDialogElement>(null);
   const accountDialog = useRef<HTMLDialogElement>(null);
+  const loginButton = useRef<HTMLButtonElement>(null);
+  const restoreLoginFocus = useRef(false);
   const [previewLoggedIn, setPreviewLoggedIn] = useState<boolean | null>(null);
   const isDevelopment = process.env.NODE_ENV === "development";
   const displayedLoggedIn = isDevelopment
     ? (previewLoggedIn ?? isLoggedIn)
     : isLoggedIn;
+
+  useEffect(() => {
+    if (!displayedLoggedIn && restoreLoginFocus.current) {
+      restoreLoginFocus.current = false;
+      loginButton.current?.focus();
+    }
+  }, [displayedLoggedIn]);
+
+  function logoutPreview() {
+    accountDialog.current?.close();
+    restoreLoginFocus.current = true;
+    setPreviewLoggedIn(false);
+    router.push("/", { scroll: false });
+  }
 
   function onLogin() {
     loginDialog.current?.showModal();
@@ -83,11 +100,18 @@ export default function AppShell({
         )}
         <Header
           {...actions}
+          loginButtonRef={loginButton}
           onAccount={() => accountDialog.current?.showModal()}
         />
         {children}
         <LoginModal dialogRef={loginDialog} />
-        <AccountModal dialogRef={accountDialog} onNavigate={onNavigate} />
+        <AccountModal
+          dialogRef={accountDialog}
+          onNavigate={onNavigate}
+          onPreviewLogout={
+            isDevelopment && displayedLoggedIn ? logoutPreview : undefined
+          }
+        />
       </div>
     </StartActionsContext.Provider>
   );

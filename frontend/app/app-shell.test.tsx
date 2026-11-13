@@ -5,6 +5,7 @@ import AppShell from "../components/common/AppShell";
 import Home from "./page";
 
 const { push } = vi.hoisted(() => ({ push: vi.fn() }));
+const focusLogin = vi.fn();
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
 
 let renderer: ReactTestRenderer | undefined;
@@ -32,8 +33,14 @@ async function renderShell(isLoggedIn: boolean) {
       </AppShell>,
       {
         createNodeMock: (element) => {
+          const props = element.props as {
+            children?: unknown;
+            "aria-labelledby"?: string;
+          };
+          if (element.type === "button" && props.children === "로그인") {
+            return { focus: focusLogin };
+          }
           if (element.type !== "dialog") return null;
-          const props = element.props as { "aria-labelledby"?: string };
           return props["aria-labelledby"] === "login-title"
             ? loginDialog
             : accountDialog;
@@ -54,6 +61,20 @@ it("opens login from the logged-out header and keeps the introduction link", asy
   expect(loginDialog.showModal).toHaveBeenCalledTimes(1);
   expect(root.findByType("a").props.href).toBe("/");
   expect(push).not.toHaveBeenCalled();
+});
+
+it("logs out of the development preview and focuses the login entry", async () => {
+  vi.stubEnv("NODE_ENV", "development");
+  const root = await renderShell(true);
+  const logout = root
+    .findAllByType("button")
+    .find((button) => button.children.join("") === "로그아웃");
+  expect(logout).toBeDefined();
+  await act(async () => logout?.props.onClick());
+  expect(accountDialog.close).toHaveBeenCalledOnce();
+  expect(push).toHaveBeenCalledExactlyOnceWith("/", { scroll: false });
+  expect(root.findAllByProps({ "aria-label": "계정" })).toHaveLength(0);
+  expect(focusLogin).toHaveBeenCalledOnce();
 });
 
 it("previews both login states and updates both start buttons in development", async () => {

@@ -13,6 +13,7 @@ export default function LoginModal({
       <button type="button" className="primary wide" disabled>
         Google로 계속하기
       </button>
+      <p className="space muted">Google 로그인은 연결 준비 중입니다.</p>
     </Modal>
   );
 }

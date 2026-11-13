@@ -2,9 +2,11 @@
 
 import { UserRound } from "lucide-react";
 import Link from "next/link";
+import type { Ref } from "react";
 
 type HeaderProps = {
   isLoggedIn: boolean;
+  loginButtonRef?: Ref<HTMLButtonElement>;
   onLogin?: () => void;
   onAccount?: () => void;
   onNavigate?: (page: "planners") => void;
@@ -12,6 +14,7 @@ type HeaderProps = {
 
 export default function Header({
   isLoggedIn,
+  loginButtonRef,
   onLogin,
   onAccount,
   onNavigate,
@@ -26,7 +29,10 @@ export default function Header({
         Ople
       </Link>
 
-      <nav className="flex items-center gap-1 text-[13px]" aria-label="공통 메뉴">
+      <nav
+        className="flex items-center gap-1 text-[13px]"
+        aria-label="공통 메뉴"
+      >
         {isLoggedIn ? (
           <>
             <button
@@ -46,7 +52,12 @@ export default function Header({
             </button>
           </>
         ) : (
-          <button type="button" className="text-button" onClick={onLogin}>
+          <button
+            ref={loginButtonRef}
+            type="button"
+            className="text-button"
+            onClick={onLogin}
+          >
             로그인
           </button>
         )}
