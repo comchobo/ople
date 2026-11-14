@@ -8,14 +8,6 @@ export default defineConfig({
   use: { baseURL: "http://127.0.0.1:3000", trace: "retain-on-failure" },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },
-    {
-      name: "tablet",
-      use: {
-        ...devices["Desktop Chrome"],
-        viewport: { width: 1194, height: 834 },
-        hasTouch: true,
-      },
-    },
     { name: "mobile", use: { ...devices["Pixel 7"] } },
   ],
   webServer: {
