@@ -11,8 +11,7 @@ import {
 import { AccountDialog, LoginDialog } from "./auth-dialogs";
 import type { AuthAdapter } from "./auth-types";
 import { SiteHeader } from "./site-header";
-
-const anonymousAuth: AuthAdapter = { user: null };
+import { restoreTemporaryUser, temporaryAuth } from "./temporary-auth";
 
 const ShellContext = createContext<{ start: () => void } | null>(null);
 
@@ -24,21 +23,24 @@ export function useAppShell() {
 
 export function AppShell({
   children,
-  auth = anonymousAuth,
+  auth = temporaryAuth,
 }: {
   children: ReactNode;
   auth?: AuthAdapter;
 }) {
+  const temporary = auth === temporaryAuth;
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useState(auth.user);
   const [dialog, setDialog] = useState<"login" | "account" | null>(null);
+  const [loginError, setLoginError] = useState(false);
+  const [loggingIn, setLoggingIn] = useState(false);
   const [logoutError, setLogoutError] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
-    setUser(auth.user);
-  }, [auth.user]);
+    setUser(temporary ? restoreTemporaryUser() : auth.user);
+  }, [auth.user, temporary]);
   useEffect(() => {
     if (!pathname) return;
     document
@@ -51,9 +53,28 @@ export function AppShell({
     router.push("/planners");
   }
 
+  function openLogin() {
+    setLoginError(false);
+    setDialog("login");
+  }
+
+  async function login() {
+    if (!auth.login || loggingIn) return;
+    setLoggingIn(true);
+    setLoginError(false);
+    try {
+      setUser(await auth.login());
+      goToPlanners();
+    } catch {
+      setLoginError(true);
+    } finally {
+      setLoggingIn(false);
+    }
+  }
+
   function start() {
     if (user) goToPlanners();
-    else setDialog("login");
+    else openLogin();
   }
 
   async function logout() {
@@ -77,7 +98,7 @@ export function AppShell({
       <div className="app-frame m-auto flex h-[min(100dvh,834px)] w-[min(100%,1194px)] flex-col overflow-hidden border border-[#d4d4d4] bg-white">
         <SiteHeader
           user={user}
-          onLogin={() => setDialog("login")}
+          onLogin={openLogin}
           onAccount={() => {
             setLogoutError(false);
             setDialog("account");
@@ -90,7 +111,15 @@ export function AppShell({
           {children}
         </main>
       </div>
-      {dialog === "login" && <LoginDialog onClose={() => setDialog(null)} />}
+      {dialog === "login" && (
+        <LoginDialog
+          onClose={() => setDialog(null)}
+          onLogin={auth.login ? login : undefined}
+          loggingIn={loggingIn}
+          loginError={loginError}
+          temporary={temporary}
+        />
+      )}
       {dialog === "account" && user && (
         <AccountDialog
           user={user}

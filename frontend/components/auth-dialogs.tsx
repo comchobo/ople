@@ -2,15 +2,41 @@ import type { AuthUser } from "./auth-types";
 import { Modal } from "./modal";
 import { buttonClass, primaryButtonClass } from "./ui-styles";
 
-export function LoginDialog({ onClose }: { onClose: () => void }) {
+export function LoginDialog({
+  onClose,
+  onLogin,
+  loggingIn,
+  loginError,
+  temporary,
+}: {
+  onClose: () => void;
+  onLogin?: () => Promise<void>;
+  loggingIn: boolean;
+  loginError: boolean;
+  temporary: boolean;
+}) {
   return (
     <Modal title="로그인" onClose={onClose}>
       <p className="mb-5 text-[14px] text-[#555]">
-        로그인 기능 준비 중입니다. Google 로그인은 추후 제공됩니다.
+        {temporary
+          ? "현재는 임시 로그인으로 김민수 데모 계정을 사용합니다. 실제 Google 계정 인증은 진행하지 않습니다."
+          : onLogin
+            ? "Google 계정으로 로그인해주세요."
+            : "로그인 기능 준비 중입니다. Google 로그인은 추후 제공됩니다."}
       </p>
-      <button type="button" className={`${primaryButtonClass} w-full`} disabled>
-        Google로 계속하기
+      <button
+        type="button"
+        className={`${primaryButtonClass} w-full`}
+        onClick={onLogin}
+        disabled={!onLogin || loggingIn}
+      >
+        {loggingIn ? "로그인 중…" : "Google로 계속하기"}
       </button>
+      {loginError && (
+        <p className="mt-4 text-[14px] text-[#555]" role="alert">
+          로그인하지 못했습니다. 다시 시도해주세요.
+        </p>
+      )}
     </Modal>
   );
 }

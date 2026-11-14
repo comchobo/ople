@@ -5,5 +5,6 @@ export interface AuthUser {
 
 export interface AuthAdapter {
   user: AuthUser | null;
+  login?: () => Promise<AuthUser>;
   logout?: () => Promise<void>;
 }
