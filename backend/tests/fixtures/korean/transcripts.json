@@ -1,0 +1,49 @@
+{
+  "dataset": "google/fleurs",
+  "revision": "70bb2e84b976b7e960aa89f1c648e09c59f894dd",
+  "config": "ko_kr",
+  "split": "test",
+  "license": "CC-BY-4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "license_legalcode": "https://creativecommons.org/licenses/by/4.0/legalcode",
+  "dataset_url": "https://huggingface.co/datasets/google/fleurs",
+  "paper_url": "https://arxiv.org/abs/2205.12446",
+  "attribution": "Google FLEURS: Few-shot Learning Evaluation of Universal Representations of Speech (Conneau, Ma, Khanuja, Zhang, Axelrod, Dalmia, Riesa, Rivera and Bapna, 2022)",
+  "redistribution_note": "WAVs are byte-for-byte downloads from the public dataset viewer, renamed locally; no audio editing. Reference text is copied from the source raw_transcription and transcription fields without modification. Retain this attribution and license notice when redistributing; no endorsement implied.",
+  "metadata_url": "https://datasets-server.huggingface.co/rows?dataset=google%2Ffleurs&config=ko_kr&split=test&offset=0&length=2",
+  "revision_metadata_url": "https://huggingface.co/api/datasets/google/fleurs/revision/70bb2e84b976b7e960aa89f1c648e09c59f894dd",
+  "samples": [
+    {
+      "file": "fleurs_ko_kr_test_1883.wav",
+      "row_idx": 0,
+      "source_id": 1883,
+      "source_filename": "10015989594226850325.wav",
+      "audio_url": "https://datasets-server.huggingface.co/cached-assets/google/fleurs/--/70bb2e84b976b7e960aa89f1c648e09c59f894dd/--/ko_kr/test/0/audio/audio.wav",
+      "reference": "다리 밑 수직 간격은 15미터이며, 공사는 2011년 8월에 마무리되었으며, 해당 다리의 통행금지는 2017년 3월까지이다.",
+      "transcription": "다리 밑 수직 간격은 15미터이며 공사는 2011년 8월에 마무리되었으며 해당 다리의 통행금지는 2017년 3월까지이다",
+      "num_samples": 199680,
+      "sample_rate_hz": 16000,
+      "channels": 1,
+      "encoding": "IEEE float32 (WAVE format 3)",
+      "duration_seconds": 12.48,
+      "bytes": 798778,
+      "sha256": "e6bc095e55046de927d7c937f036f96ebb506570648ad9ae7c6576febfc4746a"
+    },
+    {
+      "file": "fleurs_ko_kr_test_1929.wav",
+      "row_idx": 1,
+      "source_id": 1929,
+      "source_filename": "1007237877117014760.wav",
+      "audio_url": "https://datasets-server.huggingface.co/cached-assets/google/fleurs/--/70bb2e84b976b7e960aa89f1c648e09c59f894dd/--/ko_kr/test/1/audio/audio.wav",
+      "reference": "델 포트로가 2세트에서 먼저 어드밴티지를 얻었지만 6 대 6이 된 후 다시 타이 브레이크가 필요했다.",
+      "transcription": "델 포트로가 2세트에서 먼저 어드밴티지를 얻었지만 6 대 6이 된 후 다시 타이 브레이크가 필요했다",
+      "num_samples": 172800,
+      "sample_rate_hz": 16000,
+      "channels": 1,
+      "encoding": "IEEE float32 (WAVE format 3)",
+      "duration_seconds": 10.8,
+      "bytes": 691258,
+      "sha256": "a5a400dda19a17f0ceb0c4a2542387ae376e3f0518ba0f9769564402df55affd"
+    }
+  ]
+}

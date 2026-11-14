@@ -21,6 +21,9 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-ople}:${POSTGRES_PASSWORD:-ople}@db:5432/${POSTGRES_DB:-ople}
     ports:
@@ -28,6 +31,7 @@ services:
     volumes:
       - ./backend:/app
       - /app/.venv
+      - ople-audio-data:/data/audio
     depends_on:
       db:
         condition: service_healthy
@@ -52,5 +56,6 @@ services:
     ipc: host
 
 volumes:
+  ople-audio-data:
   ople-db-data:
     name: ople-db-data

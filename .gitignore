@@ -232,3 +232,7 @@ playwright-report/
 # macOS
 .DS_Store
 .localized
+
+# Local Compose resource isolation
+/tmp/compose.worktree.yaml
+/tmp/ui-comparison/

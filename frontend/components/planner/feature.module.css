@@ -1,0 +1,316 @@
+.surface {
+  color: #222;
+  background: #fff;
+  min-height: 100dvh;
+  padding: clamp(20px, 4vw, 48px);
+  font:
+    15px / 1.65 -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.surface * {
+  box-sizing: border-box;
+}
+.surface ::selection {
+  color: white;
+  background: #222;
+}
+.surface :focus-visible {
+  outline: 2px solid #222;
+  outline-offset: 4px;
+}
+.surface h1 {
+  font-size: clamp(25px, 3vw, 34px);
+  line-height: 1.35;
+  font-weight: 650;
+  margin: 0 0 12px;
+  text-wrap: balance;
+}
+.surface h2 {
+  font-size: 21px;
+  font-weight: 650;
+  margin: 0 0 12px;
+}
+.surface h3 {
+  font-size: 16px;
+  font-weight: 650;
+}
+.surface p {
+  max-width: 72ch;
+  margin: 0 0 16px;
+  white-space: pre-wrap;
+}
+.surface a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.surface button,
+.surface input,
+.surface textarea,
+.surface select {
+  font: inherit;
+  color: inherit;
+}
+.surface button {
+  min-height: 44px;
+  padding: 9px 15px;
+  border: 1px solid #bdbdbd;
+  border-radius: 3px;
+  background: white;
+  cursor: pointer;
+}
+.surface button:hover {
+  background: #f1f1f1;
+}
+.surface button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.surface button.primary {
+  background: #222;
+  color: white;
+  border-color: #222;
+}
+.surface input,
+.surface textarea,
+.surface select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #aaa;
+  background: white;
+  border-radius: 3px;
+  caret-color: #222;
+}
+.surface input[type="range"] {
+  accent-color: #222;
+  padding: 0;
+}
+.surface label {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 18px;
+}
+.surface textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+.editor fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.content {
+  max-width: 1194px;
+  margin: auto;
+}
+.heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 28px;
+}
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.muted {
+  color: #606060;
+}
+.notice {
+  background: #f3f3f3;
+  border: 1px solid #ccc;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.error {
+  border: 1px solid #9d3030;
+  background: #fff6f5;
+  color: #812b25;
+  padding: 16px;
+  margin: 16px 0;
+}
+.list {
+  list-style: none;
+  padding: 0;
+  border-top: 1px solid #ccc;
+}
+.list > li {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 0;
+  border-bottom: 1px solid #ddd;
+}
+.empty {
+  padding: 60px 0;
+  text-align: center;
+}
+.empty p {
+  margin-inline: auto;
+}
+.editor {
+  border: 1px solid #ccc;
+  padding: 24px;
+  margin: 20px 0;
+  max-width: 680px;
+  background: #fafafa;
+}
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid #222;
+  margin-bottom: 28px;
+}
+.tabs button {
+  border: 0;
+  border-radius: 0;
+}
+.tabs [aria-selected="true"] {
+  box-shadow: inset 0 -3px #222;
+  font-weight: 700;
+}
+.board {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
+  gap: 32px;
+}
+.timeline {
+  overflow: auto;
+  scrollbar-color: #999 #f3f3f3;
+  border: 1px solid #bbb;
+  margin: 18px 0;
+}
+.track {
+  min-width: 840px;
+}
+.years {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  background: #f4f4f4;
+}
+.years span {
+  padding: 12px;
+  border-right: 1px solid #ddd;
+  font-variant-numeric: tabular-nums;
+}
+.lane {
+  height: 64px;
+  position: relative;
+  border-top: 1px solid #ddd;
+  background: repeating-linear-gradient(
+    to right,
+    transparent 0,
+    transparent calc(1.66667% - 1px),
+    #eee calc(1.66667% - 1px),
+    #eee 1.66667%
+  );
+}
+.piece {
+  position: absolute;
+  top: 8px;
+  height: 48px;
+  display: flex;
+  min-width: 14px;
+  background: #ededed;
+  border: 1px solid #888;
+  border-radius: 3px;
+}
+.piece[data-category="창작"] {
+  background: #e9e2f1;
+}
+.piece[data-category="관계"] {
+  background: #e1ece5;
+}
+.piece[data-category="휴식"] {
+  background: #e2eaf1;
+}
+.piece[data-selected="true"] {
+  outline: 2px solid #222;
+  z-index: 2;
+}
+.piece button {
+  border: 0;
+  background: transparent;
+  min-width: 0;
+  padding: 3px 6px;
+  border-radius: 0;
+}
+.piece .pieceBody {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+  font-size: 12px;
+  touch-action: pan-x pan-y;
+}
+.piece[data-selected="true"] .pieceBody {
+  touch-action: none;
+  cursor: grab;
+}
+.piece .handle {
+  padding: 0;
+  width: 18px;
+  flex-shrink: 0;
+  touch-action: none;
+  background: #fff;
+  border: 1px solid #555;
+}
+.ratings {
+  padding: 20px 0;
+  border-top: 1px solid #ccc;
+}
+.ratings dl {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+}
+.ratings dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.interview {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+  gap: 40px;
+  margin-top: 40px;
+}
+.record {
+  border: 1px solid #ccc;
+  padding: 24px;
+}
+.timer {
+  font-size: 40px;
+  font-variant-numeric: tabular-nums;
+  margin: 20px 0;
+}
+.surface progress {
+  accent-color: #222;
+  width: 100%;
+  height: 8px;
+}
+@media (max-width: 850px) {
+  .board,
+  .interview {
+    grid-template-columns: 1fr;
+  }
+  .heading,
+  .list > li {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .surface button {
+    transition: background-color 140ms ease-out;
+  }
+}
