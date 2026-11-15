@@ -1,8 +1,13 @@
-// TEMP: 리뉴얼 스켈레톤 스모크 테스트. 실제 테스트 작성 시 교체/삭제.
 import { expect, test } from "@playwright/test";
 
-test("loads the placeholder home page", async ({ page }) => {
+test("loads the product introduction", async ({ page }) => {
+  await page.route("**/api/auth/me", (route) => route.fulfill({ status: 401 }));
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: "Ople" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: "앞으로 5년, 세 가지 계획으로 살펴보기",
+    }),
+  ).toBeVisible();
 });
