@@ -92,7 +92,7 @@ export default function Modal({
           </h2>
           <button
             type="button"
-            className="min-h-11 rounded-md border border-neutral-300 px-3 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2"
+            className="min-h-11 rounded-md border border-neutral-300 px-3 text-sm font-semibold focus-visible:border-neutral-800 focus-visible:bg-neutral-800 focus-visible:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-800"
             onClick={onDismiss}
           >
             닫기
