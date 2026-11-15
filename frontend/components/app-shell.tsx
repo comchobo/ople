@@ -106,7 +106,7 @@ export function AppShell({
         />
         <main
           id="main"
-          className={`min-h-0 flex-1 [scrollbar-color:#aaa_#f3f3f3] [scrollbar-width:thin] ${pathname === "/" ? "overflow-hidden p-0" : "overflow-auto p-7"}`}
+          className={`min-h-0 flex-1 [scrollbar-color:#aaa_#f3f3f3] [scrollbar-width:thin] ${pathname === "/" ? "overflow-hidden p-0" : pathname === "/planners" ? "overflow-hidden p-7" : "overflow-auto p-7"}`}
         >
           {children}
         </main>
