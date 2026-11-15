@@ -22,8 +22,17 @@ for (const name of ["시작하기", "하단에서 시작하기"]) {
     await page.goto("/");
     await page.getByRole("button", { name, exact: true }).click();
     await expect(page).toHaveURL(/\/planners$/);
+    await expect(page.getByRole("heading", { name: "내 플래너" })).toBeVisible();
+    await expect(page.getByText("로그인한 뒤 내 플래너를 확인해 주세요.", { exact: false })).toHaveCount(0);
   });
 }
+
+test("shows the login notice on my planners for guests", async ({ page }) => {
+  await page.route("**/api/auth/me", (route) => route.fulfill({ status: 401 }));
+  await page.goto("/planners");
+
+  await expect(page.getByText("로그인한 뒤 내 플래너를 확인해 주세요.", { exact: false })).toBeVisible();
+});
 
 test("shows the account and restores the guest header after logout", async ({ page }) => {
   await page.route("**/api/auth/me", (route) =>
