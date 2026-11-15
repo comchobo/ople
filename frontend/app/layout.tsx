@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import SiteHeader from "../components/site-header/site-header";
+import { SiteSessionProvider } from "../components/site-header/site-session";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,8 +13,10 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        <SiteHeader />
-        {children}
+        <SiteSessionProvider>
+          <SiteHeader />
+          {children}
+        </SiteSessionProvider>
       </body>
     </html>
   );

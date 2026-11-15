@@ -2,15 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import {
-  logoutPreviewAccount,
-  readPreviewAccount,
-} from "../account-preview/preview-account";
+import { logoutPreviewAccount } from "../account-preview/preview-account";
 import Modal from "../modal/modal";
+import { useSiteSession } from "./site-session";
 
 export default function SiteHeader() {
-  const [account, setAccount] =
-    useState<Awaited<ReturnType<typeof readPreviewAccount>>>(null);
+  const { account, clearAccount, openLogin } = useSiteSession();
   const [accountOpener, setAccountOpener] = useState<HTMLButtonElement | null>(
     null,
   );
@@ -18,24 +15,6 @@ export default function SiteHeader() {
   const [logoutError, setLogoutError] = useState("");
   const loginButton = useRef<HTMLButtonElement>(null);
   const focusLogin = useRef(false);
-  const [loginOpener, setLoginOpener] = useState<HTMLButtonElement | null>(
-    null,
-  );
-
-  useEffect(() => {
-    const controller = new AbortController();
-    readPreviewAccount(controller.signal)
-      .then((value) => {
-        if (!controller.signal.aborted) {
-          if (value) setLoginOpener(null);
-          setAccount(value);
-        }
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) setAccount(null);
-      });
-    return () => controller.abort();
-  }, []);
 
   useEffect(() => {
     if (!account && focusLogin.current) {
@@ -52,7 +31,7 @@ export default function SiteHeader() {
       await logoutPreviewAccount(account.csrf_token);
       focusLogin.current = true;
       setAccountOpener(null);
-      setAccount(null);
+      clearAccount();
     } catch {
       setLogoutError("로그아웃하지 못했습니다. 다시 시도해 주세요.");
     } finally {
@@ -95,7 +74,7 @@ export default function SiteHeader() {
               type="button"
               aria-haspopup="dialog"
               className="min-h-11 cursor-pointer rounded-[3px] border border-transparent p-2 text-[13px] leading-[1.4] underline underline-offset-4 hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#222]"
-              onClick={(event) => setLoginOpener(event.currentTarget)}
+              onClick={(event) => openLogin(event.currentTarget)}
             >
               로그인
             </button>
@@ -134,20 +113,6 @@ export default function SiteHeader() {
               {loggingOut ? "로그아웃 중…" : "로그아웃"}
             </button>
           </div>
-        </Modal>
-      )}
-      {loginOpener && (
-        <Modal
-          title="로그인"
-          opener={loginOpener}
-          onDismiss={() => setLoginOpener(null)}
-        >
-          <a
-            href="/api/auth/login"
-            className="inline-flex min-h-11 w-full items-center justify-center rounded-[3px] border border-[#222] bg-[#222] px-3.5 py-[9px] text-center text-[15px] leading-[1.4] text-white hover:border-[#999] hover:bg-[#444] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#222]"
-          >
-            Google로 계속하기
-          </a>
         </Modal>
       )}
     </header>

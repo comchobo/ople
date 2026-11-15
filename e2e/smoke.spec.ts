@@ -1,5 +1,30 @@
 import { expect, test } from "@playwright/test";
 
+for (const name of ["시작하기", "하단에서 시작하기"]) {
+  test(`opens the login modal from ${name} for guests`, async ({ page }) => {
+    await page.route("**/api/auth/me", (route) => route.fulfill({ status: 401 }));
+    await page.goto("/");
+
+    const start = page.getByRole("button", { name, exact: true });
+    await start.click();
+    const dialog = page.getByRole("dialog", { name: "로그인" });
+    await expect(dialog.getByRole("link", { name: "Google로 계속하기" })).toBeVisible();
+    await dialog.getByRole("button", { name: "닫기" }).click();
+    await expect(start).toBeFocused();
+  });
+
+  test(`opens my planners from ${name} for signed-in users`, async ({ page }) => {
+    await page.route("**/api/auth/me", (route) =>
+      route.fulfill({
+        json: { id: "account-1", name: "김민수", email: "minsu@example.com", csrf_token: "test-token" },
+      }),
+    );
+    await page.goto("/");
+    await page.getByRole("button", { name, exact: true }).click();
+    await expect(page).toHaveURL(/\/planners$/);
+  });
+}
+
 test("shows the account and restores the guest header after logout", async ({ page }) => {
   await page.route("**/api/auth/me", (route) =>
     route.fulfill({
