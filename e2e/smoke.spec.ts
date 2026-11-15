@@ -14,13 +14,16 @@ test("keeps focus in the login modal and restores it on dismissal", async ({ pag
   const trigger = page.getByRole("button", { name: "로그인", exact: true });
   const dialog = page.getByRole("dialog", { name: "로그인" });
   const close = dialog.getByRole("button", { name: "닫기" });
+  const googleLogin = dialog.getByRole("link", { name: "Google로 계속하기" });
 
   await trigger.click();
   await expect(close).toBeFocused();
   await page.keyboard.press("Tab");
+  await expect(googleLogin).toBeFocused();
+  await page.keyboard.press("Tab");
   await expect(close).toBeFocused();
   await page.keyboard.press("Shift+Tab");
-  await expect(close).toBeFocused();
+  await expect(googleLogin).toBeFocused();
 
   await close.click();
   await expect(dialog).toBeHidden();

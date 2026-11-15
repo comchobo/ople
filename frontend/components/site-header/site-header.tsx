@@ -1,16 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { readPreviewAccount } from "../account-preview/preview-account";
 import Modal from "../modal/modal";
 
-const pendingAction =
-  "min-h-11 rounded-md px-3 text-sm font-semibold disabled:cursor-not-allowed disabled:text-neutral-500";
-
 export default function SiteHeader({ isSignedIn }: { isSignedIn: boolean }) {
+  const [hasSession, setHasSession] = useState(isSignedIn);
   const [loginOpener, setLoginOpener] = useState<HTMLButtonElement | null>(
     null,
   );
+
+  useEffect(() => {
+    const controller = new AbortController();
+    readPreviewAccount(controller.signal)
+      .then((account) => {
+        if (!controller.signal.aborted) setHasSession(account !== null);
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setHasSession(false);
+      });
+    return () => controller.abort();
+  }, []);
 
   return (
     <header className="border-b border-neutral-300">
@@ -24,7 +35,7 @@ export default function SiteHeader({ isSignedIn }: { isSignedIn: boolean }) {
         </Link>
 
         <nav aria-label="공통 탐색" className="flex items-center gap-2">
-          {isSignedIn ? (
+          {hasSession ? (
             <>
               <Link
                 href="/planners"
@@ -32,9 +43,12 @@ export default function SiteHeader({ isSignedIn }: { isSignedIn: boolean }) {
               >
                 내 플래너
               </Link>
-              <button type="button" className={pendingAction} disabled>
+              <Link
+                href="/tmp/preview/implementation"
+                className="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-semibold focus-visible:outline-2"
+              >
                 내 계정
-              </button>
+              </Link>
             </>
           ) : (
             <button
@@ -54,13 +68,12 @@ export default function SiteHeader({ isSignedIn }: { isSignedIn: boolean }) {
           opener={loginOpener}
           onDismiss={() => setLoginOpener(null)}
         >
-          <button
-            type="button"
+          <a
+            href="/api/auth/login"
             className="inline-flex min-h-11 w-full items-center justify-center rounded-[3px] border border-[#222] bg-[#222] px-3.5 py-[9px] text-center text-[15px] leading-[1.4] text-white hover:border-[#999] hover:bg-[#444] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#222]"
-            disabled
           >
             Google로 계속하기
-          </button>
+          </a>
         </Modal>
       )}
     </header>

@@ -16,6 +16,8 @@ it("shows planner and account actions for signed-in users", () => {
   const html = renderToStaticMarkup(<SiteHeader isSignedIn />);
 
   expect(html).toMatch(/<a[^>]*href="\/planners"[^>]*>내 플래너<\/a>/);
-  expect(html).toContain(">내 계정</button>");
+  expect(html).toMatch(
+    /<a[^>]*href="\/tmp\/preview\/implementation"[^>]*>내 계정<\/a>/,
+  );
   expect(html).not.toContain("로그인");
 });
