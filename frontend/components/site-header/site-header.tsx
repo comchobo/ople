@@ -26,9 +26,12 @@ export default function SiteHeader({ isSignedIn }: { isSignedIn: boolean }) {
         <nav aria-label="공통 탐색" className="flex items-center gap-2">
           {isSignedIn ? (
             <>
-              <button type="button" className={pendingAction} disabled>
+              <Link
+                href="/planners"
+                className="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-semibold focus-visible:outline-2"
+              >
                 내 플래너
-              </button>
+              </Link>
               <button type="button" className={pendingAction} disabled>
                 내 계정
               </button>
