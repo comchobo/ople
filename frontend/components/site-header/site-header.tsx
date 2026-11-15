@@ -6,6 +6,9 @@ import { logoutPreviewAccount } from "../account-preview/preview-account";
 import Modal from "../modal/modal";
 import { useSiteSession } from "./site-session";
 
+const navigationActionClass =
+  "inline-flex min-h-11 cursor-pointer items-center rounded-[3px] border border-transparent p-2 text-[13px] leading-[1.4] underline underline-offset-4 hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#222]";
+
 export default function SiteHeader() {
   const { account, clearAccount, openLogin } = useSiteSession();
   const [accountOpener, setAccountOpener] = useState<HTMLButtonElement | null>(
@@ -53,16 +56,13 @@ export default function SiteHeader() {
         <nav aria-label="공통 탐색" className="flex items-center gap-2">
           {account ? (
             <>
-              <Link
-                href="/planners"
-                className="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-semibold focus-visible:outline-2"
-              >
+              <Link href="/planners" className={navigationActionClass}>
                 내 플래너
               </Link>
               <button
                 type="button"
                 aria-haspopup="dialog"
-                className="min-h-11 rounded-md px-3 text-sm font-semibold focus-visible:outline-2"
+                className={navigationActionClass}
                 onClick={(event) => setAccountOpener(event.currentTarget)}
               >
                 내 계정
@@ -73,7 +73,7 @@ export default function SiteHeader() {
               ref={loginButton}
               type="button"
               aria-haspopup="dialog"
-              className="min-h-11 cursor-pointer rounded-[3px] border border-transparent p-2 text-[13px] leading-[1.4] underline underline-offset-4 hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#222]"
+              className={navigationActionClass}
               onClick={(event) => openLogin(event.currentTarget)}
             >
               로그인
