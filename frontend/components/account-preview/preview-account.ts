@@ -15,3 +15,15 @@ export async function readPreviewAccount(signal?: AbortSignal) {
     csrf_token: string;
   };
 }
+
+export async function logoutPreviewAccount(csrfToken: string) {
+  const response = await fetch("/api/auth/logout", {
+    method: "POST",
+    headers: { "X-CSRF-Token": csrfToken },
+    credentials: "same-origin",
+  });
+
+  if (!response.ok && response.status !== 401) {
+    throw new Error("로그아웃하지 못했습니다. 다시 시도해 주세요.");
+  }
+}

@@ -1,5 +1,31 @@
 import { expect, test } from "@playwright/test";
 
+test("shows the account and restores the guest header after logout", async ({ page }) => {
+  await page.route("**/api/auth/me", (route) =>
+    route.fulfill({
+      json: { id: "account-1", name: "김민수", email: "minsu@example.com", csrf_token: "test-token" },
+    }),
+  );
+  await page.route("**/api/auth/logout", async (route) => {
+    expect(route.request().method()).toBe("POST");
+    expect(route.request().headers()["x-csrf-token"]).toBe("test-token");
+    await route.fulfill({ status: 204 });
+  });
+
+  await page.goto("/");
+  await page.getByRole("button", { name: "내 계정" }).click();
+  const dialog = page.getByRole("dialog", { name: "내 계정" });
+  await expect(dialog.getByText("김민수")).toBeVisible();
+  await expect(dialog.getByText("minsu@example.com")).toBeVisible();
+  await expect(dialog.getByRole("link", { name: "내 플래너 보기" })).toHaveAttribute("href", "/planners");
+
+  await dialog.getByRole("button", { name: "로그아웃" }).click();
+  await expect(dialog).toBeHidden();
+  const login = page.getByRole("button", { name: "로그인", exact: true });
+  await expect(login).toBeFocused();
+  await expect(page.getByRole("button", { name: "내 계정" })).toHaveCount(0);
+});
+
 test("loads the product introduction", async ({ page }) => {
   await page.goto("/");
 

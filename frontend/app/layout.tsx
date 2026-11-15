@@ -12,7 +12,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        <SiteHeader isSignedIn={false} />
+        <SiteHeader />
         {children}
       </body>
     </html>

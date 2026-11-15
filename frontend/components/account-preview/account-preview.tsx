@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { readPreviewAccount } from "./preview-account";
+import { logoutPreviewAccount, readPreviewAccount } from "./preview-account";
 
 export default function AccountPreview() {
   const [account, setAccount] =
@@ -42,12 +42,7 @@ export default function AccountPreview() {
     setLoading(true);
     setError("");
     try {
-      const response = await fetch("/api/auth/logout", {
-        method: "POST",
-        headers: { "X-CSRF-Token": account.csrf_token },
-        credentials: "same-origin",
-      });
-      if (!response.ok && response.status !== 401) throw new Error();
+      await logoutPreviewAccount(account.csrf_token);
       window.location.replace("/tmp/preview/implementation");
     } catch {
       setError("로그아웃하지 못했습니다. 다시 시도해 주세요.");
