@@ -40,7 +40,7 @@ export default function SiteHeader({ isSignedIn }: { isSignedIn: boolean }) {
             <button
               type="button"
               aria-haspopup="dialog"
-              className="min-h-11 rounded-md px-3 text-sm font-semibold focus-visible:outline-2"
+              className="min-h-11 cursor-pointer rounded-[3px] border border-transparent p-2 text-[13px] leading-[1.4] underline underline-offset-4 hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#222]"
               onClick={(event) => setLoginOpener(event.currentTarget)}
             >
               로그인
@@ -54,7 +54,11 @@ export default function SiteHeader({ isSignedIn }: { isSignedIn: boolean }) {
           opener={loginOpener}
           onDismiss={() => setLoginOpener(null)}
         >
-          <button type="button" className={pendingAction} disabled>
+          <button
+            type="button"
+            className="inline-flex min-h-11 w-full items-center justify-center rounded-[3px] border border-[#222] bg-[#222] px-3.5 py-[9px] text-center text-[15px] leading-[1.4] text-white hover:border-[#999] hover:bg-[#444] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#222]"
+            disabled
+          >
             Google로 계속하기
           </button>
         </Modal>
