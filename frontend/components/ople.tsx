@@ -1,7 +1,7 @@
 "use client";
 
-import { CircleUserRound } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
 import {
   api,
   flushSaves,
@@ -9,12 +9,11 @@ import {
   type Job,
   type Planner,
   savePlanner,
-  type User,
 } from "@/lib/api";
-import { Auth } from "./auth";
 import { Board } from "./board";
 import { Interview } from "./interview";
 import { Modal } from "./modal";
+import { useAppNavigation } from "./navigation";
 
 function Intro({ start }: { start: () => void }) {
   return (
@@ -127,20 +126,25 @@ function Intro({ start }: { start: () => void }) {
   );
 }
 
-export function Ople() {
-  const [user, setUser] = useState<User | null>(null),
-    [loading, setLoading] = useState(true);
-  const [view, setView] = useState<
-    "intro" | "planners" | "interview" | "board"
-  >("intro");
-  const [auth, setAuth] = useState(false),
-    [account, setAccount] = useState(false);
+type View = "intro" | "planners" | "interview" | "board";
+export function Ople({
+  view = "intro",
+  plannerId,
+}: {
+  view?: View;
+  plannerId?: string;
+}) {
+  const { user, loading: authLoading } = useAuth();
+  const move = useAppNavigation();
+  const [dataLoading, setDataLoading] = useState(
+    view === "planners" || view === "board",
+  );
   const [planners, setPlanners] = useState<Planner[]>([]),
     [jobs, setJobs] = useState<Job[]>([]);
-  const [activeId, setActiveId] = useState<string | null>(null),
-    [rename, setRename] = useState<Planner | null>(null);
+  const [rename, setRename] = useState<Planner | null>(null);
   const [error, setError] = useState("");
   const alive = useRef(true);
+  const authenticated = useRef(false);
   const accountVersion = useRef(0);
   const revision = useRef(0);
   const localEdits = useRef(new Map<string, number>());
@@ -166,26 +170,41 @@ export function Ople() {
   }, []);
   useEffect(() => {
     alive.current = true;
-    void api<User>("/auth/me")
-      .then(async (value) => {
-        if (alive.current) {
-          setUser(value);
-          setView("planners");
-          await refresh();
-        }
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (alive.current) setLoading(false);
-      });
-    if (new URLSearchParams(window.location.search).has("auth_error")) {
-      setError("Google 로그인에 실패했습니다. 다시 시도해주세요.");
-      window.history.replaceState(null, "", "/");
+    if (!authLoading && view !== "intro") {
+      if (!user) {
+        if (!authenticated.current)
+          window.dispatchEvent(new Event("ople:login"));
+        void move("/", true, true);
+      } else if (view === "planners" || view === "board") {
+        authenticated.current = true;
+        setDataLoading(true);
+        void refresh()
+          .catch((cause: Error) => {
+            if (!alive.current) return;
+            if (view === "board") void move("/planners", true, true);
+            else setError(cause.message);
+          })
+          .finally(() => {
+            if (alive.current) setDataLoading(false);
+          });
+      }
+      if (user) authenticated.current = true;
     }
     return () => {
       alive.current = false;
+      accountVersion.current += 1;
     };
-  }, [refresh]);
+  }, [authLoading, user, view, refresh, move]);
+  useEffect(() => {
+    if (
+      view === "board" &&
+      user &&
+      !dataLoading &&
+      !planners.some((item) => item.id === plannerId)
+    ) {
+      void move("/planners", true, true);
+    }
+  }, [view, user, dataLoading, planners, plannerId, move]);
   useEffect(() => {
     if (view !== "planners" || !jobs.some((job) => job.status === "running"))
       return;
@@ -194,35 +213,14 @@ export function Ople() {
     }, 3000);
     return () => clearInterval(timer);
   }, [jobs, view, refresh]);
-  function navigate(next: typeof view) {
-    if (
-      view === "interview" &&
-      !window.confirm("인터뷰를 나가면 이어할 수 없습니다. 나갈까요?")
-    )
-      return;
-    setView(next);
-    setError("");
-    if (next === "planners")
-      void refresh().catch((cause) => setError(cause.message));
-  }
-  async function logout() {
-    if (
-      view === "interview" &&
-      !window.confirm("인터뷰를 종료하고 로그아웃할까요?")
-    )
-      return;
-    try {
-      await flushSaves();
-      await api("/auth/logout", {});
-      accountVersion.current += 1;
-      setUser(null);
-      setPlanners([]);
-      setJobs([]);
-      setAccount(false);
-      setView("intro");
-    } catch (cause) {
-      setError((cause as Error).message);
-    }
+  function navigate(next: View) {
+    void move(
+      next === "intro"
+        ? "/"
+        : next === "interview"
+          ? "/planners/new"
+          : "/planners",
+    );
   }
   function changed(value: Planner) {
     localEdits.current.set(value.id, ++revision.current);
@@ -232,57 +230,21 @@ export function Ople() {
     void savePlanner(value);
   }
   async function generated(job: Job) {
-    const accountAtStart = accountVersion.current;
-    await refresh();
-    if (accountAtStart !== accountVersion.current) return;
     if (job.status === "completed" && job.planner_id) {
-      setActiveId(job.planner_id);
-      setView("board");
+      await move(
+        `/planners/${encodeURIComponent(job.planner_id)}`,
+        false,
+        true,
+      );
     } else {
-      setView("planners");
-      if (job.error) setError(job.error);
+      if (view === "planners") await refresh();
+      else await move("/planners", false, true);
     }
   }
-  const active = planners.find((item) => item.id === activeId);
+  const active = planners.find((item) => item.id === plannerId);
+  const loading = authLoading || (view !== "intro" && (!user || dataLoading));
   return (
-    <div id="app" className={view}>
-      <header className="site-header">
-        <a
-          href="/"
-          className="brand"
-          onClick={(event) => {
-            event.preventDefault();
-            navigate("intro");
-          }}
-        >
-          Ople
-        </a>
-        <nav className="header-links" aria-label="계정 메뉴">
-          {user ? (
-            <>
-              <button
-                type="button"
-                className="text-button"
-                onClick={() => navigate("planners")}
-              >
-                내 플래너
-              </button>
-              <button
-                type="button"
-                className="icon-button"
-                aria-label="계정"
-                onClick={() => setAccount(true)}
-              >
-                <CircleUserRound />
-              </button>
-            </>
-          ) : (
-            <button type="button" onClick={() => setAuth(true)}>
-              로그인
-            </button>
-          )}
-        </nav>
-      </header>
+    <>
       <main>
         {loading ? (
           <p>불러오는 중…</p>
@@ -295,7 +257,11 @@ export function Ople() {
             )}
             {view === "intro" && (
               <Intro
-                start={() => (user ? navigate("planners") : setAuth(true))}
+                start={() =>
+                  user
+                    ? navigate("planners")
+                    : window.dispatchEvent(new Event("ople:login"))
+                }
               />
             )}
             {view === "planners" && (
@@ -327,6 +293,7 @@ export function Ople() {
                         <button
                           type="button"
                           onClick={async () => {
+                            const accountAtStart = accountVersion.current;
                             setJobs((previous) =>
                               previous.map((item) =>
                                 item.id === job.id
@@ -335,13 +302,22 @@ export function Ople() {
                               ),
                             );
                             try {
-                              await generated(
-                                await api<Job>(
-                                  `/generations/${job.id}/run`,
-                                  {},
-                                ),
+                              const result = await api<Job>(
+                                `/generations/${job.id}/run`,
+                                {},
                               );
+                              if (
+                                !alive.current ||
+                                accountAtStart !== accountVersion.current
+                              )
+                                return;
+                              await generated(result);
                             } catch (cause) {
+                              if (
+                                !alive.current ||
+                                accountAtStart !== accountVersion.current
+                              )
+                                return;
                               setError((cause as Error).message);
                               await refresh();
                             }
@@ -362,8 +338,9 @@ export function Ople() {
                               type="button"
                               className="planner-open"
                               onClick={() => {
-                                setActiveId(planner.id);
-                                setView("board");
+                                void move(
+                                  `/planners/${encodeURIComponent(planner.id)}`,
+                                );
                               }}
                             >
                               {planner.name}
@@ -420,7 +397,9 @@ export function Ople() {
                   <button
                     type="button"
                     className="text-button"
-                    onClick={() => void logout()}
+                    onClick={() =>
+                      window.dispatchEvent(new Event("ople:logout"))
+                    }
                   >
                     로그아웃
                   </button>
@@ -447,40 +426,6 @@ export function Ople() {
           </>
         )}
       </main>
-      {auth && (
-        <Auth
-          close={() => setAuth(false)}
-          loggedIn={(value) => {
-            accountVersion.current += 1;
-            setUser(value);
-            setAuth(false);
-            setView("planners");
-            void refresh().catch((cause) => setError(cause.message));
-          }}
-        />
-      )}
-      {account && user && (
-        <Modal title="내 계정" close={() => setAccount(false)}>
-          <div className="account-info">
-            <h3>{user.name}</h3>
-            <p>{user.email}</p>
-          </div>
-          <div className="account-menu">
-            <button
-              type="button"
-              onClick={() => {
-                setAccount(false);
-                navigate("planners");
-              }}
-            >
-              내 플래너
-            </button>
-            <button type="button" onClick={() => void logout()}>
-              로그아웃
-            </button>
-          </div>
-        </Modal>
-      )}
       {rename && (
         <Modal title="플래너 이름 변경" close={() => setRename(null)}>
           <form
@@ -514,6 +459,6 @@ export function Ople() {
           </form>
         </Modal>
       )}
-    </div>
+    </>
   );
 }

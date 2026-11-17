@@ -3,6 +3,7 @@
 import { Mic, Pause, Play, RotateCcw, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { type Answer, api, type Job } from "@/lib/api";
+import { setInterviewActive } from "./navigation";
 
 function stopMedia(stream: MediaStream | null) {
   stream?.getTracks().forEach((track) => {
@@ -251,6 +252,11 @@ export function Interview({
   const [phase, setPhase] = useState<
     "prepare" | "interview" | "summary" | "generating"
   >("prepare");
+  const [submitted, setSubmitted] = useState(false);
+  useEffect(() => {
+    setInterviewActive(!submitted);
+    return () => setInterviewActive(false);
+  }, [submitted]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const mounted = useRef(true);
@@ -325,6 +331,7 @@ export function Interview({
         answers,
         summary,
       });
+      if (mounted.current) setSubmitted(true);
       const job = await api<Job>(`/generations/${jobId}/run`, {});
       if (mounted.current) generated(job);
     } catch (cause) {
