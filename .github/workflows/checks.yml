@@ -14,14 +14,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Configure environment
-        run: cp .env.example .env
+        run: cp .env.example .env.dev
       - name: Build services
-        run: docker compose build
+        run: docker compose -f compose.dev.yaml --env-file .env.dev build
       - name: Start PostgreSQL
-        run: docker compose up -d --wait db
+        run: docker compose -f compose.dev.yaml --env-file .env.dev up -d --wait db
       - name: Backend checks
         run: |
-          docker compose run --rm --no-deps backend sh -ec '
+          docker compose -f compose.dev.yaml --env-file .env.dev run --rm --no-deps backend sh -ec '
             uv run ruff check .
             uv run ruff format --check .
             uv run ty check
@@ -30,7 +30,7 @@ jobs:
           '
       - name: Frontend checks
         run: |
-          docker compose run --rm --no-deps frontend sh -ec '
+          docker compose -f compose.dev.yaml --env-file .env.dev run --rm --no-deps frontend sh -ec '
             pnpm exec vitest run
             pnpm run typecheck
             pnpm exec biome check .

@@ -4,20 +4,20 @@ pre-commit:
     backend:
       glob: "backend/**/*.py"
       run: |
-        docker compose exec -T backend sh -ec '
+        docker compose -f compose.dev.yaml --env-file .env.dev exec -T backend sh -ec '
           uv run ruff check .
           uv run ruff format --check .
         '
     biome:
       glob: "frontend/**/*.{json,jsonc,js,jsx,ts,tsx,cjs,mjs,css}"
-      run: docker compose exec -T frontend pnpm exec biome check .
+      run: docker compose -f compose.dev.yaml --env-file .env.dev exec -T frontend pnpm exec biome check .
 
 pre-push:
   parallel: true
   commands:
     backend:
       run: |
-        docker compose exec -T backend sh -ec '
+        docker compose -f compose.dev.yaml --env-file .env.dev exec -T backend sh -ec '
           uv run ruff check .
           uv run ruff format --check .
           uv run ty check
@@ -26,7 +26,7 @@ pre-push:
         '
     frontend:
       run: |
-        docker compose exec -T frontend sh -ec '
+        docker compose -f compose.dev.yaml --env-file .env.dev exec -T frontend sh -ec '
           pnpm exec vitest run
           pnpm run typecheck
           pnpm exec biome check .
