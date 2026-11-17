@@ -232,3 +232,6 @@ playwright-report/
 # macOS
 .DS_Store
 .localized
+.env.prod
+.env.old
+.env.prod.old
