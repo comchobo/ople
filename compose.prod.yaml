@@ -35,7 +35,7 @@ services:
       SES_FROM_EMAIL: ${SES_FROM_EMAIL}
     command: sh -ec 'uv run alembic upgrade head && uv run uvicorn main:app --host 0.0.0.0 --port 8000'
     volumes:
-      - ople-backend-recording-data:/recordings
+      - ople-backend-recordings:/recordings
     depends_on:
       db:
         condition: service_healthy
@@ -62,7 +62,7 @@ services:
       - frontend
 
 volumes:
-  ople-backend-recording-data:
+  ople-backend-recordings:
   ople-db-data:
     name: ople-db-data
   ople-caddy-data:

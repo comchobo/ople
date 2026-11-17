@@ -41,7 +41,7 @@ services:
     volumes:
       - ./backend:/app
       - /app/.venv
-      - ople-backend-recording-data:/recordings
+      - ople-backend-recordings:/recordings
     depends_on:
       db:
         condition: service_healthy
@@ -68,4 +68,4 @@ services:
 volumes:
   ople-db-data:
     name: ople-db-data
-  ople-backend-recording-data:
+  ople-backend-recordings:
