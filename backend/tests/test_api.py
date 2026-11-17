@@ -57,7 +57,7 @@ def test_audio_is_retained_and_only_metadata_returned(client, db, monkeypatch, t
     from routers import api
 
     user = authenticated(client, db)
-    monkeypatch.setenv("RECORDINGS_DIR", str(tmp_path))
+    monkeypatch.setattr(api, "RECORDINGS_DIR", tmp_path)
     monkeypatch.setattr(api.providers, "transcribe", Mock(return_value="응답입니다"))
     response = client.post(
         "/api/interview/recording",

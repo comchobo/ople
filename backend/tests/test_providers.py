@@ -15,6 +15,7 @@ def client_with(monkeypatch, contents):
     ]
     monkeypatch.setattr(providers.httpx, "Client", Mock(return_value=client))
     monkeypatch.setenv("OLLAMA_API_KEY", "test-key")
+    monkeypatch.setenv("OLLAMA_MODEL", "test-model")
     return client
 
 
@@ -24,6 +25,7 @@ def test_llm_repair_up_to_twice_and_max_reasoning(monkeypatch):
     assert value.question == "원하는 삶은?"
     assert client.post.call_count == 3
     assert client.post.call_args.kwargs["json"]["think"] == "max"
+    assert client.post.call_args.kwargs["json"]["model"] == "test-model"
 
 
 def test_llm_fails_after_two_repairs(monkeypatch):
