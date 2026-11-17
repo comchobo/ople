@@ -1,3 +1,4 @@
+# docker compose -f compose.dev.yaml --env-file .env.dev up -d
 services:
   db:
     image: postgres:17-alpine
