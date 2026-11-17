@@ -5,7 +5,7 @@ export default defineConfig({
   resolve: { alias: { "@": fileURLToPath(new URL(".", import.meta.url)) } },
   test: {
     environment: "jsdom",
-    setupFiles: ["./test/setup.ts"],
+    setupFiles: ["./vitest.setup.ts"],
     include: ["**/*.{test,spec}.{js,jsx,ts,tsx,mjs,cjs}"],
     exclude: ["**/node_modules/**", "**/.venv/**", "**/dist/**"],
   },
