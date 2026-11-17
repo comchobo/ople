@@ -150,8 +150,8 @@ activemq-data/
 *.sage.py
 
 # Environments
-.env
-.envrc
+.env*
+!.env.example
 .venv
 env/
 venv/
@@ -232,6 +232,3 @@ playwright-report/
 # macOS
 .DS_Store
 .localized
-.env.prod
-.env.old
-.env.prod.old

@@ -6,7 +6,7 @@ import httpx
 from pydantic import BaseModel, ValidationError
 
 from schemas.domain import KINDS, Interview, Plans, Question, Summary
-from utils.config import required, setting
+from utils.config import required
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -37,7 +37,7 @@ def llm_json[T: BaseModel](schema: type[T], instruction: str, context: dict) -> 
                     "https://ollama.com/api/chat",
                     headers={"Authorization": f"Bearer {required('OLLAMA_API_KEY')}"},
                     json={
-                        "model": setting("OLLAMA_MODEL", "deepseek-v4.1-flash:1017"),
+                        "model": required("OLLAMA_MODEL"),
                         "think": "max",
                         "stream": False,
                         "messages": messages,

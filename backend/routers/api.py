@@ -38,10 +38,11 @@ from models.entities import (
 from schemas.domain import Credentials, Generate, Interview, PlannerUpdate, Verify
 from services import auth, providers
 from services.planners import owned, run_generation
-from utils.config import origin, required, secure_cookie, setting
+from utils.config import origin, required, secure_cookie
 
 router = APIRouter(prefix="/api")
 DB = Annotated[Session, Depends(session)]
+RECORDINGS_DIR = Path("/recordings")
 
 
 def user_dependency(db: DB, ople_session: Annotated[str | None, Cookie()] = None) -> User:
@@ -267,7 +268,7 @@ def recording(
     data = audio.file.read(20 * 1024 * 1024 + 1)
     if not data or len(data) > 20 * 1024 * 1024:
         raise HTTPException(413, "녹음 파일은 20MB 이하여야 합니다.")
-    directory = Path(setting("RECORDINGS_DIR", "/recordings"))
+    directory = RECORDINGS_DIR
     directory.mkdir(parents=True, exist_ok=True, mode=0o700)
     filename = f"{uid()}.{extensions[content_type]}"
     path = directory / filename
