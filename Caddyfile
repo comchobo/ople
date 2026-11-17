@@ -1,9 +1,3 @@
 ople.ink {
-	handle /prototype {
-		root * /srv
-		rewrite * /PROTOTYPE.html
-		file_server
-	}
-
 	reverse_proxy frontend:3000
 }
