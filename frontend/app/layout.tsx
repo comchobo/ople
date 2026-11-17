@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { AppShell } from "@/components/app-shell";
+import { Navigation } from "@/components/navigation";
+import { AuthProvider } from "@/hooks/use-auth";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -10,7 +13,12 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          <Navigation />
+          <AppShell>{children}</AppShell>
+        </AuthProvider>
+      </body>
     </html>
   );
 }

@@ -1,8 +1,37 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useState } from "react";
 import { expect, it, vi } from "vitest";
+import { AuthProvider } from "@/hooks/use-auth";
 import type { Planner } from "@/lib/api";
+import { AppShell } from "./app-shell";
 import { Ople } from "./ople";
+
+const routing = vi.hoisted(() => ({
+  push: vi.fn(),
+  replace: vi.fn(),
+  path: "/planners",
+}));
+vi.mock("next/navigation", () => ({
+  useRouter: () => routing,
+  usePathname: () => routing.path,
+}));
+
+function Application() {
+  const [path, setPath] = useState("/planners");
+  routing.path = path;
+  routing.push.mockImplementation(setPath);
+  routing.replace.mockImplementation(setPath);
+  const view =
+    path === "/planners" ? "planners" : path === "/" ? "intro" : "board";
+  return (
+    <AuthProvider>
+      <AppShell>
+        <Ople key={path} view={view} plannerId={path.split("/")[2]} />
+      </AppShell>
+    </AuthProvider>
+  );
+}
 
 function sample(): Planner {
   return {
@@ -47,9 +76,9 @@ it("이전 저장 완료 후 목록을 갱신해 이름 변경이 최신 편집�
       return json([structuredClone(stored)]);
     });
   const user = userEvent.setup();
-  render(<Ople />);
+  render(<Application />);
   await user.click(await screen.findByRole("button", { name: "나의 계획" }));
-  await user.click(screen.getByRole("button", { name: "플랜 수정" }));
+  await user.click(await screen.findByRole("button", { name: "플랜 수정" }));
   await user.clear(screen.getByLabelText("제목"));
   await user.type(screen.getByLabelText("제목"), "중요한 수정");
   await user.click(screen.getByRole("button", { name: "저장" }));
@@ -107,7 +136,7 @@ it("실패한 생성 작업을 같은 작업 ID로 재시도하고 완성된 플
       ]);
     });
   const user = userEvent.setup();
-  render(<Ople />);
+  render(<Application />);
   await user.click(await screen.findByRole("button", { name: "다시 시도" }));
   expect(
     await screen.findByRole("heading", { name: "나의 계획" }),
