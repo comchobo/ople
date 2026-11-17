@@ -1,9 +1,8 @@
-// TEMP: 리뉴얼 스켈레톤. 실제 구현 시 교체/삭제.
 import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Ople",
+  title: "Ople — 오디세이 플래너",
 };
 
 export default function RootLayout({
