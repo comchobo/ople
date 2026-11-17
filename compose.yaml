@@ -58,14 +58,6 @@ services:
     depends_on:
       - backend
 
-  e2e:
-    profiles: [test]
-    build:
-      context: .
-      dockerfile: e2e/Dockerfile
-    init: true
-    ipc: host
-
 volumes:
   ople-db-data:
     name: ople-db-data
