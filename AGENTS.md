@@ -6,6 +6,10 @@
 - Do not write tests with trivial assertions or tests that merely mirror the implementation.
 - Give each module, function, and component one responsibility and one reason to change.
 
+## Backend
+
+- Keep `utils/` domain-agnostic.
+
 ## Frontend
 
 - Keep `lib/` domain-agnostic.
