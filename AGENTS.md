@@ -1,5 +1,6 @@
 # AGENTS.md
 
+- Add content to this file only when the agent harness cannot verify it.
 - Always perform development, testing, and debugging inside the `compose.dev.yaml` environment.
 - Write every commit and PR title in clear, concise Korean. Never use any prefix.
 - Never force-push (`git push --force`, `--force-with-lease`) to any branch.
@@ -16,5 +17,4 @@
 
 - Keep `lib/` domain-agnostic.
 - Keep `components/` for React component modules and their tests.
-- Keep `app/` server-only and do not use the `use client` directive there.
 - When making UI changes, attach screenshots to the PR body.
