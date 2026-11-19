@@ -23,8 +23,7 @@ it("계정 변경 후 이전 계정의 늦은 응답과 오류를 반영하지 �
   const first = deferred<Response>();
   const second = deferred<Response>();
   let reads = 0;
-  vi.spyOn(globalThis, "fetch").mockImplementation(async (path) => {
-    if (path === "/api/generations") return json([]);
+  vi.spyOn(globalThis, "fetch").mockImplementation(async () => {
     return ++reads === 1 ? first.promise : second.promise;
   });
   const { result, rerender } = renderHook(
@@ -51,8 +50,7 @@ it("갱신 요청 이후의 로컬 편집을 보존하고 API에 저장한다", 
   let reads = 0;
   const fetcher = vi
     .spyOn(globalThis, "fetch")
-    .mockImplementation(async (path, options) => {
-      if (path === "/api/generations") return json([]);
+    .mockImplementation(async (_path, options) => {
       if (options?.method === "PUT") return json(planner);
       return ++reads === 1 ? json([planner]) : stale.promise;
     });
@@ -80,41 +78,11 @@ it("갱신 요청 이후의 로컬 편집을 보존하고 API에 저장한다", 
   );
 });
 
-it("진행 중 생성만 폴링하고 완료 후와 언마운트 시 타이머를 정리한다", async () => {
-  vi.useFakeTimers();
-  try {
-    let status = "running";
-    const fetcher = vi
-      .spyOn(globalThis, "fetch")
-      .mockImplementation(async (path) =>
-        json(
-          path === "/api/generations"
-            ? [{ id: "j", status, planner_id: null, error: null }]
-            : [planner],
-        ),
-      );
-    const { result, unmount } = renderHook(() => usePlanners(user, true));
-    await act(async () => {});
-    expect(result.current.jobs[0].status).toBe("running");
-    status = "completed";
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(3000);
-    });
-    expect(result.current.jobs[0].status).toBe("completed");
-    const completedReads = fetcher.mock.calls.length;
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(6000);
-    });
-    expect(fetcher.mock.calls).toHaveLength(completedReads);
-    status = "running";
-    await act(async () => {
-      await result.current.refresh();
-    });
-    unmount();
-    const unmountedReads = fetcher.mock.calls.length;
-    await vi.advanceTimersByTimeAsync(3000);
-    expect(fetcher.mock.calls).toHaveLength(unmountedReads);
-  } finally {
-    vi.useRealTimers();
-  }
+it("생성 작업 API가 아닌 플래너 API만 조회한다", async () => {
+  const fetcher = vi
+    .spyOn(globalThis, "fetch")
+    .mockResolvedValue(json([planner]));
+  const { result } = renderHook(() => usePlanners(user));
+  await waitFor(() => expect(result.current.loading).toBe(false));
+  expect(fetcher.mock.calls.map(([path]) => path)).toEqual(["/api/planners"]);
 });
