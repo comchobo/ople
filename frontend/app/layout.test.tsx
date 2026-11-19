@@ -26,10 +26,9 @@ it.each([
       "text/html",
     );
     const app = document.querySelector("#app");
-    expect(app?.querySelector("header .brand")?.textContent).toBe("Ople");
+    expect(app?.querySelector("header a")?.textContent).toBe("Ople");
     expect(app?.querySelector("nav button")?.textContent).toBe("로그인");
     expect(app?.querySelector("main h1")?.textContent).toBe(title);
-    expect(app?.querySelector("main")?.classList.contains("board")).toBe(false);
     expect(app?.querySelector("main")?.textContent).not.toContain("준비 중");
     expect(app?.querySelector("main")?.textContent).toContain("이홍주");
     expect(app?.querySelector("main")?.textContent).toContain(

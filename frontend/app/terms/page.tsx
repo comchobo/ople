@@ -6,10 +6,10 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <main>
-      <article className="mx-auto max-w-[760px] pb-6 wrap-anywhere [&>section]:mt-8 [&_h1]:mb-2! [&_h2]:mb-3! [&_li+li]:mt-2 [&_p+p]:mt-4! [&_ul]:my-3 [&_ul]:list-disc [&_ul]:pl-6">
+    <main className="min-h-0 flex-1 overflow-auto p-7 [scrollbar-color:#aaa_#f3f3f3] [scrollbar-width:thin]">
+      <article className="mx-auto max-w-[760px] pb-6 wrap-anywhere [&>section]:mt-8 [&_a]:focus-visible:[outline:2px_solid_#222] [&_a]:focus-visible:[outline-offset:3px] [&_h1]:mb-2! [&_h1]:text-[30px] [&_h1]:leading-[1.35] [&_h1]:tracking-[-1px] [&_h1]:[font-weight:650] [&_h1]:text-balance [&_h2]:mb-3! [&_h2]:text-xl [&_h2]:leading-[1.45] [&_h2]:tracking-[-0.5px] [&_h2]:[font-weight:650] [&_li+li]:mt-2 [&_p+p]:mt-4! [&_ul]:my-3 [&_ul]:list-disc [&_ul]:pl-6">
         <h1>서비스 약관</h1>
-        <p className="text-(--muted)">시행일: 2026년 11월 19일</p>
+        <p className="text-[#666]">시행일: 2026년 11월 19일</p>
         <p>
           이 약관은 이홍주(이하 “운영자”)가 제공하는 Ople 서비스의 이용 조건과
           운영자 및 이용자의 권리·의무를 정합니다.

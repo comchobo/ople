@@ -23,10 +23,10 @@ export function Recorder({
     send,
   } = useRecorder(submit);
   return (
-    <aside className="record-panel">
-      <div className="record-state">
+    <aside className="overflow-auto border-l border-[#d4d4d4] py-7 pl-7 text-center">
+      <div className="flex items-center justify-center gap-2 text-[13px]">
         <span
-          className={`status-dot ${state === "recording" ? "active" : ""}`}
+          className={`size-[7px] rounded-full border border-[#555] ${state === "recording" ? "bg-[#333]" : ""}`}
         />
         {busy
           ? "답변 처리 중"
@@ -36,14 +36,18 @@ export function Recorder({
               ? "일시정지"
               : "녹음 준비"}
       </div>
-      <p className="timer" role="timer" aria-label="녹음 시간">
+      <p
+        className="my-6 text-[44px] tracking-[1px] tabular-nums"
+        role="timer"
+        aria-label="녹음 시간"
+      >
         {String(Math.floor(seconds / 60)).padStart(2, "0")}:
         {String(seconds % 60).padStart(2, "0")}
       </p>
-      <div className="record-actions">
+      <div className="flex min-h-[88px] items-center justify-center gap-5">
         <button
           type="button"
-          className="audio-button"
+          className="inline-grid size-12 shrink-0 cursor-pointer place-items-center rounded-full border border-[#d4d4d4] bg-white p-0 leading-[1.4] hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45] [&_svg]:size-[22px]"
           aria-label="다시 녹음"
           disabled={busy || state === "idle"}
           onClick={reset}
@@ -52,7 +56,7 @@ export function Recorder({
         </button>
         <button
           type="button"
-          className="audio-button main-control primary"
+          className="inline-grid size-[72px] shrink-0 cursor-pointer place-items-center rounded-full border border-[#222] bg-[#222] p-0 leading-[1.4] text-white hover:border-[#999] hover:bg-[#444] hover:text-white focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45] [&_svg]:size-7"
           aria-label={
             state === "idle"
               ? "녹음 시작"
@@ -77,7 +81,7 @@ export function Recorder({
         </button>
         <button
           type="button"
-          className="audio-button"
+          className="inline-grid size-12 shrink-0 cursor-pointer place-items-center rounded-full border border-[#d4d4d4] bg-white p-0 leading-[1.4] hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45] [&_svg]:size-[22px]"
           aria-label="답변 제출"
           disabled={busy || state !== "paused" || seconds < 1 || oversized}
           onClick={send}
@@ -85,13 +89,16 @@ export function Recorder({
           <Send />
         </button>
       </div>
-      <p className="small muted space">
+      <p className="mt-6 text-[12px] text-[#666]">
         문항당 최대 3분 · 20MB
         <br />
         잠시 멈춘 뒤 답변을 제출해주세요.
       </p>
       {error && (
-        <p className="error space" role="alert">
+        <p
+          className="mt-6 border border-[#555] bg-[#f0f0f0] p-3.5"
+          role="alert"
+        >
           {error}
         </p>
       )}

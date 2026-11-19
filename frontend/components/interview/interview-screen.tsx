@@ -10,13 +10,13 @@ export function InterviewScreen() {
   const move = useAppNavigation();
   const [error, setError] = useState("");
   return (
-    <main className="interview">
+    <main className="flex min-h-0 flex-1 flex-col overflow-auto p-7 [scrollbar-color:#aaa_#f3f3f3] [scrollbar-width:thin]">
       {loading ? (
         <p>불러오는 중…</p>
       ) : (
         <>
           {error && (
-            <p role="alert" className="error">
+            <p role="alert" className="border border-[#555] bg-[#f0f0f0] p-3.5">
               {error}
             </p>
           )}
