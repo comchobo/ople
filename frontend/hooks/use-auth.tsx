@@ -8,7 +8,9 @@ import {
   useRef,
   useState,
 } from "react";
-import { api, flushSaves, type User } from "@/lib/api";
+import { getCurrentUser, logout as logoutUser } from "@/api/auth";
+import type { User } from "@/api/core";
+import { flushSaves } from "@/api/planners";
 
 type AuthState = {
   user: User | null;
@@ -24,7 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const version = useRef(0);
   useEffect(() => {
     const current = ++version.current;
-    void api<User>("/auth/me")
+    void getCurrentUser()
       .then((value) => {
         if (current === version.current) setUser(value);
       })
@@ -43,7 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
   const logout = useCallback(async () => {
     await flushSaves();
-    await api("/auth/logout", {});
+    await logoutUser();
     version.current += 1;
     setUser(null);
   }, []);

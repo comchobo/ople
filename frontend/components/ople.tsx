@@ -1,15 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
+import type { Job, Planner } from "@/api/core";
+import { listGenerations, runGeneration } from "@/api/generations";
 import {
-  api,
+  deletePlanner,
   flushSaves,
-  formatDate,
-  type Job,
-  type Planner,
+  listPlanners,
   savePlanner,
-} from "@/lib/api";
+} from "@/api/planners";
+import { useAuth } from "@/hooks/use-auth";
+import { formatDate } from "@/lib/date";
 import { Board } from "./board";
 import { Interview } from "./interview";
 import { Modal } from "./modal";
@@ -153,8 +154,8 @@ export function Ople({
     await flushSaves();
     const revisionAtStart = revision.current;
     const [values, tasks] = await Promise.all([
-      api<Planner[]>("/planners"),
-      api<Job[]>("/generations"),
+      listPlanners(),
+      listGenerations(),
     ]);
     if (alive.current && accountAtStart === accountVersion.current) {
       setPlanners((current) =>
@@ -302,10 +303,7 @@ export function Ople({
                               ),
                             );
                             try {
-                              const result = await api<Job>(
-                                `/generations/${job.id}/run`,
-                                {},
-                              );
+                              const result = await runGeneration(job.id);
                               if (
                                 !alive.current ||
                                 accountAtStart !== accountVersion.current
@@ -365,11 +363,7 @@ export function Ople({
                               )
                                 return;
                               try {
-                                await api(
-                                  `/planners/${planner.id}`,
-                                  undefined,
-                                  "DELETE",
-                                );
+                                await deletePlanner(planner.id);
                                 setPlanners((previous) =>
                                   previous.filter(
                                     (item) => item.id !== planner.id,

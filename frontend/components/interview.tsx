@@ -2,7 +2,9 @@
 
 import { Mic, Pause, Play, RotateCcw, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { type Answer, api, type Job } from "@/lib/api";
+import type { Answer, Job } from "@/api/core";
+import { createGeneration, runGeneration } from "@/api/generations";
+import { getQuestion, getSummary, uploadRecording } from "@/api/interview";
 import { setInterviewActive } from "./navigation";
 
 function stopMedia(stream: MediaStream | null) {
@@ -270,21 +272,14 @@ export function Interview({
     setBusy(true);
     setError("");
     try {
-      const body = { interview_id: interviewId, answers: values };
       if (values.length === 10) {
-        const result = await api<{ summary: string }>(
-          "/interview/summary",
-          body,
-        );
+        const result = await getSummary(interviewId, values);
         if (mounted.current) {
           setSummary(result.summary);
           setPhase("summary");
         }
       } else {
-        const result = await api<{ question: string }>(
-          "/interview/question",
-          body,
-        );
+        const result = await getQuestion(interviewId, values);
         if (mounted.current) {
           setQuestion(result.question);
           setPhase("interview");
@@ -299,15 +294,12 @@ export function Interview({
   async function submit(blob: Blob, duration: number) {
     setBusy(true);
     setError("");
-    const form = new FormData();
-    form.set("audio", blob, "recording");
-    form.set("duration", String(duration));
-    form.set("interview_id", interviewId);
-    form.set("question_index", String(answers.length));
     try {
-      const result = await api<{ recording_id: string; text: string }>(
-        "/interview/recording",
-        form,
+      const result = await uploadRecording(
+        interviewId,
+        answers.length,
+        blob,
+        duration,
       );
       if (!mounted.current) return;
       const values = [
@@ -326,13 +318,9 @@ export function Interview({
     setError("");
     setPhase("generating");
     try {
-      await api(`/generations/${jobId}`, {
-        interview_id: interviewId,
-        answers,
-        summary,
-      });
+      await createGeneration(jobId, interviewId, answers, summary);
       if (mounted.current) setSubmitted(true);
-      const job = await api<Job>(`/generations/${jobId}/run`, {});
+      const job = await runGeneration(jobId);
       if (mounted.current) generated(job);
     } catch (cause) {
       if (mounted.current) setError((cause as Error).message);
