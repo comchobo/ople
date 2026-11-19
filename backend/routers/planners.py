@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from routers.dependencies import DB, CurrentUser
 from schemas.planners import PlannerUpdate
-from services import planners
+from services.planner import planners
 
 router = APIRouter(prefix="/planners")
 

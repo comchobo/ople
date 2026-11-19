@@ -5,15 +5,18 @@ from sqlmodel import select
 
 from models.recordings import Recording
 from schemas.interviews import Question, Summary
-from services import interviews, recording_files, recordings
-from services.errors import ProviderError
+from services.external.exceptions import ProviderError
+from services.interview import questions, summaries
+from services.recording import storage as recording_files
+from services.recording import uploads as recordings
 
 
 def test_question_and_summary_validate_answer_count_and_recording_ownership(
     client, db, signed_in, monkeypatch
 ):
     llm = Mock(side_effect=[Question(question="다음 질문"), Summary(summary="핵심 가치")])
-    monkeypatch.setattr(interviews, "llm_json", llm)
+    monkeypatch.setattr(questions, "llm_json", llm)
+    monkeypatch.setattr(summaries, "llm_json", llm)
     body = {"interview_id": "i", "answers": []}
     assert client.post("/api/interview/summary", json=body).status_code == 400
     item = Recording(

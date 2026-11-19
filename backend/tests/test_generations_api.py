@@ -9,7 +9,8 @@ from models.planners import Planner
 from models.recordings import Recording
 from models.users import User
 from schemas.planners import Plans
-from services import generations, sessions
+from services.auth import sessions
+from services.planner import generations
 
 
 @pytest.fixture

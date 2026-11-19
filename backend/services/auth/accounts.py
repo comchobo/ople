@@ -6,8 +6,8 @@ from sqlmodel import Session, select
 
 from models.auth import Signup
 from models.users import User
-from services.mail import send_code
-from services.passwords import check_password, hasher
+from services.auth.passwords import check_password, hasher
+from services.external.email import send_code
 from utils.clock import now
 
 

@@ -7,7 +7,8 @@ from sqlmodel import select
 
 from models.auth import LoginSession, Signup
 from models.users import User
-from services import auth, google, sessions
+from services.auth import accounts as auth
+from services.auth import google, sessions
 from utils.clock import now
 
 

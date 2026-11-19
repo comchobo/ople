@@ -4,8 +4,8 @@ import httpx
 import pytest
 
 from schemas.interviews import Question
-from services import llm
-from services.errors import ProviderError
+from services.external import llm
+from services.external.exceptions import ProviderError
 
 
 @pytest.fixture

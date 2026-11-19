@@ -4,8 +4,8 @@ import json
 import httpx
 import pytest
 
-from services import transcription
-from services.errors import ProviderError
+from services.external import transcription
+from services.external.exceptions import ProviderError
 
 
 @pytest.mark.parametrize("model", ["@cf/openai/whisper-large-v3-turbo", "@cf/openai/whisper"])

@@ -11,7 +11,7 @@ from sqlmodel import select
 
 from models.auth import LoginSession, OAuthAttempt
 from models.users import User
-from services import google, sessions
+from services.auth import google, sessions
 from utils.clock import now
 
 

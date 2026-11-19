@@ -4,8 +4,8 @@ from fastapi import HTTPException
 from sqlmodel import Session
 
 from models.recordings import Recording
-from services.recording_files import save_audio
-from services.transcription import transcribe
+from services.external.transcription import transcribe
+from services.recording.storage import save_audio
 
 
 def record(
