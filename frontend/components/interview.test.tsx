@@ -1,7 +1,8 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { Interview, Recorder } from "./interview";
+import { Interview } from "./interview";
+import { Recorder } from "./recorder";
 
 describe("음성 인터뷰", () => {
   it("질문 생성 실패 시 같은 인터뷰로 재시도한다", async () => {

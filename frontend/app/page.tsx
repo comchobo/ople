@@ -1,5 +1,5 @@
-import { Ople } from "@/components/ople";
+import { HomeScreen } from "@/components/home-screen";
 
 export default function Home() {
-  return <Ople />;
+  return <HomeScreen />;
 }

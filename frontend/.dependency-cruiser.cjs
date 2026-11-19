@@ -22,12 +22,24 @@ module.exports = {
       name: "lib-must-remain-domain-agnostic",
       severity: "error",
       from: { path: "^lib/" },
-      to: { path: "^(api|app|components|hooks)/" },
+      to: { path: "^(api|app|components|hooks|planners)/" },
     },
     {
       name: "api-may-not-import-ui",
       severity: "error",
       from: { path: "^api/" },
+      to: { path: "^(app|components|hooks)/" },
+    },
+    {
+      name: "hooks-may-not-import-ui",
+      severity: "error",
+      from: { path: "^hooks/" },
+      to: { path: "^(app|components)/" },
+    },
+    {
+      name: "planner-domain-may-not-import-ui",
+      severity: "error",
+      from: { path: "^planners/" },
       to: { path: "^(app|components|hooks)/" },
     },
     {

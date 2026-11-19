@@ -2,7 +2,9 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import type { Planner } from "@/api/core";
-import { Board, PieceEditor, RatingEditor } from "./board";
+import { Board } from "./board";
+import { PieceEditor } from "./piece-editor";
+import { RatingEditor } from "./rating-editor";
 
 const planner: Planner = {
   id: "p",

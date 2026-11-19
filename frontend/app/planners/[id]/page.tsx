@@ -1,4 +1,4 @@
-import { Ople } from "@/components/ople";
+import { PlannerBoardScreen } from "@/components/planner-board-screen";
 
 export default async function Page({
   params,
@@ -6,5 +6,5 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return <Ople key={id} view="board" plannerId={id} />;
+  return <PlannerBoardScreen key={id} plannerId={id} />;
 }

@@ -1,5 +1,5 @@
-import { Ople } from "@/components/ople";
+import { PlannersScreen } from "@/components/planners-screen";
 
 export default function Page() {
-  return <Ople view="planners" />;
+  return <PlannersScreen />;
 }
