@@ -45,7 +45,7 @@ typography:
     fontFamily: '"Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
     fontSize: "14px"
     fontWeight: 550
-    lineHeight: 1.65
+    lineHeight: "20px"
 rounded:
   timeline-inner: "3px"
   timeline: "4px"
@@ -54,7 +54,7 @@ rounded:
   dialog-mobile: "10px"
   dialog: "12px"
   sample-label: "20px"
-  circle: "50%"
+  circle: "2.14748e+09px"
 spacing:
   gap-6: "6px"
   gap-8: "8px"
@@ -125,7 +125,7 @@ components:
 
 주홍은 소개와 녹음의 활력, 버터는 질문과 안내, 라임·연보라·살구는 세 계획의 식별을 맡는다. 로그인·계정·편집 폼도 종이 바탕, 잉크 텍스트, 같은 필드와 버튼을 사용한다. 기존 흑백 정체성을 교체한다는 확인된 방향을 기록하며, 제품 사실과 한국어 콘텐츠·정책의 진실은 PRODUCT.md가 맡는다.
 
-근거와 신뢰도: 토큰·상태·경계값은 frontend/app/globals.css에서 직접 추출해 신뢰도 높음. 동작과 적용 범위는 frontend/components/home/{intro,plan-preview}.tsx, frontend/components/navigation/site-header.tsx, frontend/components/planner/{board,planner-list,piece-editor}.tsx, frontend/components/auth/auth.tsx, frontend/components/modal.tsx 및 frontend/hooks/planner/use-timeline-export.ts로 확인했다. 정성 언어는 PRODUCT.md와 .impeccable/surfaces/redesign.md 및 사용자가 선택한 .impeccable/mocks/decision/round2-color-studio.html에 근거한다. .impeccable/review/final-home/{desktop,mobile}.png와 .impeccable/review/{board-desktop,list-mobile,interview-mobile}.png는 시각 교차 확인 자료이며 수치의 출처는 코드다. 보지 않은 화면이나 배포 환경까지 검증했다는 뜻은 아니다.
+근거와 신뢰도: 토큰·상태·경계값은 frontend/app/globals.css의 Tailwind 소스와 Compose frontend가 제공하는 컴파일된 CSS·브라우저 computed style을 대조해 신뢰도 높음. 동작과 적용 범위는 frontend/components/home/{intro,plan-preview}.tsx, frontend/components/navigation/site-header.tsx, frontend/components/planner/{board,planner-list,piece-editor}.tsx, frontend/components/auth/auth.tsx, frontend/components/modal.tsx 및 frontend/hooks/planner/use-timeline-export.ts에 근거한다. 정성 언어는 PRODUCT.md와 .impeccable/surfaces/redesign.md 및 사용자가 선택한 .impeccable/mocks/decision/round2-color-studio.html에 근거한다. .impeccable/review/tailwind-home/{desktop,mobile}.png와 .impeccable/review/{tailwind-board-desktop,tailwind-list-mobile,tailwind-interview-mobile}.png로 시각 교차 확인했다. 보지 않은 화면이나 배포 환경까지 검증했다는 뜻은 아니다.
 
 **Key Characteristics:**
 - 밝은 종이, 어두운 잉크, 역할이 분리된 컬러 면.
@@ -136,6 +136,8 @@ components:
 ## Colors
 
 선명한 주홍과 부드러운 계획색을 따뜻한 종이·보라 기운의 잉크가 연결한다. 위 frontmatter가 실제 사용값의 기준이다.
+
+실제 소스는 `@layer base`의 `:root` custom property를 유지하고, `@theme inline`에서 `--color-ink` → `var(--ink)` 같은 이름의 Tailwind 색 별칭과 `--font-sans`를 연결한다. 선택 계획 별칭 `--color-plan`은 `var(--plan-color)`를 가리킨다. 기본 요소는 base, 화면·상태·반응형 선택자는 components 레이어에서 `@apply`로 구성한다. frontend/biome.json은 `css.parser.tailwindDirectives: true`로 이 문법을 허용한다. 사이드카 스니펫은 이 소스를 브라우저용 CSS로 풀어 쓴 것이며 `@apply`나 Tailwind 번들을 요구하지 않는다.
 
 ### Primary
 - **스튜디오 주홍 (`accent`)**: 홈 소개 면, 녹음 주 컨트롤, 진행 상태에 사용한다. 모든 주요 버튼의 배경색이라는 뜻은 아니다.
@@ -175,6 +177,8 @@ components:
 
 한글 본문은 keep-all, 제목은 balance와 overflow-wrap:anywhere, 편집한 설명은 pre-wrap과 anywhere를 사용한다. 균등한 배율의 타입 스케일을 가정하지 않는다.
 
+Tailwind 기본 크기 유틸리티에는 행간도 포함된다. 현재 컴파일 결과에서 `text-sm`인 폼 레이블·헤더 링크·안내/오류·이용 방법 설명은 (14px / 20px), `text-xs`인 예시 레이블·샘플 활동·계획 종류·타임라인 연차는 (12px / 16px)이다. 반면 버튼의 명시적 `leading-[1.4]`와 제목·설명의 명시적 행간은 유지된다. 보드 탭은 데스크톱 (14px / 19.6px), 모바일 (12px / 16.8px); 모바일 타이머도 명시된 행간 (1.2)을 유지한다. 임의 크기인 (13px) 보조 본문 전체를 `text-sm`과 같은 행간으로 취급하지 않는다.
+
 ## Layout
 
 기본 main은 중앙 정렬·최대 폭 (1440px)·패딩 (48px). 목록 main은 최대 (1200px), 정책은 (880px), 준비·완료 본문은 (680px), 단계 표시는 (760px). 헤더·정책 푸터 좌우 여백은 (max(32px, calc((100vw - 1344px) / 2))). 간격은 frontmatter의 관측값 모음이며 단일 배수 스케일은 아니다.
@@ -197,23 +201,25 @@ components:
 - **모달**: `box-shadow: 0 20px 80px rgb(49 44 66 / 0.18)`. 배경은 `rgb(36 29 42 / 0.5)`의 native dialog backdrop.
 - **선택 탭**: `box-shadow: inset 0 -3px var(--ink)`.
 
+위 값은 소스의 shadow arbitrary utility가 나타내는 유효 그림자다. Tailwind의 컴파일된 `box-shadow`는 투명한 0 크기 ring/shadow 슬롯을 함께 합성한다. 스니펫은 그 보일러플레이트 없이 같은 시각적 그림자를 사용한다.
+
 **The Flat Work Surface Rule.** 작업 면은 색과 경계로 나누고, 부드러운 외부 그림자는 모달의 겹침을 설명한다.
 
 ## Shapes
 
-큰 컬러 면·탭은 직각, 기본 컨트롤은 작은 곡률이다. 둥근 값은 frontmatter 기준: 버튼·안내 (control), 입력 (field), 조각과 내부 조작부 (timeline / timeline-inner), 모달 (dialog / dialog-mobile). 원형 단계 번호와 녹음 컨트롤, 결과 예시의 작은 둥근 레이블은 각자의 용도에 한정된다. 일반 경계는 (1px), 선택된 조각은 잉크 (2px) 경계와 양끝 리사이즈 핸들을 가진다.
+큰 컬러 면·탭은 직각, 기본 컨트롤은 작은 곡률이다. 둥근 값은 frontmatter 기준: 버튼·안내 (control), 입력 (field), 조각과 내부 조작부 (timeline / timeline-inner), 모달 (dialog / dialog-mobile). 원형 단계 번호와 녹음 컨트롤은 `rounded-full`이며, circle 토큰은 현재 컴파일된 CSS의 큰 반지름 값이다. 이전의 `50%` 선언이 아니다. 결과 예시의 작은 둥근 레이블은 그 용도에 한정된다. 일반 경계는 (1px), 선택된 조각은 잉크 (2px) 경계와 양끝 리사이즈 핸들을 가진다.
 
 ## Components
 
 ### Buttons
 또렷하고 익숙한 웹 컨트롤. 기본 최소 높이 (46px), 간격 (10px), 굵기 (550), 행간 (1.4), 경계 (1px). primary·secondary·text의 색과 패딩은 frontmatter 기준이며, icon 버튼 너비는 (46px)이다.
 
-일반 hover는 soft 배경·경계 `#a69b8e`; primary hover는 ink-hover. 홈 주 동작만 종이색 전폭 버튼이며 최소 높이 (64px), 모바일 (58px), 글자 (17px), hover는 butter다. 비활성 버튼은 opacity (0.5)와 not-allowed 커서. 전역 focus-visible은 `2px solid var(--accent-dark)`, offset (4px).
+기본 보조 버튼 hover는 soft 배경·경계 `#a69b8e`; primary hover는 ink-hover. components 레이어의 text 버튼은 base hover보다 우선하므로 hover에서도 투명 배경·경계를 유지한다. 홈 주 동작만 종이색 전폭 버튼이며 최소 높이 (64px), 모바일 (58px), 글자 (17px), hover는 butter와 투명 경계다. 비활성 버튼은 opacity (0.5)와 not-allowed 커서. 전역 focus-visible은 `2px solid var(--accent-dark)`, offset (4px).
 
-배경색과 경계색은 각각 (160ms ease-out) 전환한다. 홈 예시 막대만 `plan-reveal 650ms cubic-bezier(0.16, 1, 0.3, 1) both`로 clip-path를 `inset(0 100% 0 0)`에서 `inset(0)`까지 드러낸다. reduced-motion에서는 이 애니메이션과 버튼 전환을 끈다. 추가적인 이동·탄성·상시 애니메이션은 기록하지 않는다.
+배경색과 경계색의 전환은 (160ms), 곡선은 Tailwind `ease-out`의 실제 값인 `cubic-bezier(0, 0, 0.2, 1)`이다. CSS 키워드 `ease-out`과 같은 값으로 기록하지 않는다. 홈 예시 막대만 `plan-reveal 650ms cubic-bezier(0.16, 1, 0.3, 1) both`로 clip-path를 `inset(0 100% 0 0)`에서 `inset(0)`까지 드러낸다. reduced-motion에서는 이 애니메이션과 버튼 전환을 끈다. 추가적인 이동·탄성·상시 애니메이션은 기록하지 않는다.
 
 ### Chips
-결과 예시 레이블은 행동 칩이 아닌 정적 표시다. 글자 (12px), 경계 `1px solid #b1a896`, 패딩·곡률은 frontmatter 기준. 선택·삭제 상태를 갖는 칩 컴포넌트는 구현되지 않았다.
+결과 예시 레이블은 행동 칩이 아닌 정적 표시다. 글자·행간 (12px / 16px), 경계 `1px solid #b1a896`, 패딩·곡률은 frontmatter 기준. 선택·삭제 상태를 갖는 칩 컴포넌트는 구현되지 않았다.
 
 ### Cards / Containers
 계획 상세 면은 선택색을 배경으로 하는 평평한 컨테이너이며 패딩은 데스크톱 (26px), 모바일 (24px). 홈 예시는 데스크톱 (24px), 모바일 (22px 18px). 연보라는 준비 안내 목록·빈 목록·계정 정보에도 사용된다. 이 보조 사용은 계획 B 선택 상태를 뜻하지 않는다.

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-19T12:00:00Z",
+  "generatedAt": "2026-11-19T12:25:00Z",
   "title": "Design System: Ople",
   "extensions": {
     "colorMeta": {
@@ -25,14 +25,14 @@
       "headline": { "displayName": "기본 h1", "purpose": "globals.css h1; 화면별 override는 DESIGN.md Typography 참조." },
       "title": { "displayName": "기본 h2", "purpose": "globals.css h2의 기본 위계." },
       "body": { "displayName": "한글 본문", "purpose": "globals.css body와 기존 Pretendard v1.3.9 CDN import. 시스템 폰트는 fallback." },
-      "label": { "displayName": "필드 레이블", "purpose": "globals.css label.field; body 행간 상속." }
+      "label": { "displayName": "필드 레이블", "purpose": "globals.css components 레이어 label.field의 @apply text-sm font-[550]. 컴파일된 행간 20px; body 행간 상속이 아님. Compose computed style 대조, 신뢰도 높음." }
     },
     "shadows": [
       { "name": "dialog", "value": "0 20px 80px rgb(49 44 66 / 0.18)", "purpose": "globals.css dialog의 외부 그림자. 직접 추출, 신뢰도 높음." },
       { "name": "selected-tab", "value": "inset 0 -3px var(--ink)", "purpose": "globals.css 선택된 preview-tabs와 tabs의 상태 표시; elevation 단계가 아님." }
     ],
     "motion": [
-      { "name": "control-transition", "value": "background-color 160ms ease-out, border-color 160ms ease-out", "purpose": "globals.css button, .button. reduced-motion에서는 none." },
+      { "name": "control-transition", "value": "background-color 160ms cubic-bezier(0, 0, 0.2, 1), border-color 160ms cubic-bezier(0, 0, 0.2, 1)", "purpose": "globals.css base 레이어 button, .button의 @apply duration-160 ease-out. Tailwind --ease-out의 컴파일된 값이며 CSS ease-out 키워드와 다름. reduced-motion에서는 transition-property: none." },
       { "name": "plan-reveal", "value": "plan-reveal 650ms cubic-bezier(0.16, 1, 0.3, 1) both", "purpose": "홈 예시 막대 clip-path inset(0 100% 0 0) → inset(0). reduced-motion에서는 none." }
     ],
     "breakpoints": [
@@ -44,57 +44,57 @@
   "components": [
     {
       "name": "일반 주요 버튼", "kind": "button", "refersTo": "button-primary",
-      "description": "globals.css button + .primary. 직접 추출, 신뢰도 높음; 최소 높이와 상태를 보존한다.",
+      "description": "globals.css base button과 components .primary의 @apply를 literal CSS로 확장. 컴파일 결과·computed style 대조, 신뢰도 높음.",
       "html": "<button type=\"button\" class=\"ds-primary\">저장</button>",
-      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:var(--paper);border-radius:6px;min-height:46px;padding:10px 18px;font:550 15px/1.4 \"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;transition:background-color 160ms ease-out,border-color 160ms ease-out}.ds-primary:hover{background:#4c435e;border-color:#4c435e}.ds-primary:focus-visible{outline:2px solid var(--accent-dark);outline-offset:4px}.ds-primary:disabled{cursor:not-allowed;opacity:.5}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none}}"
+      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:var(--paper);border-radius:6px;min-height:46px;padding:10px 18px;font:550 15px/1.4 \"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;transition:background-color 160ms cubic-bezier(0,0,.2,1),border-color 160ms cubic-bezier(0,0,.2,1)}.ds-primary:hover{background:#4c435e;border-color:#4c435e}.ds-primary:focus-visible{outline:2px solid var(--accent-dark);outline-offset:4px}.ds-primary:disabled{cursor:not-allowed;opacity:.5}@media(prefers-reduced-motion:reduce){.ds-primary{transition-property:none}}"
     },
     {
       "name": "보조 버튼", "kind": "button", "refersTo": "button-secondary",
       "description": "globals.css 기본 button. 이름 변경·새 플래너 등에 쓰는 종이색 컨트롤.",
       "html": "<button type=\"button\" class=\"ds-secondary\">이름 변경</button>",
-      "css": ".ds-secondary{display:inline-flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:6px;min-height:46px;padding:10px 18px;font:550 15px/1.4 \"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;transition:background-color 160ms ease-out,border-color 160ms ease-out}.ds-secondary:hover{background:var(--soft);border-color:#a69b8e}.ds-secondary:focus-visible{outline:2px solid var(--accent-dark);outline-offset:4px}.ds-secondary:disabled{cursor:not-allowed;opacity:.5}@media(prefers-reduced-motion:reduce){.ds-secondary{transition:none}}"
+      "css": ".ds-secondary{display:inline-flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:6px;min-height:46px;padding:10px 18px;font:550 15px/1.4 \"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;transition:background-color 160ms cubic-bezier(0,0,.2,1),border-color 160ms cubic-bezier(0,0,.2,1)}.ds-secondary:hover{background:var(--soft);border-color:#a69b8e}.ds-secondary:focus-visible{outline:2px solid var(--accent-dark);outline-offset:4px}.ds-secondary:disabled{cursor:not-allowed;opacity:.5}@media(prefers-reduced-motion:reduce){.ds-secondary{transition-property:none}}"
     },
     {
       "name": "텍스트 버튼", "kind": "button", "refersTo": "button-text",
-      "description": "globals.css .text-button. 평가하기·내 플래너 같은 보조 동작.",
+      "description": "globals.css components .text-button이 base hover보다 우선한다. 평가하기·내 플래너 같은 보조 동작이며 hover에서도 투명 배경·경계를 유지한다.",
       "html": "<button type=\"button\" class=\"ds-text\">평가하기</button>",
-      "css": ".ds-text{display:inline-flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;border:1px solid transparent;background:transparent;color:var(--ink);border-radius:6px;min-height:46px;padding:8px 10px;font:550 15px/1.4 \"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;text-decoration:underline;text-underline-offset:4px;transition:background-color 160ms ease-out,border-color 160ms ease-out}.ds-text:hover{background:var(--soft);border-color:#a69b8e}.ds-text:focus-visible{outline:2px solid var(--accent-dark);outline-offset:4px}.ds-text:disabled{cursor:not-allowed;opacity:.5}@media(prefers-reduced-motion:reduce){.ds-text{transition:none}}"
+      "css": ".ds-text{display:inline-flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;border:1px solid transparent;background:transparent;color:var(--ink);border-radius:6px;min-height:46px;padding:8px 10px;font:550 15px/1.4 \"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;text-decoration:underline;text-underline-offset:4px;transition:background-color 160ms cubic-bezier(0,0,.2,1),border-color 160ms cubic-bezier(0,0,.2,1)}.ds-text:hover{background:transparent;border-color:transparent}.ds-text:focus-visible{outline:2px solid var(--accent-dark);outline-offset:4px}.ds-text:disabled{cursor:not-allowed;opacity:.5}@media(prefers-reduced-motion:reduce){.ds-text{transition-property:none}}"
     },
     {
       "name": "홈 시작 버튼", "kind": "button", "refersTo": "button-hero",
       "description": "intro.tsx + globals.css .intro-hero .primary. 일반 주요 버튼과 다른 종이색 변형. SVG는 ArrowRight의 선 도형.",
       "html": "<button type=\"button\" class=\"ds-hero\">나의 플래너 시작하기<svg aria-hidden=\"true\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14m-7-7 7 7-7 7\"/></svg></button>",
-      "css": ".ds-hero{display:inline-flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;width:100%;border:1px solid transparent;background:var(--paper);color:var(--ink);border-radius:6px;min-height:64px;padding:18px 24px;font:550 17px/1.4 \"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;transition:background-color 160ms ease-out,border-color 160ms ease-out}.ds-hero svg{width:18px;height:18px;flex-shrink:0}.ds-hero:hover{background:var(--butter);border-color:transparent}.ds-hero:focus-visible{outline:2px solid var(--accent-dark);outline-offset:4px}.ds-hero:disabled{cursor:not-allowed;opacity:.5}@media(max-width:760px){.ds-hero{min-height:58px}}@media(prefers-reduced-motion:reduce){.ds-hero{transition:none}}"
+      "css": ".ds-hero{display:inline-flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;width:100%;border:1px solid transparent;background:var(--paper);color:var(--ink);border-radius:6px;min-height:64px;padding:18px 24px;font:550 17px/1.4 \"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;transition:background-color 160ms cubic-bezier(0,0,.2,1),border-color 160ms cubic-bezier(0,0,.2,1)}.ds-hero svg{width:18px;height:18px;flex-shrink:0}.ds-hero:hover{background:var(--butter);border-color:transparent}.ds-hero:focus-visible{outline:2px solid var(--accent-dark);outline-offset:4px}.ds-hero:disabled{cursor:not-allowed;opacity:.5}@media(max-width:760px){.ds-hero{min-height:58px}}@media(prefers-reduced-motion:reduce){.ds-hero{transition-property:none}}"
     },
     {
       "name": "입력 필드", "kind": "input", "refersTo": "input-field",
       "description": "auth.tsx / piece-editor.tsx와 globals.css의 동일한 필드. 전용 hover·오류 외곽선은 없음.",
       "html": "<label class=\"ds-field-label\" for=\"ds-piece-title\">활동 제목</label><input class=\"ds-field\" id=\"ds-piece-title\" value=\"주말 창작 활동\" />",
-      "css": ".ds-field-label{display:block;color:var(--ink);font:550 14px/1.65 \"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;margin:20px 0 8px}.ds-field{display:block;width:100%;border:1px solid #aaa091;border-radius:5px;padding:12px 14px;background:#fffefa;color:var(--ink);min-height:48px;font:400 15px/1.65 \"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;caret-color:var(--accent-dark)}.ds-field:focus,.ds-field:focus-visible{outline:2px solid var(--accent-dark);outline-offset:2px}.ds-field:disabled{background:var(--soft);color:var(--muted)}"
+      "css": ".ds-field-label{display:block;color:var(--ink);font:550 14px/20px \"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;margin:20px 0 8px}.ds-field{display:block;width:100%;border:1px solid #aaa091;border-radius:5px;padding:12px 14px;background:#fffefa;color:var(--ink);min-height:48px;font:400 15px/1.65 \"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;caret-color:var(--accent-dark)}.ds-field:focus,.ds-field:focus-visible{outline:2px solid var(--accent-dark);outline-offset:2px}.ds-field:disabled{background:var(--soft);color:var(--muted)}"
     },
     {
       "name": "헤더 구획 링크", "kind": "nav", "refersTo": "header-navigation",
       "description": "site-header.tsx의 데스크톱 홈 구획 링크. 760px 이하에서는 숨기며 계정 동작은 별도로 유지한다.",
       "html": "<nav class=\"ds-nav\" aria-label=\"홈 구획\"><a href=\"/#possibilities\">세 가지 삶의 가능성</a><a href=\"/#method\">이용 방법</a></nav>",
-      "css": ".ds-nav{display:flex;gap:24px;align-items:center;color:var(--ink);font:400 14px/1.65 \"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif}.ds-nav>a{color:inherit;text-decoration:none;text-underline-offset:4px}.ds-nav>a:hover{text-decoration:underline}.ds-nav>a:focus-visible{outline:2px solid var(--accent-dark);outline-offset:4px}@media(max-width:760px){.ds-nav{gap:8px}.ds-nav>a{display:none}}"
+      "css": ".ds-nav{display:flex;gap:24px;align-items:center;color:var(--ink);font:400 14px/20px \"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif}.ds-nav>a{color:inherit;text-decoration:none;text-underline-offset:4px}.ds-nav>a:hover{text-decoration:underline}.ds-nav>a:focus-visible{outline:2px solid var(--accent-dark);outline-offset:4px}@media(max-width:760px){.ds-nav{gap:8px}.ds-nav>a{display:none}}"
     },
     {
       "name": "결과 예시 레이블", "kind": "chip", "refersTo": "sample-label",
       "description": "plan-preview.tsx .sample-label. 정적 레이블이며 상호작용·선택 상태는 없다.",
       "html": "<span class=\"ds-sample-label\">결과 예시</span>",
-      "css": ".ds-sample-label{display:inline;color:var(--ink);font:400 12px/1.65 \"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;border:1px solid #b1a896;padding:3px 12px;border-radius:20px;white-space:nowrap}"
+      "css": ".ds-sample-label{display:inline;color:var(--ink);font:400 12px/16px \"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;border:1px solid #b1a896;padding:3px 12px;border-radius:20px;white-space:nowrap}"
     },
     {
       "name": "계획 상세 면", "kind": "card", "refersTo": "plan-details-a",
       "description": "board.tsx .details-pane의 정적 발췌. --plan-color는 선택 계획에서 상속; A는 기본값. 떠 있는 카드가 아니다.",
       "html": "<aside class=\"ds-details\"><h2>일을 이어가며 생활의 여유 만들기</h2><p class=\"ds-kind\">현재 방향을 발전시키는 계획</p><p class=\"ds-description\">지금의 삶에서 소중한 것을 지키며 더 나은 방향으로 이어갑니다.</p></aside>",
-      "css": ".ds-details{min-width:0;padding:26px;background:var(--plan-color,var(--plan-a));color:var(--ink);font:400 15px/1.65 \"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif}.ds-details h2{margin:0 0 14px;padding-top:5px;font-size:24px;line-height:1.4;letter-spacing:-.025em;font-weight:650;text-wrap:balance;overflow-wrap:anywhere}.ds-kind{margin:0;font-size:12px;color:#51465f}.ds-description{font-size:14px;line-height:1.9;margin:14px 0 24px;white-space:pre-wrap;overflow-wrap:anywhere}@media(max-width:760px){.ds-details{padding:24px}}"
+      "css": ".ds-details{min-width:0;padding:26px;background:var(--plan-color,var(--plan-a));color:var(--ink);font:400 15px/1.65 \"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif}.ds-details h2{margin:0 0 14px;padding-top:5px;font-size:24px;line-height:1.4;letter-spacing:-.025em;font-weight:650;text-wrap:balance;overflow-wrap:anywhere}.ds-kind{margin:0;font-size:12px;line-height:16px;color:#51465f}.ds-description{font-size:14px;line-height:1.9;margin:14px 0 24px;white-space:pre-wrap;overflow-wrap:anywhere}@media(max-width:760px){.ds-details{padding:24px}}"
     },
     {
       "name": "선택된 계획 탭", "kind": "button", "refersTo": "plan-tab-a-selected",
       "description": "board.tsx + globals.css .tabs. 이 미리보기는 선택된 A 탭의 CSS 상태 발췌이며 앱의 탭 전환 로직은 포함하지 않는다.",
       "html": "<div class=\"ds-tabs\"><button type=\"button\" class=\"ds-tab\" aria-pressed=\"true\">A · 현재 방향을 발전시키는 계획</button></div>",
-      "css": ".ds-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:32px;border-bottom:1px solid var(--ink)}.ds-tab{display:inline-flex;align-items:center;justify-content:flex-start;gap:10px;cursor:pointer;min-height:46px;border:0;border-radius:0;background:var(--plan-color,var(--plan-a));color:var(--ink);padding:18px;text-align:left;font:650 14px/1.4 \"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;box-shadow:inset 0 -3px var(--ink);transition:background-color 160ms ease-out,border-color 160ms ease-out}.ds-tab:hover{background:var(--plan-color,var(--plan-a))}.ds-tab:focus-visible{outline:2px solid var(--accent-dark);outline-offset:4px}@media(max-width:1100px){.ds-tab{padding:16px 12px;font-size:13px}}@media(max-width:760px){.ds-tabs{margin-bottom:24px}.ds-tab{flex-direction:column;align-items:flex-start;font-size:12px;padding:14px 10px;gap:4px}}@media(prefers-reduced-motion:reduce){.ds-tab{transition:none}}"
+      "css": ".ds-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:32px;border-bottom:1px solid var(--ink)}.ds-tab{display:inline-flex;align-items:center;justify-content:flex-start;gap:10px;cursor:pointer;min-height:46px;border:0;border-radius:0;background:var(--plan-color,var(--plan-a));color:var(--ink);padding:18px;text-align:left;font:650 14px/1.4 \"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;box-shadow:inset 0 -3px var(--ink);transition:background-color 160ms cubic-bezier(0,0,.2,1),border-color 160ms cubic-bezier(0,0,.2,1)}.ds-tab:hover{background:var(--plan-color,var(--plan-a))}.ds-tab:focus-visible{outline:2px solid var(--accent-dark);outline-offset:4px}@media(max-width:1100px){.ds-tab{padding:16px 12px;font-size:13px}}@media(max-width:760px){.ds-tabs{margin-bottom:24px}.ds-tab{flex-direction:column;align-items:flex-start;font-size:12px;padding:14px 10px;gap:4px}}@media(prefers-reduced-motion:reduce){.ds-tab{transition-property:none}}"
     },
     {
       "name": "예시 막대 드러내기", "kind": "custom",
@@ -111,7 +111,7 @@
   ],
   "narrative": {
     "northStar": "컬러 스튜디오",
-    "overview": "삶의 여러 가능성을 밝은 종이와 컬러 면 위에 구체적으로 그린다. SNS에 익숙한 젊은 사용자에게 감성적인 개인 플래너로 다가가되, 긴 생각과 실제 편집을 받치는 또렷한 한글과 익숙한 웹 컨트롤을 유지한다. 넓은 제목, 얇은 경계, 평평한 색면과 밀도 있는 작업 영역이 같은 세계를 만든다.\n\n주홍은 소개와 녹음의 활력, 버터는 질문과 안내, 라임·연보라·살구는 세 계획의 식별을 맡는다. 로그인·계정·편집 폼도 종이 바탕, 잉크 텍스트, 같은 필드와 버튼을 사용한다. 기존 흑백 정체성을 교체한다는 확인된 방향을 기록하며, 제품 사실과 한국어 콘텐츠·정책의 진실은 PRODUCT.md가 맡는다.\n\n근거와 신뢰도: 토큰·상태·경계값은 frontend/app/globals.css에서 직접 추출해 신뢰도 높음. 동작과 적용 범위는 frontend/components/home/{intro,plan-preview}.tsx, frontend/components/navigation/site-header.tsx, frontend/components/planner/{board,planner-list,piece-editor}.tsx, frontend/components/auth/auth.tsx, frontend/components/modal.tsx 및 frontend/hooks/planner/use-timeline-export.ts로 확인했다. 정성 언어는 PRODUCT.md와 .impeccable/surfaces/redesign.md 및 사용자가 선택한 .impeccable/mocks/decision/round2-color-studio.html에 근거한다. .impeccable/review/final-home/{desktop,mobile}.png와 .impeccable/review/{board-desktop,list-mobile,interview-mobile}.png는 시각 교차 확인 자료이며 수치의 출처는 코드다. 보지 않은 화면이나 배포 환경까지 검증했다는 뜻은 아니다.",
+    "overview": "삶의 여러 가능성을 밝은 종이와 컬러 면 위에 구체적으로 그린다. SNS에 익숙한 젊은 사용자에게 감성적인 개인 플래너로 다가가되, 긴 생각과 실제 편집을 받치는 또렷한 한글과 익숙한 웹 컨트롤을 유지한다. 넓은 제목, 얇은 경계, 평평한 색면과 밀도 있는 작업 영역이 같은 세계를 만든다.\n\n주홍은 소개와 녹음의 활력, 버터는 질문과 안내, 라임·연보라·살구는 세 계획의 식별을 맡는다. 로그인·계정·편집 폼도 종이 바탕, 잉크 텍스트, 같은 필드와 버튼을 사용한다. 기존 흑백 정체성을 교체한다는 확인된 방향을 기록하며, 제품 사실과 한국어 콘텐츠·정책의 진실은 PRODUCT.md가 맡는다.\n\n근거와 신뢰도: 토큰·상태·경계값은 frontend/app/globals.css의 Tailwind 소스와 Compose frontend가 제공하는 컴파일된 CSS·브라우저 computed style을 대조해 신뢰도 높음. 동작과 적용 범위는 frontend/components/home/{intro,plan-preview}.tsx, frontend/components/navigation/site-header.tsx, frontend/components/planner/{board,planner-list,piece-editor}.tsx, frontend/components/auth/auth.tsx, frontend/components/modal.tsx 및 frontend/hooks/planner/use-timeline-export.ts에 근거한다. 정성 언어는 PRODUCT.md와 .impeccable/surfaces/redesign.md 및 사용자가 선택한 .impeccable/mocks/decision/round2-color-studio.html에 근거한다. .impeccable/review/tailwind-home/{desktop,mobile}.png와 .impeccable/review/{tailwind-board-desktop,tailwind-list-mobile,tailwind-interview-mobile}.png로 시각 교차 확인했다. 보지 않은 화면이나 배포 환경까지 검증했다는 뜻은 아니다.",
     "keyCharacteristics": ["밝은 종이, 어두운 잉크, 역할이 분리된 컬러 면.", "A/B/C 식별색이 결과 예시·보드·PNG까지 이어지는 연속성.", "Pretendard Variable의 한글 위계와 얇은 경계.", "평평한 작업 면, 작은 컨트롤 곡률, 모달에 한정된 부드러운 그림자."],
     "rules": [
       { "name": "The Palette Split Rule", "body": "주홍은 소개·녹음 강조, 잉크는 일반 주요 동작, A/B/C 색은 계획 식별을 맡는다.", "section": "colors" },

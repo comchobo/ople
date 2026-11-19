@@ -1,8 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Job, Planner, User } from "@/api/core";
-import { listGenerations, runGeneration } from "@/api/generations";
+import type { Planner, User } from "@/api/core";
 import {
   deletePlanner,
   flushSaves,
@@ -10,9 +9,8 @@ import {
   savePlanner,
 } from "@/api/planners";
 
-export function usePlanners(user: User | null, poll = false) {
+export function usePlanners(user: User | null) {
   const [planners, setPlanners] = useState<Planner[]>([]);
-  const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const version = useRef(0);
@@ -22,10 +20,7 @@ export function usePlanners(user: User | null, poll = false) {
     const account = version.current;
     await flushSaves();
     const started = revision.current;
-    const [values, tasks] = await Promise.all([
-      listPlanners(),
-      listGenerations(),
-    ]);
+    const values = await listPlanners();
     if (account !== version.current) return;
     setPlanners((current) =>
       values.map((value) =>
@@ -34,12 +29,10 @@ export function usePlanners(user: User | null, poll = false) {
           : value,
       ),
     );
-    setJobs(tasks);
   }, []);
   useEffect(() => {
     const account = ++version.current;
     setPlanners([]);
-    setJobs([]);
     setError("");
     localEdits.current.clear();
     setLoading(true);
@@ -56,13 +49,6 @@ export function usePlanners(user: User | null, poll = false) {
       version.current += 1;
     };
   }, [user, refresh]);
-  useEffect(() => {
-    if (!poll || !user || !jobs.some((job) => job.status === "running")) return;
-    const timer = setInterval(() => {
-      void refresh().catch(() => {});
-    }, 3000);
-    return () => clearInterval(timer);
-  }, [poll, user, jobs, refresh]);
   function change(value: Planner) {
     localEdits.current.set(value.id, ++revision.current);
     setPlanners((current) =>
@@ -80,32 +66,12 @@ export function usePlanners(user: User | null, poll = false) {
       if (account === version.current) setError((cause as Error).message);
     }
   }
-  async function retryGeneration(id: string) {
-    const account = version.current;
-    setJobs((current) =>
-      current.map((job) =>
-        job.id === id ? { ...job, status: "running" } : job,
-      ),
-    );
-    try {
-      const result = await runGeneration(id);
-      if (account !== version.current) return;
-      if (result.status !== "completed" || !result.planner_id) await refresh();
-      return result;
-    } catch (cause) {
-      if (account !== version.current) return;
-      setError((cause as Error).message);
-      await refresh().catch(() => {});
-    }
-  }
   return {
     planners,
-    jobs,
     loading,
     error,
     setError,
     refresh,
-    retryGeneration,
     change,
     remove,
   };

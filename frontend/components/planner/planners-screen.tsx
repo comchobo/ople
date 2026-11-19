@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Job, Planner } from "@/api/core";
 import { useRequireAuth } from "@/hooks/auth/use-require-auth";
+import { useGenerationJobs } from "@/hooks/planner/use-generation-jobs";
 import { usePlanners } from "@/hooks/planner/use-planners";
 import { useAppNavigation } from "@/hooks/use-app-navigation";
 import { GenerationNotices } from "./generation-notices";
@@ -13,14 +14,21 @@ export function PlannersScreen() {
   const { user, loading: authLoading } = useRequireAuth();
   const {
     planners,
-    jobs,
-    loading,
-    error,
-    setError,
-    retryGeneration,
+    loading: plannersLoading,
+    error: plannersError,
+    refresh: refreshPlanners,
     change,
     remove,
-  } = usePlanners(user, true);
+  } = usePlanners(user);
+  const {
+    jobs,
+    loading: jobsLoading,
+    error: jobsError,
+    setError,
+    retryGeneration,
+  } = useGenerationJobs(user, { poll: true, onPoll: refreshPlanners });
+  const loading = plannersLoading || jobsLoading;
+  const error = plannersError || jobsError;
   const move = useAppNavigation();
   const [rename, setRename] = useState<Planner | null>(null);
   useEffect(() => {
