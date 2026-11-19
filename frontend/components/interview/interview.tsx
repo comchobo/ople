@@ -1,7 +1,7 @@
 "use client";
 
 import type { Job } from "@/api/core";
-import { useInterview } from "@/hooks/use-interview";
+import { useInterview } from "@/hooks/interview/use-interview";
 import { InterviewSteps } from "./interview-steps";
 import { Recorder } from "./recorder";
 

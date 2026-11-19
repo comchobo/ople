@@ -6,7 +6,7 @@ import type { Planner } from "@/api/core";
 import { HomeScreen } from "@/components/home/home-screen";
 import { InterviewScreen } from "@/components/interview/interview-screen";
 import { SiteHeader } from "@/components/navigation/site-header";
-import { AuthProvider } from "@/hooks/use-auth";
+import { AuthProvider } from "@/hooks/auth/use-auth";
 import { PlannerBoardScreen } from "./planner-board-screen";
 import { PlannersScreen } from "./planners-screen";
 

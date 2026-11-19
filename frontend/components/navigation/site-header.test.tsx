@@ -1,8 +1,8 @@
 import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { AuthProvider } from "@/hooks/auth/use-auth";
 import { setInterviewActive } from "@/hooks/use-app-navigation";
-import { AuthProvider } from "@/hooks/use-auth";
 import { SiteHeader } from "./site-header";
 
 const router = vi.hoisted(() => ({ push: vi.fn(), replace: vi.fn() }));
