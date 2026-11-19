@@ -17,4 +17,5 @@
 
 - Keep `lib/` domain-agnostic.
 - Keep `components/` for React component modules and their tests.
+- Always use TailwindCSS for styling.
 - When making UI changes, attach screenshots to the PR body.

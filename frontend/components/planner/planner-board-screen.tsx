@@ -16,7 +16,7 @@ export function PlannerBoardScreen({ plannerId }: { plannerId: string }) {
       void move("/planners", true, true);
   }, [user, loading, error, planner, move]);
   return (
-    <main className="board">
+    <main className="min-h-0 flex-1 [scrollbar-color:#aaa_#f3f3f3] [scrollbar-width:thin] flex flex-col overflow-hidden p-7 pb-0">
       {authLoading || loading ? (
         <p>불러오는 중…</p>
       ) : (

@@ -64,8 +64,16 @@ export function Auth({
       }
       close={close}
     >
-      <a className="button wide google-login" href={googleLoginUrl}>
-        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+      <a
+        className="flex min-h-11 w-full cursor-pointer items-center justify-center gap-2.5 rounded-[3px] border border-[#d4d4d4] bg-white px-3.5 py-[9px] text-center leading-[1.4] no-underline hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px]"
+        href={googleLoginUrl}
+      >
+        <svg
+          aria-hidden="true"
+          className="size-[18px] shrink-0"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
           <path
             fill="#4285F4"
             d="M22.56 12.25c0-.71-.06-1.39-.18-2.05H12v3.88h5.92a5.07 5.07 0 0 1-2.2 3.32v2.77h3.56c2.08-1.92 3.28-4.75 3.28-7.92Z"
@@ -85,12 +93,13 @@ export function Auth({
         </svg>
         Google로 계속하기
       </a>
-      <p className="muted space">또는 이메일로 계속하기</p>
+      <p className="mt-6 text-[#666]">또는 이메일로 계속하기</p>
       <form onSubmit={submit}>
-        <label className="field" htmlFor="email">
+        <label className="mt-4 mb-1.5 block text-[13px]" htmlFor="email">
           이메일
         </label>
         <input
+          className="block min-h-11 w-full rounded-[3px] border border-[#aaa] bg-white p-[11px] caret-[#222] focus:[outline:2px_solid_#555] focus:[outline-offset:1px]"
           id="email"
           type="email"
           autoComplete="email"
@@ -101,10 +110,11 @@ export function Auth({
         />
         {mode !== "verify" ? (
           <>
-            <label className="field" htmlFor="password">
+            <label className="mt-4 mb-1.5 block text-[13px]" htmlFor="password">
               비밀번호
             </label>
             <input
+              className="block min-h-11 w-full rounded-[3px] border border-[#aaa] bg-white p-[11px] caret-[#222] focus:[outline:2px_solid_#555] focus:[outline-offset:1px]"
               id="password"
               type="password"
               minLength={8}
@@ -119,13 +129,14 @@ export function Auth({
           </>
         ) : (
           <>
-            <p className="small space">
+            <p className="mt-6 text-[12px]">
               메일로 전송한 인증번호를 10분 안에 입력해주세요.
             </p>
-            <label className="field" htmlFor="code">
+            <label className="mt-4 mb-1.5 block text-[13px]" htmlFor="code">
               인증번호
             </label>
             <input
+              className="block min-h-11 w-full rounded-[3px] border border-[#aaa] bg-white p-[11px] caret-[#222] focus:[outline:2px_solid_#555] focus:[outline-offset:1px]"
               id="code"
               inputMode="numeric"
               autoComplete="one-time-code"
@@ -135,7 +146,7 @@ export function Auth({
               onChange={(e) => setCode(e.target.value)}
             />
             <button
-              className="text-button"
+              className="min-h-11 cursor-pointer rounded-[3px] border border-transparent bg-transparent p-2 leading-[1.4] underline underline-offset-4 hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45]"
               type="button"
               disabled={busy || cooldown > 0}
               onClick={sendCode}
@@ -145,11 +156,18 @@ export function Auth({
           </>
         )}
         {error && (
-          <p role="alert" className="error space">
+          <p
+            role="alert"
+            className="mt-6 border border-[#555] bg-[#f0f0f0] p-3.5"
+          >
             {error}
           </p>
         )}
-        <button className="primary wide space" disabled={busy} type="submit">
+        <button
+          className="mt-6 w-full min-h-11 cursor-pointer rounded-[3px] border border-[#222] bg-[#222] px-3.5 py-[9px] leading-[1.4] text-white hover:border-[#999] hover:bg-[#444] hover:text-white focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45]"
+          disabled={busy}
+          type="submit"
+        >
           {busy
             ? "처리 중…"
             : mode === "login"
@@ -160,7 +178,7 @@ export function Auth({
         </button>
       </form>
       <button
-        className="text-button space"
+        className="mt-6 min-h-11 cursor-pointer rounded-[3px] border border-transparent bg-transparent p-2 leading-[1.4] underline underline-offset-4 hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45]"
         type="button"
         onClick={() => {
           setMode(mode === "login" ? "signup" : "login");

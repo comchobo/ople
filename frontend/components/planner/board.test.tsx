@@ -37,13 +37,13 @@ describe("플래너 편집", () => {
     const { container } = render(
       <RatingSummary scores={{ resources: 0, appeal: 8 }} />,
     );
-    const values = container.querySelectorAll(".rating-value");
+    const values = container.querySelectorAll("[data-score]");
     expect(values[0]).toHaveTextContent("자원 0");
-    expect(values[0].querySelector(".rating-meter span")).toHaveStyle({
+    expect(values[0].querySelector("span")).toHaveStyle({
       width: "0%",
     });
     expect(values[1]).toHaveTextContent("호감 8");
-    expect(values[1].querySelector(".rating-meter span")).toHaveStyle({
+    expect(values[1].querySelector("span")).toHaveStyle({
       width: "80%",
     });
     expect(values[2]).toHaveTextContent("자신감 미평가");
