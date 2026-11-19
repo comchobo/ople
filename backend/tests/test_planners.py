@@ -9,8 +9,8 @@ from models.generations import Generation
 from models.planners import Planner
 from models.users import User
 from schemas.planners import Plans
-from services import generations
 from services.ownership import owned
+from services.planner import generations
 
 
 def test_schema_rejects_overflow_duplicate_ids_and_invalid_scores(plans_data):

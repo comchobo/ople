@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 from models.planners import Planner
 from models.recordings import Recording
-from services import google, sessions
+from services.auth import google, sessions
 
 
 def authenticated(client, db):
@@ -43,7 +43,8 @@ def test_planner_save_delete_and_user_isolation(client, db, plans_data):
 
 
 def test_audio_is_retained_and_only_metadata_returned(client, db, monkeypatch, tmp_path):
-    from services import recording_files, recordings
+    from services.recording import storage as recording_files
+    from services.recording import uploads as recordings
 
     user = authenticated(client, db)
     monkeypatch.setattr(recording_files, "RECORDINGS_DIR", tmp_path)

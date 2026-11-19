@@ -12,8 +12,8 @@ from sqlmodel import Session, select
 from config import origin
 from models.auth import OAuthAttempt
 from models.users import User
-from services.auth import normalize
-from services.sessions import digest
+from services.auth.accounts import normalize
+from services.auth.sessions import digest
 from utils.clock import now
 from utils.env import required
 

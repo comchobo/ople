@@ -9,7 +9,8 @@ from models.users import User
 from routers.cookies import login_cookie, secure_cookie
 from routers.dependencies import DB, CurrentUser
 from schemas.auth import Credentials, Verify
-from services import auth, google, sessions
+from services.auth import accounts as auth
+from services.auth import google, sessions
 
 router = APIRouter(prefix="/auth")
 

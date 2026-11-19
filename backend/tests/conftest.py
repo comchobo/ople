@@ -7,7 +7,7 @@ import models  # noqa: F401
 from db import session
 from main import app
 from models.users import User
-from services.sessions import create_session
+from services.auth.sessions import create_session
 
 
 @pytest.fixture

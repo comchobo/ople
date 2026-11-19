@@ -18,6 +18,8 @@ CONFIG = Path(__file__).parents[1] / "pyproject.toml"
         ("models/example.py", "import botocore\nprint(botocore)\n", False),
         ("schemas/example.py", "import httpx2\nprint(httpx2)\n", False),
         ("services/example.py", "import httpx\nhttpx.Client()\n", True),
+        ("services/external/example.py", "import httpx\nhttpx.Client()\n", True),
+        ("services/auth/example.py", "from authlib.jose import JsonWebToken\n", True),
         ("tests/test_example.py", "import httpx\nhttpx.MockTransport(print)\n", True),
     ],
 )
@@ -47,6 +49,9 @@ def test_external_sdk_boundary_is_enforced_for_imports_and_aliases(filename, cod
     ("source", "target", "allowed"),
     [
         ("services", "schemas", True),
+        ("services.interview", "schemas", True),
+        ("services.external", "routers", False),
+        ("services.auth", "routers", False),
         ("routers", "services", True),
         ("services", "routers", False),
         ("models", "services", False),
@@ -66,7 +71,10 @@ def test_layer_and_utility_contracts_reject_real_dependency_violations(
         (tmp_path / f"{module}.py").write_text("")
     # Keep external application modules visible to the graph even in allowed fixtures.
     (tmp_path / "routers" / "infrastructure.py").write_text("import config\nimport db\n")
-    (tmp_path / source / "example.py").write_text(f"import {target}\n")
+    source_path = tmp_path.joinpath(*source.split("."))
+    source_path.mkdir(parents=True, exist_ok=True)
+    (source_path / "__init__.py").touch()
+    (source_path / "example.py").write_text(f"import {target}\n")
     result = subprocess.run(
         [str(Path(sys.executable).with_name("lint-imports")), "--no-cache"],
         cwd=tmp_path,

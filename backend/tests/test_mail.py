@@ -1,7 +1,7 @@
 import boto3
 from botocore.stub import Stubber
 
-from services import mail
+from services.external import email as mail
 
 
 def test_signup_code_is_sent_through_ses_with_expected_recipient_and_content(monkeypatch):

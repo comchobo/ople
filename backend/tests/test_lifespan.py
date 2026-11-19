@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 
 from main import app
 from models.generations import Generation
-from services import generations
+from services.planner import generations
 
 
 def test_startup_marks_only_running_jobs_as_failed(database, db, monkeypatch):
