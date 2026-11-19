@@ -14,7 +14,7 @@ it.each([
   ["/privacy", PrivacyPage, "개인정보처리방침"],
   ["/terms", TermsPage, "서비스 약관"],
 ] as const)(
-  "%s도 루트 레이아웃의 공통 헤더와 인증 UI를 사용한다",
+  "%s는 인증 없이 정책 본문과 공통 헤더·푸터를 제공한다",
   (path, Page, title) => {
     window.history.replaceState({}, "", path);
     const document = new DOMParser().parseFromString(
@@ -30,5 +30,21 @@ it.each([
     expect(app?.querySelector("nav button")?.textContent).toBe("로그인");
     expect(app?.querySelector("main h1")?.textContent).toBe(title);
     expect(app?.querySelector("main")?.classList.contains("board")).toBe(false);
+    expect(app?.querySelector("main")?.textContent).not.toContain("준비 중");
+    expect(app?.querySelector("main")?.textContent).toContain("이홍주");
+    expect(app?.querySelector("main")?.textContent).toContain(
+      "삭제 요청 시까지",
+    );
+    expect(
+      app?.querySelector('main a[href="mailto:help@ople.ink"]'),
+    ).not.toBeNull();
+    const footer = app?.querySelector(":scope > footer");
+    expect(footer?.querySelector('a[href="/privacy"]')?.textContent).toBe(
+      "개인정보처리방침",
+    );
+    expect(footer?.querySelector('a[href="/terms"]')?.textContent).toBe(
+      "서비스 약관",
+    );
+    expect(footer?.previousElementSibling?.tagName).toBe("MAIN");
   },
 );

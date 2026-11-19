@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Navigation } from "@/components/navigation/navigation";
+import { SiteFooter } from "@/components/navigation/site-footer";
 import { SiteHeader } from "@/components/navigation/site-header";
 import { AuthProvider } from "@/hooks/auth/use-auth";
 import "./globals.css";
@@ -19,6 +20,7 @@ export default function RootLayout({
           <div id="app">
             <SiteHeader />
             {children}
+            <SiteFooter />
           </div>
         </AuthProvider>
       </body>
