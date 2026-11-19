@@ -1,8 +1,13 @@
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy.pool import StaticPool
 from sqlmodel import Session, SQLModel, create_engine
 
-from models import entities  # noqa: F401
+import models  # noqa: F401
+from db import session
+from main import app
+from models.users import User
+from services.sessions import create_session
 
 
 @pytest.fixture
@@ -22,8 +27,24 @@ def db(database):
 
 
 @pytest.fixture
+def client(db):
+    app.dependency_overrides[session] = lambda: db
+    yield TestClient(app)
+    app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def signed_in(client, db):
+    user = User(email="hello@example.com", name="이름")
+    db.add(user)
+    db.commit()
+    client.cookies.set("ople_session", create_session(db, user))
+    return user
+
+
+@pytest.fixture
 def plans_data():
-    from schemas.domain import KINDS
+    from schemas.planners import KINDS
 
     return {
         "plans": [
