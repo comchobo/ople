@@ -18,13 +18,21 @@ export function SiteFooter() {
     void navigate(event.currentTarget.pathname);
   }
   return (
-    <footer className="site-footer global-footer">
+    <footer className="flex shrink-0 flex-wrap items-center justify-between gap-x-6 gap-y-1 border-t border-(--line) px-7 py-2 text-[13px] text-(--muted)">
       <span>Ople · 오디세이 플래너</span>
-      <nav aria-label="서비스 정책">
-        <a href="/privacy" onClick={followPolicy}>
+      <nav className="flex flex-wrap gap-x-5" aria-label="서비스 정책">
+        <a
+          className="inline-flex min-h-11 items-center"
+          href="/privacy"
+          onClick={followPolicy}
+        >
           개인정보처리방침
         </a>
-        <a href="/terms" onClick={followPolicy}>
+        <a
+          className="inline-flex min-h-11 items-center"
+          href="/terms"
+          onClick={followPolicy}
+        >
           서비스 약관
         </a>
       </nav>
