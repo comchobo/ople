@@ -5,7 +5,7 @@ import pytest
 
 from schemas.interviews import Question
 from services.integrations import llm
-from services.integrations.errors import ProviderError
+from services.integrations.llm import LLMError
 
 
 @pytest.fixture
@@ -57,7 +57,7 @@ def test_llm_stops_after_two_repairs(ollama):
         return httpx.Response(200, json={"message": {"content": "invalid"}})
 
     ollama(handle)
-    with pytest.raises(ProviderError, match="AI 응답 형식이 올바르지 않습니다"):
+    with pytest.raises(LLMError, match="AI 응답 형식이 올바르지 않습니다"):
         llm.llm_json(Question, "질문", {})
     assert len(requests) == 3
 
@@ -77,6 +77,6 @@ def test_llm_translates_transport_and_response_errors_without_retrying(ollama, f
         return httpx.Response(200, content=b"invalid")
 
     ollama(handle)
-    with pytest.raises(ProviderError, match="AI 서비스에 연결할 수 없습니다"):
+    with pytest.raises(LLMError, match="AI 서비스에 연결할 수 없습니다"):
         llm.llm_json(Question, "질문", {})
     assert len(requests) == 1

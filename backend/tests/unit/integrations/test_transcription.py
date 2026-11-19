@@ -5,7 +5,7 @@ import httpx
 import pytest
 
 from services.integrations import transcription
-from services.integrations.errors import ProviderError
+from services.integrations.transcription import TranscriptionError
 
 
 @pytest.mark.parametrize("model", ["@cf/openai/whisper-large-v3-turbo", "@cf/openai/whisper"])
@@ -62,7 +62,7 @@ def test_stt_translates_remote_failures_to_provider_errors(monkeypatch, failure)
         "Client",
         lambda **kwargs: client(transport=httpx.MockTransport(handle), **kwargs),
     )
-    with pytest.raises(ProviderError) as error:
+    with pytest.raises(TranscriptionError) as error:
         transcription.transcribe(b"audio", "audio/webm")
     assert str(error.value) == (
         "음성을 인식하지 못했습니다. 다시 녹음해주세요."

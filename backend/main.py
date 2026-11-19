@@ -5,7 +5,8 @@ from fastapi.responses import JSONResponse
 
 from config import origin
 from routers.api import router
-from services.integrations.errors import ProviderError
+from services.integrations.llm import LLMError
+from services.integrations.transcription import TranscriptionError
 from services.planners.generations import recover_interrupted
 
 
@@ -30,8 +31,9 @@ async def same_origin(request: Request, call_next):
     return await call_next(request)
 
 
-@app.exception_handler(ProviderError)
-async def provider_error(request: Request, exc: ProviderError):
+@app.exception_handler(LLMError)
+@app.exception_handler(TranscriptionError)
+async def provider_error(request: Request, exc: LLMError | TranscriptionError):
     return JSONResponse({"detail": str(exc)}, status_code=502)
 
 

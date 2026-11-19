@@ -4,7 +4,7 @@ from sqlmodel import Session
 from models.recordings import Recording
 from models.users import User
 from schemas.interviews import Interview, Question, Summary
-from services.common.ownership import owned
+from services.common import owned
 from services.integrations.llm import llm_json
 
 

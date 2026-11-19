@@ -5,7 +5,8 @@ from sqlmodel import select
 
 from models.recordings import Recording
 from schemas.interviews import Question, Summary
-from services.integrations.errors import ProviderError
+from services.integrations.llm import LLMError
+from services.integrations.transcription import TranscriptionError
 from services.interviews import recording_files, recordings
 from services.interviews import service as interviews
 
@@ -81,7 +82,7 @@ def test_transcription_failure_keeps_private_audio_and_metadata(
     client, db, signed_in, tmp_path, monkeypatch
 ):
     monkeypatch.setattr(recording_files, "RECORDINGS_DIR", tmp_path)
-    monkeypatch.setattr(recordings, "transcribe", Mock(side_effect=ProviderError("인식 실패")))
+    monkeypatch.setattr(recordings, "transcribe", Mock(side_effect=TranscriptionError("인식 실패")))
     response = client.post(
         "/api/interview/recording",
         files={"audio": ("voice.webm", b"audio", "audio/webm;codecs=opus")},
@@ -93,3 +94,12 @@ def test_transcription_failure_keeps_private_audio_and_metadata(
     assert item.user_id == signed_in.id and item.content_type == "audio/webm"
     assert path.read_bytes() == b"audio"
     assert path.stat().st_mode & 0o777 == 0o600
+
+
+def test_question_provider_failure_returns_bad_gateway(client, signed_in, monkeypatch):
+    monkeypatch.setattr(interviews, "llm_json", Mock(side_effect=LLMError("AI 연결 실패")))
+
+    response = client.post("/api/interview/question", json={"interview_id": "i", "answers": []})
+
+    assert response.status_code == 502
+    assert response.json() == {"detail": "AI 연결 실패"}

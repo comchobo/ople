@@ -3,8 +3,11 @@ import json
 import httpx
 from pydantic import BaseModel, ValidationError
 
-from services.integrations.errors import ProviderError
 from utils.env import required
+
+
+class LLMError(Exception):
+    pass
 
 
 def llm_json[T: BaseModel](schema: type[T], instruction: str, context: dict) -> T:
@@ -43,7 +46,7 @@ def llm_json[T: BaseModel](schema: type[T], instruction: str, context: dict) -> 
                     return schema.model_validate_json(content)
                 except ValidationError:
                     if attempt == 2:
-                        raise ProviderError(
+                        raise LLMError(
                             "AI 응답 형식이 올바르지 않습니다. 다시 시도해주세요."
                         ) from None
                     messages.extend(
@@ -57,7 +60,7 @@ def llm_json[T: BaseModel](schema: type[T], instruction: str, context: dict) -> 
                         ]
                     )
     except (httpx.HTTPError, KeyError, ValueError, RuntimeError) as exc:
-        raise ProviderError(
+        raise LLMError(
             "AI 서비스에 연결할 수 없습니다. 설정을 확인하거나 다시 시도해주세요."
         ) from exc
-    raise ProviderError("AI 생성에 실패했습니다.")
+    raise LLMError("AI 생성에 실패했습니다.")

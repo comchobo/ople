@@ -2,8 +2,11 @@ import base64
 
 import httpx
 
-from services.integrations.errors import ProviderError
 from utils.env import required
+
+
+class TranscriptionError(Exception):
+    pass
 
 
 def transcribe(audio: bytes, content_type: str) -> str:
@@ -33,7 +36,9 @@ def transcribe(audio: bytes, content_type: str) -> str:
         data = response.json()
         text = data.get("result", {}).get("text", "").strip()
         if not data.get("success") or not text:
-            raise ProviderError("음성을 인식하지 못했습니다. 다시 녹음해주세요.")
+            raise TranscriptionError("음성을 인식하지 못했습니다. 다시 녹음해주세요.")
         return text
     except (httpx.HTTPError, ValueError) as exc:
-        raise ProviderError("음성 인식 서비스에 연결할 수 없습니다. 다시 시도해주세요.") from exc
+        raise TranscriptionError(
+            "음성 인식 서비스에 연결할 수 없습니다. 다시 시도해주세요."
+        ) from exc
