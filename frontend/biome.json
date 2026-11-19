@@ -12,6 +12,12 @@
     "enabled": true,
     "indentStyle": "space"
   },
+  "plugins": [
+    {
+      "path": "./biome-plugins/no-use-client-in-app.grit",
+      "includes": ["app/**/*.{js,jsx,ts,tsx,cjs,mjs}"]
+    }
+  ],
   "overrides": [
     {
       "includes": ["**/*.{js,jsx,ts,tsx,cjs,mjs}", "!api/**"],
