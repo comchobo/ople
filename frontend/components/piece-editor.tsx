@@ -2,8 +2,14 @@
 
 import { useState } from "react";
 import type { Category, Piece } from "@/api/core";
-import { categories } from "@/planners/labels";
 import { Modal } from "./modal";
+
+const categories: Record<Category, string> = {
+  work: "일",
+  creative: "창작",
+  relation: "관계",
+  rest: "휴식",
+};
 
 export function PieceEditor({
   piece,

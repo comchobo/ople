@@ -5,6 +5,7 @@
 - When implementing code, add meaningful unit, component, and integration tests that verify behavior, including external API interactions.
 - Do not write tests with trivial assertions or tests that merely mirror the implementation.
 - Give each module, function, and component one responsibility and one reason to change.
+- Do not add new architectural layers without the user's explicit request.
 
 ## Frontend
 

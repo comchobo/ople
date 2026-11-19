@@ -1,6 +1,26 @@
+"use client";
+
+import { useState } from "react";
 import type { Piece } from "@/api/core";
 
-export async function exportTimeline(pieces: Piece[], filename: string) {
+export function useTimelineExport() {
+  const [exporting, setExporting] = useState(false);
+  const [error, setError] = useState("");
+  async function download(pieces: Piece[], filename: string) {
+    setExporting(true);
+    setError("");
+    try {
+      await exportTimeline(pieces, filename);
+    } catch (cause) {
+      setError((cause as Error).message);
+    } finally {
+      setExporting(false);
+    }
+  }
+  return { exporting, error, download };
+}
+
+async function exportTimeline(pieces: Piece[], filename: string) {
   await document.fonts.ready;
   const scale = 2,
     width = 1200,

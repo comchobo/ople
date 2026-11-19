@@ -3,7 +3,30 @@
 import { Pencil } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Piece } from "@/api/core";
-import { type Adjustment, adjustPiece } from "@/planners/adjust-piece";
+
+type Adjustment = "move" | "start" | "end";
+const clamp = (value: number, min: number, max: number) =>
+  Math.max(min, Math.min(max, value));
+
+function adjustPiece(piece: Piece, mode: Adjustment, delta: number): Piece {
+  if (mode === "move")
+    return {
+      ...piece,
+      start: clamp(piece.start + delta, 0, 60 - piece.duration),
+    };
+  if (mode === "start") {
+    const start = clamp(
+      piece.start + delta,
+      0,
+      piece.start + piece.duration - 1,
+    );
+    return { ...piece, start, duration: piece.start + piece.duration - start };
+  }
+  return {
+    ...piece,
+    duration: clamp(piece.duration + delta, 1, 60 - piece.start),
+  };
+}
 
 type Drag = {
   id: string;

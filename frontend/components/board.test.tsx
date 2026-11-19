@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { Planner } from "@/api/core";
 import { Board } from "./board";
 import { PieceEditor } from "./piece-editor";
-import { RatingEditor } from "./rating-editor";
+import { RatingEditor, RatingSummary } from "./rating-editor";
 
 const planner: Planner = {
   id: "p",
@@ -33,6 +33,51 @@ const planner: Planner = {
 };
 
 describe("플래너 편집", () => {
+  it("평가 요약은 0점과 미평가를 구분해 표시한다", () => {
+    const { container } = render(
+      <RatingSummary scores={{ resources: 0, appeal: 8 }} />,
+    );
+    const values = container.querySelectorAll(".rating-value");
+    expect(values[0]).toHaveTextContent("자원 0");
+    expect(values[0].querySelector(".rating-meter span")).toHaveStyle({
+      width: "0%",
+    });
+    expect(values[1]).toHaveTextContent("호감 8");
+    expect(values[1].querySelector(".rating-meter span")).toHaveStyle({
+      width: "80%",
+    });
+    expect(values[2]).toHaveTextContent("자신감 미평가");
+    expect(values[3]).toHaveTextContent("일관성 미평가");
+  });
+  it("PNG 생성 실패를 보드에 표시하고 다시 저장할 수 있게 한다", async () => {
+    Object.defineProperty(document, "fonts", {
+      configurable: true,
+      value: { ready: Promise.resolve() },
+    });
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
+    try {
+      render(
+        <Board
+          planner={planner}
+          change={vi.fn()}
+          list={vi.fn()}
+          create={vi.fn()}
+        />,
+      );
+      const user = userEvent.setup();
+      await user.click(
+        screen.getByRole("button", { name: "타임라인 PNG 저장" }),
+      );
+      expect(await screen.findByRole("alert")).toHaveTextContent(
+        "이미지를 생성할 수 없습니다.",
+      );
+      expect(
+        screen.getByRole("button", { name: "타임라인 PNG 저장" }),
+      ).toBeEnabled();
+    } finally {
+      Reflect.deleteProperty(document, "fonts");
+    }
+  });
   it("플랜 전환과 활동 추가를 현재 플랜에 반영한다", async () => {
     const change = vi.fn(),
       user = userEvent.setup();

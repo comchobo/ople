@@ -2,13 +2,12 @@
 
 import { Pencil } from "lucide-react";
 import { useState } from "react";
-import type { Piece, Plan, Planner, ScoreKey } from "@/api/core";
+import type { Piece, Plan, Planner } from "@/api/core";
+import { useTimelineExport } from "@/hooks/use-timeline-export";
 import { formatDate } from "@/lib/date";
-import { exportTimeline } from "@/planners/export-timeline";
-import { ratingLabels } from "@/planners/labels";
 import { PieceEditor } from "./piece-editor";
 import { PlanEditor } from "./plan-editor";
-import { RatingEditor } from "./rating-editor";
+import { RatingEditor, RatingSummary } from "./rating-editor";
 import { Timeline } from "./timeline";
 
 export function Board({
@@ -25,8 +24,7 @@ export function Board({
   const [active, setActive] = useState(0);
   const [piece, setPiece] = useState<Piece | null>(null);
   const [editing, setEditing] = useState<"plan" | "rating" | null>(null);
-  const [exporting, setExporting] = useState(false);
-  const [error, setError] = useState("");
+  const { exporting, error, download } = useTimelineExport();
   const plan = planner.plans[active];
   function update(value: Plan) {
     change({
@@ -133,39 +131,17 @@ export function Board({
                 평가하기
               </button>
             </div>
-            <div className="rating-grid">
-              {Object.entries(ratingLabels).map(([key, label]) => (
-                <div key={key} className="rating-value">
-                  {label}{" "}
-                  <strong>{plan.scores[key as ScoreKey] ?? "미평가"}</strong>
-                  <div className="rating-meter">
-                    <span
-                      style={{
-                        width: `${(plan.scores[key as ScoreKey] ?? 0) * 10}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+            <RatingSummary scores={plan.scores} />
           </section>
           <button
             type="button"
             className="wide space"
             disabled={exporting}
-            onClick={async () => {
-              setExporting(true);
-              setError("");
-              try {
-                await exportTimeline(
-                  plan.pieces,
-                  `${planner.name}-${String.fromCharCode(65 + active)}`,
-                );
-              } catch (cause) {
-                setError((cause as Error).message);
-              } finally {
-                setExporting(false);
-              }
+            onClick={() => {
+              void download(
+                plan.pieces,
+                `${planner.name}-${String.fromCharCode(65 + active)}`,
+              );
             }}
           >
             {exporting ? "이미지 생성 중…" : "타임라인 PNG 저장"}

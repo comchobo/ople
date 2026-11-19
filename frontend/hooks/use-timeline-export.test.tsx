@@ -1,6 +1,7 @@
+import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import type { Piece } from "@/api/core";
-import { exportTimeline } from "./export-timeline";
+import { useTimelineExport } from "./use-timeline-export";
 
 const piece: Piece = {
   id: "p",
@@ -62,7 +63,27 @@ it("월 위치를 PNG에 반영하고 파일명을 정리해 다운로드한 뒤
   const click = vi
     .spyOn(HTMLAnchorElement.prototype, "click")
     .mockImplementation(() => {});
-  await exportTimeline([piece], "계획/A:B");
+  let ready!: () => void;
+  Object.defineProperty(document, "fonts", {
+    configurable: true,
+    value: {
+      ready: new Promise<void>((resolve) => {
+        ready = resolve;
+      }),
+    },
+  });
+  const { result } = renderHook(() => useTimelineExport());
+  let pending!: Promise<void>;
+  act(() => {
+    pending = result.current.download([piece], "계획/A:B");
+  });
+  expect(result.current.exporting).toBe(true);
+  await act(async () => {
+    ready();
+    await pending;
+  });
+  expect(result.current.exporting).toBe(false);
+  expect(result.current.error).toBe("");
   expect(context.fillRect).toHaveBeenCalledWith(240, 43, 120, 44);
   expect(context.fillText).toHaveBeenCalledWith("작은 실험", 246, 58);
   expect(createObjectURL).toHaveBeenCalledWith(blob);
@@ -74,7 +95,7 @@ it("월 위치를 PNG에 반영하고 파일명을 정리해 다운로드한 뒤
   expect(revokeObjectURL).toHaveBeenCalledWith("blob:timeline");
 });
 
-it("Canvas 인코딩 실패를 호출자에게 전달하고 다운로드하지 않는다", async () => {
+it("Canvas 인코딩 실패를 오류 상태로 제공하고 다운로드하지 않는다", async () => {
   canvasContext();
   vi.spyOn(HTMLCanvasElement.prototype, "toBlob").mockImplementation((done) =>
     done(null),
@@ -82,19 +103,27 @@ it("Canvas 인코딩 실패를 호출자에게 전달하고 다운로드하지 �
   const click = vi
     .spyOn(HTMLAnchorElement.prototype, "click")
     .mockImplementation(() => {});
-  await expect(exportTimeline([piece], "계획")).rejects.toThrow(
-    "이미지 생성에 실패했습니다.",
-  );
+  const { result } = renderHook(() => useTimelineExport());
+  await act(async () => {
+    await result.current.download([piece], "계획");
+  });
+  expect(result.current.error).toBe("이미지 생성에 실패했습니다.");
+  expect(result.current.exporting).toBe(false);
   expect(click).not.toHaveBeenCalled();
 });
 
 it("안전한 이미지 크기를 초과하면 Canvas를 생성하지 않는다", async () => {
+  const { result } = renderHook(() => useTimelineExport());
   const create = vi.spyOn(document, "createElement");
-  await expect(
-    exportTimeline(
+  await act(async () => {
+    await result.current.download(
       Array.from({ length: 250 }, () => piece),
       "계획",
-    ),
-  ).rejects.toThrow("타임라인이 너무 커서 이미지로 저장할 수 없습니다.");
+    );
+  });
+  expect(result.current.error).toBe(
+    "타임라인이 너무 커서 이미지로 저장할 수 없습니다.",
+  );
+  expect(result.current.exporting).toBe(false);
   expect(create).not.toHaveBeenCalledWith("canvas");
 });
