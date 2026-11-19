@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { AppShell } from "@/components/app-shell";
 import { Navigation } from "@/components/navigation";
+import { SiteLayout } from "@/components/site-layout";
 import { AuthProvider } from "@/hooks/use-auth";
 import "./globals.css";
 
@@ -16,7 +16,7 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <Navigation />
-          <AppShell>{children}</AppShell>
+          <SiteLayout>{children}</SiteLayout>
         </AuthProvider>
       </body>
     </html>
