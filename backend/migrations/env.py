@@ -1,8 +1,8 @@
 from alembic import context
 from sqlmodel import SQLModel
 
+import models  # noqa: F401
 from db import engine
-from models import entities  # noqa: F401
 
 with engine.connect() as connection:
     context.configure(connection=connection, target_metadata=SQLModel.metadata)

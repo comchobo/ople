@@ -2,29 +2,16 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from sqlalchemy import update
-from sqlmodel import col
 
-from db import engine
-from models.entities import Generation, now
+from config import origin
 from routers.api import router
-from services.providers import ProviderError
-from utils.config import origin
+from services.errors import ProviderError
+from services.generations import recover_interrupted
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # A terminated API request is retried explicitly; never silently re-run the LLM.
-    with engine.begin() as connection:
-        connection.execute(
-            update(Generation)
-            .where(col(Generation.status) == "running")
-            .values(
-                status="failed",
-                error="서버 재시작으로 중단되었습니다. 다시 시도해주세요.",
-                updated_at=now(),
-            )
-        )
+    recover_interrupted()
     yield
 
 

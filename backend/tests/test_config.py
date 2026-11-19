@@ -1,6 +1,8 @@
 import pytest
 
-from utils.config import origin, required, secure_cookie
+from config import origin
+from routers.cookies import secure_cookie
+from utils.env import required
 
 
 @pytest.mark.parametrize(

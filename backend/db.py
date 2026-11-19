@@ -1,6 +1,6 @@
 from sqlmodel import Session, create_engine
 
-from utils.config import required
+from utils.env import required
 
 url = required("DATABASE_URL")
 engine = create_engine(url.replace("postgresql://", "postgresql+psycopg://"), pool_pre_ping=True)

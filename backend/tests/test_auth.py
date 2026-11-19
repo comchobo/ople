@@ -5,8 +5,10 @@ import pytest
 from fastapi import HTTPException
 from sqlmodel import select
 
-from models.entities import LoginSession, Signup, User, now
-from services import auth
+from models.auth import LoginSession, Signup
+from models.users import User
+from services import auth, google, sessions
+from utils.clock import now
 
 
 def test_signup_verifies_code_and_hashes_password(db, monkeypatch):
@@ -52,9 +54,9 @@ def test_google_and_verified_email_merge_in_both_orders(db, monkeypatch):
     monkeypatch.setattr(auth, "send_code", sender)
     auth.start_signup(db, "hello@example.com", "password123")
     first = auth.verify_signup(db, "hello@example.com", sender.call_args.args[1])
-    google = auth.google_user(db, "google-1", "HELLO@example.com", "이름")
-    assert first.id == google.id
-    other = auth.google_user(db, "google-2", "other@example.com", "다른 이름")
+    linked = google.google_user(db, "google-1", "HELLO@example.com", "이름")
+    assert first.id == linked.id
+    other = google.google_user(db, "google-2", "other@example.com", "다른 이름")
     auth.start_signup(db, "other@example.com", "password456")
     verified = auth.verify_signup(db, "other@example.com", sender.call_args.args[1])
     assert other.id == verified.id
@@ -64,21 +66,21 @@ def test_google_and_verified_email_merge_in_both_orders(db, monkeypatch):
 def test_unverified_signup_does_not_set_google_password(db, monkeypatch):
     monkeypatch.setattr(auth, "send_code", Mock())
     auth.start_signup(db, "hello@example.com", "attacker-password")
-    user = auth.google_user(db, "google", "hello@example.com", "소유자")
+    user = google.google_user(db, "google", "hello@example.com", "소유자")
     assert user.password_hash is None
 
 
 def test_session_expiry_and_logout(db):
-    user = auth.google_user(db, "g", "hello@example.com", "이름")
-    token = auth.create_session(db, user)
-    assert auth.current_user(db, token).id == user.id
-    login = db.get(LoginSession, auth.digest(token))
+    user = google.google_user(db, "g", "hello@example.com", "이름")
+    token = sessions.create_session(db, user)
+    assert sessions.current_user(db, token).id == user.id
+    login = db.get(LoginSession, sessions.digest(token))
     assert token != login.token_hash
     login.expires_at = now() - timedelta(seconds=1)
     db.add(login)
     db.commit()
     with pytest.raises(HTTPException) as expired:
-        auth.current_user(db, token)
+        sessions.current_user(db, token)
     assert expired.value.status_code == 401
 
 
