@@ -3,7 +3,7 @@
 import { CircleUserRound } from "lucide-react";
 import { AccountDialog } from "@/components/auth/account-dialog";
 import { Auth } from "@/components/auth/auth";
-import { useAccountActions } from "@/hooks/use-account-actions";
+import { useAccountActions } from "@/hooks/auth/use-account-actions";
 import { useAppNavigation } from "@/hooks/use-app-navigation";
 
 export function SiteHeader() {

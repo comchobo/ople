@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Navigation } from "@/components/navigation/navigation";
 import { SiteHeader } from "@/components/navigation/site-header";
-import { AuthProvider } from "@/hooks/use-auth";
+import { AuthProvider } from "@/hooks/auth/use-auth";
 import "./globals.css";
 
 export const metadata: Metadata = {

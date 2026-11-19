@@ -2,7 +2,7 @@
 
 import { useLayoutEffect, useState } from "react";
 import type { User } from "@/api/core";
-import { confirmLeave, useAppNavigation } from "./use-app-navigation";
+import { confirmLeave, useAppNavigation } from "@/hooks/use-app-navigation";
 import { useAuth } from "./use-auth";
 
 export function useAccountActions() {

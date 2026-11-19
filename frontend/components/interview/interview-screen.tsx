@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRequireAuth } from "@/hooks/auth/use-require-auth";
 import { useAppNavigation } from "@/hooks/use-app-navigation";
-import { useRequireAuth } from "@/hooks/use-require-auth";
 import { Interview } from "./interview";
 
 export function InterviewScreen() {

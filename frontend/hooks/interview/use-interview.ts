@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Answer, Job } from "@/api/core";
 import { createGeneration, runGeneration } from "@/api/generations";
 import { getQuestion, getSummary, uploadRecording } from "@/api/interview";
-import { setInterviewActive } from "./use-app-navigation";
+import { setInterviewActive } from "@/hooks/use-app-navigation";
 
 export function useInterview(generated: (job: Job) => void) {
   const [interviewId] = useState(() => crypto.randomUUID());
