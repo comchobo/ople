@@ -8,7 +8,7 @@ export function HomeScreen() {
   const { user, loading } = useAuth();
   const move = useAppNavigation();
   return (
-    <main>
+    <main className="intro">
       {loading ? (
         <p>불러오는 중…</p>
       ) : (
