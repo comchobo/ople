@@ -6,8 +6,8 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <main>
-      <article className="mx-auto max-w-[760px] pb-6 wrap-anywhere [&>section]:mt-8 [&_h1]:mb-2! [&_h2]:mb-3! [&_li+li]:mt-2 [&_p+p]:mt-4! [&_ul]:my-3 [&_ul]:list-disc [&_ul]:pl-6">
+    <main className="policy">
+      <article>
         <h1>개인정보처리방침</h1>
         <p className="text-(--muted)">시행일: 2026년 11월 19일</p>
         <p>

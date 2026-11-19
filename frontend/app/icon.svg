@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <title>Ople</title>
-  <rect width="64" height="64" rx="8" fill="#222"/>
-  <g fill="#fff">
+  <rect width="64" height="64" rx="8" fill="#da5736"/>
+  <g fill="#1c1622">
     <rect x="12" y="16" width="28" height="8" rx="1"/>
     <rect x="20" y="28" width="32" height="8" rx="1"/>
     <rect x="12" y="40" width="20" height="8" rx="1"/>

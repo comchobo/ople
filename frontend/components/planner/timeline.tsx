@@ -156,6 +156,11 @@ export function Timeline({
             <span key={year}>{year}년차</span>
           ))}
         </div>
+        {!pieces.length && (
+          <p className="timeline-empty">
+            아직 활동이 없어요. 활동을 추가해 5년의 흐름을 그려보세요.
+          </p>
+        )}
         {pieces.map((original) => {
           const piece = preview?.id === original.id ? preview : original;
           return (

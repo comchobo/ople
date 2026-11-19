@@ -1,5 +1,6 @@
 "use client";
 
+import { BookOpen } from "lucide-react";
 import type { Planner } from "@/api/core";
 import { formatDate } from "@/lib/date";
 
@@ -20,6 +21,11 @@ export function PlannerList({
         <ul className="planner-list">
           {planners.map((planner) => (
             <li className="planner-item" key={planner.id}>
+              <div className="planner-cover" aria-hidden="true">
+                <span />
+                <span />
+                <b>A B C</b>
+              </div>
               <div className="planner-info">
                 <h2>
                   <button
@@ -53,6 +59,7 @@ export function PlannerList({
         </ul>
       ) : (
         <div className="planner-empty">
+          <BookOpen aria-hidden="true" />
           <h2>아직 플래너가 없어요</h2>
           <p>첫 번째 인터뷰로 나의 가능성을 탐색해보세요.</p>
         </div>

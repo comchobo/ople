@@ -33,6 +33,33 @@ const planner: Planner = {
 };
 
 describe("플래너 편집", () => {
+  it("키보드로 계획 탭을 순환하고 선택한 계획의 활동을 편집한다", async () => {
+    const change = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <Board
+        planner={planner}
+        change={change}
+        list={vi.fn()}
+        create={vi.fn()}
+      />,
+    );
+    const first = screen.getByRole("tab", { name: /A ·/ });
+    first.focus();
+    await user.keyboard("{ArrowLeft}");
+    expect(screen.getByRole("tab", { name: /C ·/ })).toHaveFocus();
+    expect(screen.getByRole("heading", { name: "플랜 2" })).toBeVisible();
+    await user.keyboard("{Home}{ArrowRight}");
+    expect(screen.getByRole("tab", { name: /B ·/ })).toHaveFocus();
+    await user.click(screen.getByRole("button", { name: "작은 실험 수정" }));
+    await user.clear(screen.getByLabelText("활동 제목"));
+    await user.type(screen.getByLabelText("활동 제목"), "나만의 다음 장");
+    await user.click(screen.getByRole("button", { name: "저장" }));
+    expect(change.mock.calls[0][0].plans[1].pieces[0].title).toBe(
+      "나만의 다음 장",
+    );
+    expect(change.mock.calls[0][0].plans[0]).toEqual(planner.plans[0]);
+  });
   it("평가 요약은 0점과 미평가를 구분해 표시한다", () => {
     const { container } = render(
       <RatingSummary scores={{ resources: 0, appeal: 8 }} />,

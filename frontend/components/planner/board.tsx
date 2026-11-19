@@ -39,7 +39,7 @@ export function Board({
     setEditing(null);
   }
   return (
-    <>
+    <div className="planner-board" data-plan={active}>
       <div className="board-heading">
         <div>
           <h1>{planner.name}</h1>
@@ -63,9 +63,31 @@ export function Board({
             role="tab"
             aria-selected={active === index}
             aria-controls="plan-panel"
+            tabIndex={active === index ? 0 : -1}
+            data-plan={index}
             onClick={() => {
               setActive(index);
               close();
+            }}
+            onKeyDown={(event) => {
+              const last = planner.plans.length - 1;
+              const next =
+                event.key === "Home"
+                  ? 0
+                  : event.key === "End"
+                    ? last
+                    : event.key === "ArrowRight"
+                      ? (index + 1) % planner.plans.length
+                      : event.key === "ArrowLeft"
+                        ? (index + last) % planner.plans.length
+                        : null;
+              if (next === null) return;
+              event.preventDefault();
+              setActive(next);
+              close();
+              event.currentTarget.parentElement
+                ?.querySelectorAll<HTMLButtonElement>("button")
+                [next]?.focus();
             }}
           >
             {String.fromCharCode(65 + index)} · {item.kind}
@@ -107,7 +129,6 @@ export function Board({
           </button>
         </section>
         <aside className="details-pane">
-          <p className="plan-kind">{plan.kind}</p>
           <div className="plan-heading">
             <h2>{plan.title}</h2>
             <button
@@ -119,6 +140,7 @@ export function Board({
               <Pencil />
             </button>
           </div>
+          <p className="plan-kind">{plan.kind}</p>
           <p className="plan-description">{plan.description}</p>
           <section className="rating-section">
             <div className="row between">
@@ -137,10 +159,13 @@ export function Board({
             type="button"
             className="wide space"
             disabled={exporting}
-            onClick={() => {
+            onClick={(event) => {
               void download(
                 plan.pieces,
                 `${planner.name}-${String.fromCharCode(65 + active)}`,
+                getComputedStyle(event.currentTarget)
+                  .getPropertyValue("--plan-color")
+                  .trim(),
               );
             }}
           >
@@ -211,6 +236,6 @@ export function Board({
           }}
         />
       )}
-    </>
+    </div>
   );
 }

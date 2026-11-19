@@ -1,6 +1,8 @@
 "use client";
 
 import { CircleUserRound } from "lucide-react";
+import Link from "next/link";
+import type { MouseEvent } from "react";
 import { AccountDialog } from "@/components/auth/account-dialog";
 import { Auth } from "@/components/auth/auth";
 import { useAccountActions } from "@/hooks/auth/use-account-actions";
@@ -10,6 +12,18 @@ export function SiteHeader() {
   const { user, loading, auth, setAuth, account, setAccount, error, loggedIn } =
     useAccountActions();
   const navigate = useAppNavigation();
+  function followIntro(event: MouseEvent<HTMLAnchorElement>) {
+    if (
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    )
+      return;
+    event.preventDefault();
+    void navigate(`${event.currentTarget.pathname}${event.currentTarget.hash}`);
+  }
   return (
     <>
       <header className="site-header">
@@ -24,6 +38,12 @@ export function SiteHeader() {
           Ople
         </a>
         <nav className="header-links" aria-label="계정 메뉴">
+          <Link href="/#possibilities" onClick={followIntro}>
+            세 가지 삶의 가능성
+          </Link>
+          <Link href="/#method" onClick={followIntro}>
+            이용 방법
+          </Link>
           {user ? (
             <>
               <button

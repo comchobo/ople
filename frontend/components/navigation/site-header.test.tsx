@@ -1,6 +1,7 @@
 import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { savePlanner } from "@/api/planners";
 import { AuthProvider } from "@/hooks/auth/use-auth";
 import { setInterviewActive } from "@/hooks/use-app-navigation";
 import { SiteHeader } from "./site-header";
@@ -138,4 +139,43 @@ it("Google 인증 오류를 알리고 히스토리 메타데이터를 보존해 
   );
   expect(window.location.search).toBe("");
   expect(window.history.state).toEqual({ opleIndex: 3 });
+});
+
+it("소개 섹션 링크도 인터뷰 이탈 확인과 진행 중인 API 저장을 기다린다", async () => {
+  let resolveSave = (_response: Response) => {};
+  const fetcher = vi
+    .spyOn(globalThis, "fetch")
+    .mockImplementation(async (url) => {
+      if (url === "/api/auth/me") return json(account);
+      return new Promise<Response>((resolve) => {
+        resolveSave = resolve;
+      });
+    });
+  renderHeader();
+  await screen.findByRole("button", { name: "계정" });
+  const pending = savePlanner({
+    id: "saved",
+    name: "나의 미래",
+    created_at: "2026-11-19",
+    plans: [],
+  });
+  await waitFor(() =>
+    expect(fetcher).toHaveBeenCalledWith(
+      "/api/planners/saved",
+      expect.objectContaining({ method: "PUT" }),
+    ),
+  );
+  setInterviewActive(true);
+  const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+  const user = userEvent.setup();
+  await user.click(screen.getByRole("link", { name: "이용 방법" }));
+  expect(router.push).not.toHaveBeenCalled();
+  confirm.mockReturnValue(true);
+  await user.click(screen.getByRole("link", { name: "이용 방법" }));
+  expect(router.push).not.toHaveBeenCalled();
+  await act(async () => {
+    resolveSave(json({}));
+    await pending;
+  });
+  await waitFor(() => expect(router.push).toHaveBeenCalledWith("/#method"));
 });

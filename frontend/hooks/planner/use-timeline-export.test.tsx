@@ -25,6 +25,7 @@ afterEach(() => {
 
 function canvasContext() {
   const context = {
+    fillStyle: "",
     scale: vi.fn(),
     fillRect: vi.fn(),
     beginPath: vi.fn(),
@@ -84,8 +85,13 @@ it("월 위치를 PNG에 반영하고 파일명을 정리해 다운로드한 뒤
   });
   expect(result.current.exporting).toBe(false);
   expect(result.current.error).toBe("");
-  expect(context.fillRect).toHaveBeenCalledWith(240, 43, 120, 44);
-  expect(context.fillText).toHaveBeenCalledWith("작은 실험", 246, 58);
+  expect(context.fillRect).toHaveBeenCalledWith(240, 146, 120, 50);
+  expect(context.fillText).toHaveBeenCalledWith("작은 실험", 249, 163);
+  expect(context.fillText).toHaveBeenCalledWith(
+    "Ople · 5년의 타임라인",
+    24,
+    66,
+  );
   expect(createObjectURL).toHaveBeenCalledWith(blob);
   const anchor = click.mock.instances[0] as HTMLAnchorElement;
   expect(anchor.download).toBe("계획_A_B.png");
@@ -93,6 +99,24 @@ it("월 위치를 PNG에 반영하고 파일명을 정리해 다운로드한 뒤
   expect(revokeObjectURL).not.toHaveBeenCalled();
   await vi.advanceTimersByTimeAsync(10000);
   expect(revokeObjectURL).toHaveBeenCalledWith("blob:timeline");
+});
+
+it("선택한 계획색을 PNG의 연도와 활동에 적용하고 빈 타임라인도 설명한다", async () => {
+  const context = canvasContext();
+  const colors: string[] = [];
+  context.fillRect.mockImplementation(() => colors.push(context.fillStyle));
+  vi.spyOn(HTMLCanvasElement.prototype, "toBlob").mockImplementation((done) =>
+    done(null),
+  );
+  const { result } = renderHook(() => useTimelineExport());
+  await act(async () =>
+    result.current.download([piece], "나의 미래-B", "#e1d8f0"),
+  );
+  expect(colors).toEqual(["#faf8f2", "#e1d8f0", "#e1d8f0"]);
+  colors.length = 0;
+  await act(async () => result.current.download([], "빈 플래너-C", "#f3d0be"));
+  expect(colors).toEqual(["#faf8f2", "#f3d0be"]);
+  expect(context.fillText).toHaveBeenCalledWith("아직 활동이 없어요.", 24, 171);
 });
 
 it("Canvas 인코딩 실패를 오류 상태로 제공하고 다운로드하지 않는다", async () => {

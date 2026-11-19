@@ -1,5 +1,6 @@
 "use client";
 
+import { X } from "lucide-react";
 import { type ReactNode, useEffect, useRef } from "react";
 
 export function Modal({
@@ -40,7 +41,7 @@ export function Modal({
             onClick={close}
             aria-label="닫기"
           >
-            ×
+            <X aria-hidden="true" />
           </button>
         </div>
         {children}
