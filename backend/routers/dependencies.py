@@ -5,7 +5,7 @@ from sqlmodel import Session
 
 from db import session
 from models.users import User
-from services.sessions import current_user
+from services.auth.sessions import current_user
 
 DB = Annotated[Session, Depends(session)]
 

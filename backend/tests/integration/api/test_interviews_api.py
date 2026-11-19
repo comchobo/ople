@@ -5,8 +5,9 @@ from sqlmodel import select
 
 from models.recordings import Recording
 from schemas.interviews import Question, Summary
-from services import interviews, recording_files, recordings
-from services.errors import ProviderError
+from services.integrations.errors import ProviderError
+from services.interviews import recording_files, recordings
+from services.interviews import service as interviews
 
 
 def test_question_and_summary_validate_answer_count_and_recording_ownership(

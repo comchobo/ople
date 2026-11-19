@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from models.generations import Generation
 from routers.dependencies import DB, CurrentUser
 from schemas.generations import Generate
-from services import generations
+from services.planners import generations
 
 router = APIRouter(prefix="/generations")
 

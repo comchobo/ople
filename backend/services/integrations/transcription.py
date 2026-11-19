@@ -2,7 +2,7 @@ import base64
 
 import httpx
 
-from services.errors import ProviderError
+from services.integrations.errors import ProviderError
 from utils.env import required
 
 

@@ -2,7 +2,7 @@ from sqlmodel import Session, col, select
 
 from models.planners import Planner
 from schemas.planners import PlannerUpdate
-from services.ownership import owned
+from services.common.ownership import owned
 from utils.clock import now
 
 

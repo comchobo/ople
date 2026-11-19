@@ -5,8 +5,8 @@ from fastapi.responses import JSONResponse
 
 from config import origin
 from routers.api import router
-from services.errors import ProviderError
-from services.generations import recover_interrupted
+from services.integrations.errors import ProviderError
+from services.planners.generations import recover_interrupted
 
 
 @asynccontextmanager

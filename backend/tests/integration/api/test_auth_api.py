@@ -1,7 +1,8 @@
 from unittest.mock import Mock
 
 from models.auth import LoginSession, Signup
-from services import auth, sessions
+from services.auth import service as auth
+from services.auth import sessions
 
 
 def test_signup_verify_login_and_logout_preserve_session_contract(client, db, monkeypatch):

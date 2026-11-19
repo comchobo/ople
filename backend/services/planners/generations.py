@@ -11,9 +11,9 @@ from models.planners import Planner
 from models.users import User
 from schemas.generations import Generate
 from schemas.planners import KINDS, Plans
-from services.interviews import validate_recordings
-from services.llm import llm_json
-from services.ownership import owned
+from services.common.ownership import owned
+from services.integrations.llm import llm_json
+from services.interviews.service import validate_recordings
 from utils.clock import now
 from utils.ids import uid
 

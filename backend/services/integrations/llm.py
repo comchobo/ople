@@ -3,7 +3,7 @@ import json
 import httpx
 from pydantic import BaseModel, ValidationError
 
-from services.errors import ProviderError
+from services.integrations.errors import ProviderError
 from utils.env import required
 
 

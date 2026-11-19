@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-CONFIG = Path(__file__).parents[1] / "pyproject.toml"
+CONFIG = Path(__file__).parents[2] / "pyproject.toml"
 
 
 @pytest.mark.parametrize(
@@ -18,7 +18,13 @@ CONFIG = Path(__file__).parents[1] / "pyproject.toml"
         ("models/example.py", "import botocore\nprint(botocore)\n", False),
         ("schemas/example.py", "import httpx2\nprint(httpx2)\n", False),
         ("services/example.py", "import httpx\nhttpx.Client()\n", True),
+        ("services/integrations/example.py", "import httpx\nhttpx.Client()\n", True),
         ("tests/test_example.py", "import httpx\nhttpx.MockTransport(print)\n", True),
+        (
+            "tests/unit/integrations/test_example.py",
+            "import httpx\nhttpx.MockTransport(print)\n",
+            True,
+        ),
     ],
 )
 def test_external_sdk_boundary_is_enforced_for_imports_and_aliases(filename, code, allowed):
@@ -49,6 +55,9 @@ def test_external_sdk_boundary_is_enforced_for_imports_and_aliases(filename, cod
         ("services", "schemas", True),
         ("routers", "services", True),
         ("services", "routers", False),
+        ("services.auth", "routers", False),
+        ("services.interviews", "schemas", True),
+        ("models", "services.auth", False),
         ("models", "services", False),
         ("utils", "models", False),
         ("utils", "config", False),
@@ -62,11 +71,15 @@ def test_layer_and_utility_contracts_reject_real_dependency_violations(
     for package in ("routers", "services", "schemas", "models", "utils"):
         (tmp_path / package).mkdir()
         (tmp_path / package / "__init__.py").write_text("")
+    for package in ("services.auth", "services.interviews"):
+        directory = tmp_path.joinpath(*package.split("."))
+        directory.mkdir()
+        (directory / "__init__.py").write_text("")
     for module in ("db", "config"):
         (tmp_path / f"{module}.py").write_text("")
     # Keep external application modules visible to the graph even in allowed fixtures.
     (tmp_path / "routers" / "infrastructure.py").write_text("import config\nimport db\n")
-    (tmp_path / source / "example.py").write_text(f"import {target}\n")
+    (tmp_path.joinpath(*source.split(".")) / "example.py").write_text(f"import {target}\n")
     result = subprocess.run(
         [str(Path(sys.executable).with_name("lint-imports")), "--no-cache"],
         cwd=tmp_path,

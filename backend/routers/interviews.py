@@ -4,7 +4,8 @@ from fastapi import APIRouter, File, Form, UploadFile
 
 from routers.dependencies import DB, CurrentUser
 from schemas.interviews import Interview
-from services import interviews, recordings
+from services.interviews import recordings
+from services.interviews import service as interviews
 
 router = APIRouter(prefix="/interview")
 

@@ -4,8 +4,8 @@ from sqlmodel import Session
 from models.recordings import Recording
 from models.users import User
 from schemas.interviews import Interview, Question, Summary
-from services.llm import llm_json
-from services.ownership import owned
+from services.common.ownership import owned
+from services.integrations.llm import llm_json
 
 
 def validate_recordings(db: Session, user: User, interview: Interview):
