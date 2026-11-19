@@ -1,14 +1,11 @@
 import base64
 import json
-from typing import TypeVar
 
 import httpx
 from pydantic import BaseModel, ValidationError
 
 from schemas.domain import KINDS, Interview, Plans, Question, Summary
 from utils.config import required
-
-T = TypeVar("T", bound=BaseModel)
 
 
 class ProviderError(Exception):
