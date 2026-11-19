@@ -2,15 +2,22 @@
 
 import { CircleUserRound } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useLayoutEffect, useState } from "react";
-import { confirmLeave, useAppNavigation } from "@/hooks/use-app-navigation";
-import { useAuth } from "@/hooks/use-auth";
+import { useShellAuth } from "@/hooks/use-shell-auth";
+import { AccountModal } from "./account-modal";
 import { Auth } from "./auth";
-import { Modal } from "./modal";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { user, loading, loggedIn, logout } = useAuth();
-  const navigate = useAppNavigation();
+  const {
+    user,
+    loading,
+    navigate,
+    auth,
+    setAuth,
+    account,
+    setAccount,
+    error,
+    completeLogin,
+  } = useShellAuth();
   const path = usePathname();
   const view =
     path === "/"
@@ -20,34 +27,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         : path === "/planners"
           ? "planners"
           : "board";
-  const [auth, setAuth] = useState(false);
-  const [account, setAccount] = useState(false);
-  const [error, setError] = useState("");
-  useLayoutEffect(() => {
-    function login() {
-      setAuth(true);
-    }
-    async function signOut() {
-      if (!confirmLeave()) return;
-      try {
-        await logout();
-        setAccount(false);
-        await navigate("/", true, true);
-      } catch (cause) {
-        setError((cause as Error).message);
-      }
-    }
-    window.addEventListener("ople:login", login);
-    window.addEventListener("ople:logout", signOut);
-    if (new URLSearchParams(window.location.search).has("auth_error")) {
-      setError("Google 로그인에 실패했습니다. 다시 시도해주세요.");
-      window.history.replaceState(window.history.state, "", "/");
-    }
-    return () => {
-      window.removeEventListener("ople:login", login);
-      window.removeEventListener("ople:logout", signOut);
-    };
-  }, [logout, navigate]);
   if (path === "/privacy" || path === "/terms") return <>{children}</>;
   return (
     <div id="app" className={view}>
@@ -98,41 +77,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </p>
       )}
       {children}
-      {auth && (
-        <Auth
-          close={() => setAuth(false)}
-          loggedIn={(value) => {
-            loggedIn(value);
-            setAuth(false);
-            void navigate("/", true, true);
-          }}
-        />
-      )}
+      {auth && <Auth close={() => setAuth(false)} loggedIn={completeLogin} />}
       {account && user && (
-        <Modal title="내 계정" close={() => setAccount(false)}>
-          <div className="account-info">
-            <h3>{user.name}</h3>
-            <p>{user.email}</p>
-          </div>
-          <div className="account-menu">
-            <button
-              type="button"
-              onClick={() => {
-                void navigate("/planners").then((moved) => {
-                  if (moved) setAccount(false);
-                });
-              }}
-            >
-              내 플래너
-            </button>
-            <button
-              type="button"
-              onClick={() => window.dispatchEvent(new Event("ople:logout"))}
-            >
-              로그아웃
-            </button>
-          </div>
-        </Modal>
+        <AccountModal user={user} close={() => setAccount(false)} />
       )}
     </div>
   );
