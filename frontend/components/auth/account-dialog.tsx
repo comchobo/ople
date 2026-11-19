@@ -1,8 +1,8 @@
 "use client";
 
 import type { User } from "@/api/core";
+import { Modal } from "@/components/modal";
 import { useAppNavigation } from "@/hooks/use-app-navigation";
-import { Modal } from "./modal";
 
 export function AccountDialog({
   user,

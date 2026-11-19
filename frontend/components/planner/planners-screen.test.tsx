@@ -3,12 +3,12 @@ import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { expect, it, vi } from "vitest";
 import type { Planner } from "@/api/core";
+import { HomeScreen } from "@/components/home/home-screen";
+import { InterviewScreen } from "@/components/interview/interview-screen";
+import { SiteHeader } from "@/components/navigation/site-header";
 import { AuthProvider } from "@/hooks/use-auth";
-import { HomeScreen } from "./home-screen";
-import { InterviewScreen } from "./interview-screen";
 import { PlannerBoardScreen } from "./planner-board-screen";
 import { PlannersScreen } from "./planners-screen";
-import { SiteHeader } from "./site-header";
 
 const routing = vi.hoisted(() => ({
   push: vi.fn(),
