@@ -16,4 +16,5 @@
 
 - Keep `lib/` domain-agnostic.
 - Keep `components/` for React component modules and their tests.
+- Keep `app/` server-only and do not use the `use client` directive there.
 - When making UI changes, attach screenshots to the PR body.

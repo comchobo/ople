@@ -1,0 +1,3 @@
+`"use client";` as $directive where {
+  register_diagnostic(span=$directive, message="Do not use the 'use client' directive in app/. Move client components to components/.")
+}
