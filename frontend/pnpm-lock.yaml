@@ -45,9 +45,6 @@ importers:
       '@types/react-dom':
         specifier: ^19.3.0
         version: 19.3.0(@types/react@19.3.0)
-      '@types/react-test-renderer':
-        specifier: ^19.3.0
-        version: 19.3.0
       dependency-cruiser:
         specifier: 18.7.0
         version: 18.7.0
@@ -57,9 +54,6 @@ importers:
       postcss:
         specifier: ^8.5.32
         version: 8.5.32
-      react-test-renderer:
-        specifier: 19.3.1
-        version: 19.3.1(react@19.3.1)
       tailwindcss:
         specifier: ^4.3.5
         version: 4.3.5
@@ -661,9 +655,6 @@ packages:
     peerDependencies:
       '@types/react': ^19.3.0
 
-  '@types/react-test-renderer@19.3.0':
-    resolution: {integrity: sha512-TX4p2D4Z2oigM3SXU7+QyLSUnSR0vR1S1Pfxm/qFL9nHQ3jclgi6ioGoWQmlIr1DeKRVmPJrmNlhgM0JlWlLUg==}
-
   '@types/react@19.3.0':
     resolution: {integrity: sha512-N0rFCuH9YoxG9/m61l9MfpJKfmLOVU0em7ipIz6TRgSSkvReLB9vL85GB+yr8Bs5leqpvg96JSwF4ZS1s4viQg==}
 
@@ -1105,14 +1096,6 @@ packages:
 
   react-is@17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
-
-  react-is@19.3.1:
-    resolution: {integrity: sha512-RRieF6IyxQBkcK6pP8xOHprLTPW6QjRkbGdImtqNme+/hYVwCZkLQLdlZGOhUqXwkS9IEynaGvPJtv6XB/cz0Q==}
-
-  react-test-renderer@19.3.1:
-    resolution: {integrity: sha512-YcNewwmnZMd0wTb2nkb4hQ58NmX/u1hW2OJsNpen8CnV+jNkmEjYd1R6wJrOMSgb8bIF5HAJv4iL+S3PwNptOA==}
-    peerDependencies:
-      react: ^19.3.1
 
   react@19.3.1:
     resolution: {integrity: sha512-QNhWdt7nrgVWWQG58QuGsAR3jv3Hbe4mb4vz7w2csnHavciZJgda1CPNaldF6eVxv90ud3jUXpKlHL69gO38yw==}
@@ -1778,10 +1761,6 @@ snapshots:
     dependencies:
       '@types/react': 19.3.0
 
-  '@types/react-test-renderer@19.3.0':
-    dependencies:
-      '@types/react': 19.3.0
-
   '@types/react@19.3.0':
     dependencies:
       csstype: 3.2.3
@@ -2160,14 +2139,6 @@ snapshots:
       scheduler: 0.28.0
 
   react-is@17.0.2: {}
-
-  react-is@19.3.1: {}
-
-  react-test-renderer@19.3.1(react@19.3.1):
-    dependencies:
-      react: 19.3.1
-      react-is: 19.3.1
-      scheduler: 0.28.0
 
   react@19.3.1: {}
 
