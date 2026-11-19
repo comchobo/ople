@@ -11,7 +11,7 @@ export default function TermsPage() {
         <h1>서비스 약관</h1>
         <p className="text-(--muted)">시행일: 2026년 11월 19일</p>
         <p>
-          이 약관은 이홍주(이하 “운영자”)가 제공하는 Ople 서비스의 이용 조건과
+          이 약관은 Ople 운영자(이하 “운영자”)가 제공하는 서비스의 이용 조건과
           운영자 및 이용자의 권리·의무를 정합니다.
         </p>
         <section aria-labelledby="terms-service">
@@ -126,7 +126,7 @@ export default function TermsPage() {
           </p>
         </section>
         <section aria-labelledby="terms-changes">
-          <h2 id="terms-changes">9. 약관 변경과 운영자 정보</h2>
+          <h2 id="terms-changes">9. 약관 변경과 문의</h2>
           <p>
             약관을 변경할 때에는 변경 내용과 시행일을 서비스 내에 사전
             안내합니다. 이용자에게 불리하거나 중요한 변경은 충분한 안내 기간을
@@ -134,8 +134,6 @@ export default function TermsPage() {
             않으면 이용을 종료하고 탈퇴를 요청할 수 있습니다.
           </p>
           <p>
-            운영자: 이홍주
-            <br />
             문의: <a href="mailto:help@ople.ink">help@ople.ink</a>
           </p>
         </section>

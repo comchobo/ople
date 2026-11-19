@@ -11,8 +11,8 @@ export default function PrivacyPage() {
         <h1>개인정보처리방침</h1>
         <p className="text-(--muted)">시행일: 2026년 11월 19일</p>
         <p>
-          Ople 운영자 이홍주(이하 “운영자”)는 오디세이 플래너 서비스 제공을 위해
-          아래와 같이 개인정보를 처리합니다.
+          Ople 운영자(이하 “운영자”)는 오디세이 플래너 서비스 제공을 위해 아래와
+          같이 개인정보를 처리합니다.
         </p>
         <section aria-labelledby="privacy-data">
           <h2 id="privacy-data">1. 처리하는 개인정보와 이용 목적</h2>
@@ -118,8 +118,6 @@ export default function PrivacyPage() {
         <section aria-labelledby="privacy-contact">
           <h2 id="privacy-contact">7. 개인정보 보호책임자 및 문의</h2>
           <p>
-            책임자: 이홍주
-            <br />
             이메일: <a href="mailto:help@ople.ink">help@ople.ink</a>
           </p>
           <p>
