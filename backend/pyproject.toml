@@ -71,3 +71,9 @@ name = "Utilities stay application-agnostic"
 type = "forbidden"
 source_modules = ["utils"]
 forbidden_modules = ["db", "config"]
+
+[[tool.importlinter.contracts]]
+name = "External integrations stay domain-agnostic"
+type = "forbidden"
+source_modules = ["services.external"]
+forbidden_modules = ["services.*"]

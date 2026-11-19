@@ -52,6 +52,10 @@ def test_external_sdk_boundary_is_enforced_for_imports_and_aliases(filename, cod
         ("services.interview", "schemas", True),
         ("services.external", "routers", False),
         ("services.auth", "routers", False),
+        ("services.external", "services.auth", False),
+        ("services.external", "services.billing", False),
+        ("services.external", "utils", True),
+        ("services.auth", "services.external", True),
         ("routers", "services", True),
         ("services", "routers", False),
         ("models", "services", False),
@@ -69,11 +73,17 @@ def test_layer_and_utility_contracts_reject_real_dependency_violations(
         (tmp_path / package / "__init__.py").write_text("")
     for module in ("db", "config"):
         (tmp_path / f"{module}.py").write_text("")
+    (tmp_path / "services" / "external").mkdir()
+    (tmp_path / "services" / "external" / "__init__.py").touch()
     # Keep external application modules visible to the graph even in allowed fixtures.
     (tmp_path / "routers" / "infrastructure.py").write_text("import config\nimport db\n")
     source_path = tmp_path.joinpath(*source.split("."))
     source_path.mkdir(parents=True, exist_ok=True)
     (source_path / "__init__.py").touch()
+    if target.startswith("services."):
+        target_path = tmp_path.joinpath(*target.split("."))
+        target_path.mkdir(parents=True, exist_ok=True)
+        (target_path / "__init__.py").touch()
     (source_path / "example.py").write_text(f"import {target}\n")
     result = subprocess.run(
         [str(Path(sys.executable).with_name("lint-imports")), "--no-cache"],

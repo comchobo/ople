@@ -11,9 +11,12 @@
 ## Backend
 
 - Keep `utils/` domain-agnostic.
+- Organize `services/` by domain and keep shared helpers at its root.
+- Keep `services/external/` free of domain package dependencies.
 
 ## Frontend
 
 - Keep `lib/` domain-agnostic.
 - Keep `components/` for React component modules and their tests.
+- Organize `components/` and `hooks/` by feature and keep shared modules at their root.
 - When making UI changes, attach screenshots to the PR body.
