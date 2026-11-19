@@ -16,3 +16,4 @@
 
 - Keep `lib/` domain-agnostic.
 - Keep `components/` for React component modules and their tests.
+- When making UI changes, attach screenshots to the PR body.
