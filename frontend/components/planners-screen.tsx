@@ -41,7 +41,7 @@ export function PlannersScreen() {
   }
   return (
     <>
-      <main>
+      <main className="planners">
         {authLoading || loading ? (
           <p>불러오는 중…</p>
         ) : (

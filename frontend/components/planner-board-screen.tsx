@@ -16,7 +16,7 @@ export function PlannerBoardScreen({ plannerId }: { plannerId: string }) {
       void move("/planners", true, true);
   }, [user, loading, error, planner, move]);
   return (
-    <main>
+    <main className="board">
       {authLoading || loading ? (
         <p>불러오는 중…</p>
       ) : (

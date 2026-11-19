@@ -10,7 +10,7 @@ export function InterviewScreen() {
   const move = useAppNavigation();
   const [error, setError] = useState("");
   return (
-    <main>
+    <main className="interview">
       {loading ? (
         <p>불러오는 중…</p>
       ) : (

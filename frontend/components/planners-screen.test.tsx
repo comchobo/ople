@@ -4,30 +4,28 @@ import { useState } from "react";
 import { expect, it, vi } from "vitest";
 import type { Planner } from "@/api/core";
 import { AuthProvider } from "@/hooks/use-auth";
-import { AppShell } from "./app-shell";
 import { HomeScreen } from "./home-screen";
 import { InterviewScreen } from "./interview-screen";
 import { PlannerBoardScreen } from "./planner-board-screen";
 import { PlannersScreen } from "./planners-screen";
+import { SiteHeader } from "./site-header";
 
 const routing = vi.hoisted(() => ({
   push: vi.fn(),
   replace: vi.fn(),
-  path: "/planners",
 }));
 vi.mock("next/navigation", () => ({
   useRouter: () => routing,
-  usePathname: () => routing.path,
 }));
 
 function Application({ initialPath = "/planners" }: { initialPath?: string }) {
   const [path, setPath] = useState(initialPath);
-  routing.path = path;
   routing.push.mockImplementation(setPath);
   routing.replace.mockImplementation(setPath);
   return (
     <AuthProvider>
-      <AppShell>
+      <div id="app">
+        <SiteHeader />
         {path === "/planners" ? (
           <PlannersScreen />
         ) : path === "/" ? (
@@ -37,7 +35,7 @@ function Application({ initialPath = "/planners" }: { initialPath?: string }) {
         ) : (
           <PlannerBoardScreen key={path} plannerId={path.split("/")[2]} />
         )}
-      </AppShell>
+      </div>
     </AuthProvider>
   );
 }

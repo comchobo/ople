@@ -211,7 +211,7 @@ main {
   scrollbar-color: #aaa var(--soft);
   scrollbar-width: thin;
 }
-.intro main {
+main.intro {
   padding: 0;
   overflow: hidden;
 }
@@ -371,7 +371,7 @@ main {
   min-height: 0;
   flex: 1;
 }
-.interview main {
+main.interview {
   display: flex;
   flex-direction: column;
 }
@@ -448,7 +448,7 @@ main {
   font-size: 26px;
   margin-bottom: 16px;
 }
-.board main {
+main.board {
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -475,7 +475,7 @@ main {
   gap: 8px;
   flex-shrink: 0;
 }
-.planners main {
+main.planners {
   display: flex;
   flex-direction: column;
   overflow: hidden;
