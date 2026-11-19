@@ -2,7 +2,10 @@
 
 import { useEffect } from "react";
 import { flushSaves } from "@/api/planners";
-import { confirmLeave, isInterviewActive } from "@/hooks/use-app-navigation";
+import {
+  confirmLeave,
+  isInterviewActive,
+} from "@/hooks/navigation/use-app-navigation";
 
 // Index history entries so a cancelled Back/Forward can restore its position
 // before Next unmounts the interview. Preserve Next's own history metadata.

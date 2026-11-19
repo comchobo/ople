@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import { useAppNavigation } from "@/hooks/use-app-navigation";
-import { usePlanners } from "@/hooks/use-planners";
-import { useRequireAuth } from "@/hooks/use-require-auth";
+import { useRequireAuth } from "@/hooks/auth/use-require-auth";
+import { useAppNavigation } from "@/hooks/navigation/use-app-navigation";
+import { usePlanners } from "@/hooks/planners/use-planners";
 import { Board } from "./board";
 
 export function PlannerBoardScreen({ plannerId }: { plannerId: string }) {

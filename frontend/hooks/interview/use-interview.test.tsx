@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react";
 import { expect, it, vi } from "vitest";
-import { isInterviewActive } from "./use-app-navigation";
+import { isInterviewActive } from "@/hooks/navigation/use-app-navigation";
 import { useInterview } from "./use-interview";
 
 it("10개 녹음 답변을 요약하고 같은 작업 ID로 생성 재시도한다", async () => {

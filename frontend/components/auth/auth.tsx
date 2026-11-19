@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { googleLoginUrl, login, signup, verifyEmail } from "@/api/auth";
 import type { User } from "@/api/core";
-import { Modal } from "./modal";
+import { Modal } from "@/components/ui/modal";
 
 export function Auth({
   close,

@@ -3,10 +3,10 @@ import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { expect, it, vi } from "vitest";
 import type { Planner } from "@/api/core";
-import { AuthProvider } from "@/hooks/use-auth";
-import { AppShell } from "./app-shell";
-import { HomeScreen } from "./home-screen";
-import { InterviewScreen } from "./interview-screen";
+import { HomeScreen } from "@/components/home/home-screen";
+import { InterviewScreen } from "@/components/interview/interview-screen";
+import { AppShell } from "@/components/layout/app-shell";
+import { AuthProvider } from "@/hooks/auth/use-auth";
 import { PlannerBoardScreen } from "./planner-board-screen";
 import { PlannersScreen } from "./planners-screen";
 
@@ -118,17 +118,20 @@ it("이전 저장 완료 후 목록을 갱신해 이름 변경이 최신 편집�
   ).not.toBeInTheDocument();
 });
 
-it("비로그인 사용자는 홈으로 이동하고 로그인 창을 연다", async () => {
-  const fetcher = vi
-    .spyOn(globalThis, "fetch")
-    .mockResolvedValue(new Response("{}", { status: 401 }));
-  render(<Application />);
-  expect(await screen.findByRole("dialog", { name: "로그인" })).toBeVisible();
-  expect(
-    await screen.findByRole("heading", { name: /하나의 정답 대신/ }),
-  ).toBeVisible();
-  expect(fetcher.mock.calls.map(([path]) => path)).toEqual(["/api/auth/me"]);
-});
+it.each(["/planners", "/planners/new", "/planners/p"])(
+  "%s의 비로그인 사용자는 홈으로 이동하고 로그인 창을 연다",
+  async (initialPath) => {
+    const fetcher = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(new Response("{}", { status: 401 }));
+    render(<Application initialPath={initialPath} />);
+    expect(await screen.findByRole("dialog", { name: "로그인" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", { name: /하나의 정답 대신/ }),
+    ).toBeVisible();
+    expect(fetcher.mock.calls.map(([path]) => path)).toEqual(["/api/auth/me"]);
+  },
+);
 
 it("홈에서 시작하면 인증된 사용자는 플래너 목록으로 이동한다", async () => {
   vi.spyOn(globalThis, "fetch").mockImplementation(async (path) =>

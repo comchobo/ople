@@ -1,7 +1,7 @@
 "use client";
 
 import { Mic, Pause, Play, RotateCcw, Send } from "lucide-react";
-import { useRecorder } from "@/hooks/use-recorder";
+import { useRecorder } from "@/hooks/media/use-recorder";
 
 export function Recorder({
   submit,

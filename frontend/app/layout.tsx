@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { AppShell } from "@/components/app-shell";
-import { Navigation } from "@/components/navigation";
-import { AuthProvider } from "@/hooks/use-auth";
+import { AppShell } from "@/components/layout/app-shell";
+import { Navigation } from "@/components/layout/navigation";
+import { AuthProvider } from "@/hooks/auth/use-auth";
 import "./globals.css";
 
 export const metadata: Metadata = {

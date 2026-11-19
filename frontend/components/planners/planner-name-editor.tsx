@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Planner } from "@/api/core";
-import { Modal } from "./modal";
+import { Modal } from "@/components/ui/modal";
 
 export function PlannerNameEditor({
   planner,

@@ -1,7 +1,7 @@
 "use client";
 
-import { useAppNavigation } from "@/hooks/use-app-navigation";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth/use-auth";
+import { useAppNavigation } from "@/hooks/navigation/use-app-navigation";
 import { Intro } from "./intro";
 
 export function HomeScreen() {

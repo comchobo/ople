@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useAppNavigation } from "./use-app-navigation";
+import { useAppNavigation } from "@/hooks/navigation/use-app-navigation";
 import { useAuth } from "./use-auth";
 
 export function useRequireAuth() {
