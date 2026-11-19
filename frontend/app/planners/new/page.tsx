@@ -1,5 +1,5 @@
-import { Ople } from "@/components/ople";
+import { InterviewScreen } from "@/components/interview-screen";
 
 export default function Page() {
-  return <Ople view="interview" />;
+  return <InterviewScreen />;
 }

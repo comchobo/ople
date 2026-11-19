@@ -5,7 +5,10 @@ import { expect, it, vi } from "vitest";
 import type { Planner } from "@/api/core";
 import { AuthProvider } from "@/hooks/use-auth";
 import { AppShell } from "./app-shell";
-import { Ople } from "./ople";
+import { HomeScreen } from "./home-screen";
+import { InterviewScreen } from "./interview-screen";
+import { PlannerBoardScreen } from "./planner-board-screen";
+import { PlannersScreen } from "./planners-screen";
 
 const routing = vi.hoisted(() => ({
   push: vi.fn(),
@@ -17,17 +20,23 @@ vi.mock("next/navigation", () => ({
   usePathname: () => routing.path,
 }));
 
-function Application() {
-  const [path, setPath] = useState("/planners");
+function Application({ initialPath = "/planners" }: { initialPath?: string }) {
+  const [path, setPath] = useState(initialPath);
   routing.path = path;
   routing.push.mockImplementation(setPath);
   routing.replace.mockImplementation(setPath);
-  const view =
-    path === "/planners" ? "planners" : path === "/" ? "intro" : "board";
   return (
     <AuthProvider>
       <AppShell>
-        <Ople key={path} view={view} plannerId={path.split("/")[2]} />
+        {path === "/planners" ? (
+          <PlannersScreen />
+        ) : path === "/" ? (
+          <HomeScreen />
+        ) : path === "/planners/new" ? (
+          <InterviewScreen />
+        ) : (
+          <PlannerBoardScreen key={path} plannerId={path.split("/")[2]} />
+        )}
       </AppShell>
     </AuthProvider>
   );
@@ -107,6 +116,64 @@ it("이전 저장 완료 후 목록을 갱신해 이름 변경이 최신 편집�
   expect(
     screen.queryByText(/저장 중|저장됨|저장 실패/),
   ).not.toBeInTheDocument();
+});
+
+it("비로그인 사용자는 홈으로 이동하고 로그인 창을 연다", async () => {
+  const fetcher = vi
+    .spyOn(globalThis, "fetch")
+    .mockResolvedValue(new Response("{}", { status: 401 }));
+  render(<Application />);
+  expect(await screen.findByRole("dialog", { name: "로그인" })).toBeVisible();
+  expect(
+    await screen.findByRole("heading", { name: /하나의 정답 대신/ }),
+  ).toBeVisible();
+  expect(fetcher.mock.calls.map(([path]) => path)).toEqual(["/api/auth/me"]);
+});
+
+it("홈에서 시작하면 인증된 사용자는 플래너 목록으로 이동한다", async () => {
+  vi.spyOn(globalThis, "fetch").mockImplementation(async (path) =>
+    json(
+      path === "/api/auth/me"
+        ? { id: "u", email: "hello@example.com", name: "사용자" }
+        : [],
+    ),
+  );
+  const user = userEvent.setup();
+  render(<Application initialPath="/" />);
+  await user.click(
+    await screen.findByRole("button", { name: "나의 플래너 시작하기" }),
+  );
+  expect(
+    await screen.findByRole("heading", { name: "내 플래너" }),
+  ).toBeVisible();
+});
+
+it("새 인터뷰 화면은 목록 조회 없이 준비 화면을 표시한다", async () => {
+  const fetcher = vi
+    .spyOn(globalThis, "fetch")
+    .mockResolvedValue(
+      json({ id: "u", email: "hello@example.com", name: "사용자" }),
+    );
+  render(<Application initialPath="/planners/new" />);
+  expect(
+    await screen.findByRole("button", { name: "인터뷰 시작" }),
+  ).toBeEnabled();
+  expect(fetcher.mock.calls.map(([path]) => path)).toEqual(["/api/auth/me"]);
+});
+
+it("존재하지 않는 플래너는 목록으로 돌려보낸다", async () => {
+  vi.spyOn(globalThis, "fetch").mockImplementation(async (path) =>
+    json(
+      path === "/api/auth/me"
+        ? { id: "u", email: "hello@example.com", name: "사용자" }
+        : [],
+    ),
+  );
+  render(<Application initialPath="/planners/missing" />);
+  expect(
+    await screen.findByRole("heading", { name: "내 플래너" }),
+  ).toBeVisible();
+  expect(screen.getByText("아직 플래너가 없어요")).toBeVisible();
 });
 
 it("실패한 생성 작업을 같은 작업 ID로 재시도하고 완성된 플래너를 연다", async () => {

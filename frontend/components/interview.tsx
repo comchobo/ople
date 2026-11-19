@@ -1,243 +1,9 @@
 "use client";
 
-import { Mic, Pause, Play, RotateCcw, Send } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import type { Answer, Job } from "@/api/core";
-import { createGeneration, runGeneration } from "@/api/generations";
-import { getQuestion, getSummary, uploadRecording } from "@/api/interview";
-import { setInterviewActive } from "./navigation";
-
-function stopMedia(stream: MediaStream | null) {
-  stream?.getTracks().forEach((track) => {
-    track.stop();
-  });
-}
-
-export function Steps({ current }: { current: number }) {
-  return (
-    <nav className="steps" aria-label="플래너 만들기 단계">
-      <ol>
-        {["인터뷰", "답변 정리", "플래너 생성"].map((label, i) => (
-          <li key={label} aria-current={i === current ? "step" : undefined}>
-            <span>{i + 1}</span>
-            {label}
-          </li>
-        ))}
-      </ol>
-    </nav>
-  );
-}
-
-export function Recorder({
-  submit,
-  busy,
-}: {
-  submit: (blob: Blob, duration: number) => Promise<void>;
-  busy: boolean;
-}) {
-  const [state, setState] = useState<"idle" | "recording" | "paused">("idle");
-  const [seconds, setSeconds] = useState(0);
-  const [error, setError] = useState("");
-  const [starting, setStarting] = useState(false);
-  const recorder = useRef<MediaRecorder | null>(null);
-  const stream = useRef<MediaStream | null>(null);
-  const chunks = useRef<Blob[]>([]);
-  const size = useRef(0);
-  const secondsRef = useRef(0);
-  const mounted = useRef(true);
-  useEffect(() => {
-    mounted.current = true;
-    return () => {
-      mounted.current = false;
-      if (recorder.current?.state !== "inactive") recorder.current?.stop();
-      stopMedia(stream.current);
-    };
-  }, []);
-  useEffect(() => {
-    if (state !== "recording") return;
-    const timer = setInterval(() => {
-      secondsRef.current += 1;
-      setSeconds(secondsRef.current);
-      if (secondsRef.current >= 180) {
-        recorder.current?.pause();
-        setState("paused");
-      }
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [state]);
-  async function start() {
-    setError("");
-    setStarting(true);
-    try {
-      if (
-        !navigator.mediaDevices?.getUserMedia ||
-        typeof MediaRecorder === "undefined"
-      )
-        throw new Error(
-          "이 환경에서는 녹음을 사용할 수 없습니다. HTTPS 연결과 브라우저의 마이크 지원을 확인해주세요.",
-        );
-      const media = await navigator.mediaDevices.getUserMedia({ audio: true });
-      if (!mounted.current) {
-        stopMedia(media);
-        return;
-      }
-      stream.current = media;
-      const mime = [
-        "audio/webm;codecs=opus",
-        "audio/mp4",
-        "audio/ogg;codecs=opus",
-      ].find((value) => MediaRecorder.isTypeSupported(value));
-      if (!mime) throw new Error("지원되는 녹음 형식이 없습니다.");
-      const value = new MediaRecorder(media, { mimeType: mime });
-      chunks.current = [];
-      size.current = 0;
-      secondsRef.current = 0;
-      setSeconds(0);
-      value.ondataavailable = (event) => {
-        if (event.data.size) {
-          chunks.current.push(event.data);
-          size.current += event.data.size;
-        }
-        if (size.current > 20 * 1024 * 1024 && value.state === "recording") {
-          value.pause();
-          setState("paused");
-          setError("20MB를 초과했습니다. 다시 녹음해주세요.");
-        }
-      };
-      value.onerror = () => {
-        setError("녹음 중 오류가 발생했습니다. 다시 녹음해주세요.");
-        stopMedia(stream.current);
-        setState("idle");
-      };
-      recorder.current = value;
-      value.start(1000);
-      setState("recording");
-    } catch (cause) {
-      stopMedia(stream.current);
-      setError((cause as Error).message);
-    } finally {
-      if (mounted.current) setStarting(false);
-    }
-  }
-  function reset() {
-    if (!window.confirm("녹음한 내용을 지우고 다시 녹음할까요?")) return;
-    if (recorder.current?.state !== "inactive") recorder.current?.stop();
-    stopMedia(stream.current);
-    recorder.current = null;
-    chunks.current = [];
-    secondsRef.current = 0;
-    setSeconds(0);
-    setState("idle");
-    setError("");
-  }
-  function send() {
-    const value = recorder.current;
-    if (!value || value.state === "inactive") return;
-    value.onstop = () => {
-      stopMedia(stream.current);
-      const blob = new Blob(chunks.current, { type: value.mimeType });
-      if (blob.size > 20 * 1024 * 1024) {
-        setError("20MB를 초과했습니다. 다시 녹음해주세요.");
-        setState("idle");
-        return;
-      }
-      void submit(blob, Math.max(1, Math.min(secondsRef.current, 180))).catch(
-        (cause) => {
-          if (mounted.current) {
-            setError((cause as Error).message);
-            setState("idle");
-          }
-        },
-      );
-    };
-    value.stop();
-  }
-  return (
-    <aside className="record-panel">
-      <div className="record-state">
-        <span
-          className={`status-dot ${state === "recording" ? "active" : ""}`}
-        />
-        {busy
-          ? "답변 처리 중"
-          : state === "recording"
-            ? "녹음 중"
-            : state === "paused"
-              ? "일시정지"
-              : "녹음 준비"}
-      </div>
-      <p className="timer" role="timer" aria-label="녹음 시간">
-        {String(Math.floor(seconds / 60)).padStart(2, "0")}:
-        {String(seconds % 60).padStart(2, "0")}
-      </p>
-      <div className="record-actions">
-        <button
-          type="button"
-          className="audio-button"
-          aria-label="다시 녹음"
-          disabled={busy || state === "idle"}
-          onClick={reset}
-        >
-          <RotateCcw />
-        </button>
-        <button
-          type="button"
-          className="audio-button main-control primary"
-          aria-label={
-            state === "idle"
-              ? "녹음 시작"
-              : state === "recording"
-                ? "일시정지"
-                : "녹음 계속"
-          }
-          disabled={busy || starting || (state === "paused" && seconds >= 180)}
-          onClick={() => {
-            if (state === "idle") void start();
-            else if (state === "recording") {
-              recorder.current?.pause();
-              setState("paused");
-            } else {
-              recorder.current?.resume();
-              setState("recording");
-            }
-          }}
-        >
-          {state === "idle" ? (
-            <Mic />
-          ) : state === "recording" ? (
-            <Pause />
-          ) : (
-            <Play />
-          )}
-        </button>
-        <button
-          type="button"
-          className="audio-button"
-          aria-label="답변 제출"
-          disabled={
-            busy ||
-            state !== "paused" ||
-            seconds < 1 ||
-            size.current > 20 * 1024 * 1024
-          }
-          onClick={send}
-        >
-          <Send />
-        </button>
-      </div>
-      <p className="small muted space">
-        문항당 최대 3분 · 20MB
-        <br />
-        잠시 멈춘 뒤 답변을 제출해주세요.
-      </p>
-      {error && (
-        <p className="error space" role="alert">
-          {error}
-        </p>
-      )}
-    </aside>
-  );
-}
+import type { Job } from "@/api/core";
+import { useInterview } from "@/hooks/use-interview";
+import { InterviewSteps } from "./interview-steps";
+import { Recorder } from "./recorder";
 
 export function Interview({
   exit,
@@ -246,91 +12,21 @@ export function Interview({
   exit: () => void;
   generated: (job: Job) => void;
 }) {
-  const [interviewId] = useState(() => crypto.randomUUID());
-  const [jobId] = useState(() => crypto.randomUUID());
-  const [answers, setAnswers] = useState<Answer[]>([]);
-  const [question, setQuestion] = useState("");
-  const [summary, setSummary] = useState("");
-  const [phase, setPhase] = useState<
-    "prepare" | "interview" | "summary" | "generating"
-  >("prepare");
-  const [submitted, setSubmitted] = useState(false);
-  useEffect(() => {
-    setInterviewActive(!submitted);
-    return () => setInterviewActive(false);
-  }, [submitted]);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-  const mounted = useRef(true);
-  useEffect(() => {
-    mounted.current = true;
-    return () => {
-      mounted.current = false;
-    };
-  }, []);
-  async function advance(values: Answer[]) {
-    setBusy(true);
-    setError("");
-    try {
-      if (values.length === 10) {
-        const result = await getSummary(interviewId, values);
-        if (mounted.current) {
-          setSummary(result.summary);
-          setPhase("summary");
-        }
-      } else {
-        const result = await getQuestion(interviewId, values);
-        if (mounted.current) {
-          setQuestion(result.question);
-          setPhase("interview");
-        }
-      }
-    } catch (cause) {
-      if (mounted.current) setError((cause as Error).message);
-    } finally {
-      if (mounted.current) setBusy(false);
-    }
-  }
-  async function submit(blob: Blob, duration: number) {
-    setBusy(true);
-    setError("");
-    try {
-      const result = await uploadRecording(
-        interviewId,
-        answers.length,
-        blob,
-        duration,
-      );
-      if (!mounted.current) return;
-      const values = [
-        ...answers,
-        { question, answer: result.text, recording_id: result.recording_id },
-      ];
-      setAnswers(values);
-      setQuestion("");
-      await advance(values);
-    } finally {
-      if (mounted.current) setBusy(false);
-    }
-  }
-  async function generate() {
-    setBusy(true);
-    setError("");
-    setPhase("generating");
-    try {
-      await createGeneration(jobId, interviewId, answers, summary);
-      if (mounted.current) setSubmitted(true);
-      const job = await runGeneration(jobId);
-      if (mounted.current) generated(job);
-    } catch (cause) {
-      if (mounted.current) setError((cause as Error).message);
-    } finally {
-      if (mounted.current) setBusy(false);
-    }
-  }
+  const {
+    answers,
+    question,
+    summary,
+    phase,
+    busy,
+    error,
+    submit,
+    start,
+    retry,
+    generate,
+  } = useInterview(generated);
   return (
     <>
-      <Steps
+      <InterviewSteps
         current={phase === "summary" ? 1 : phase === "generating" ? 2 : 0}
       />
       {phase === "prepare" ? (
@@ -354,7 +50,7 @@ export function Interview({
           <button
             className="primary space"
             disabled={busy}
-            onClick={() => void advance([])}
+            onClick={() => void start()}
             type="button"
           >
             {busy ? "질문 생성 중…" : "인터뷰 시작"}
@@ -420,13 +116,7 @@ export function Interview({
       {error && (
         <div className="error space" role="alert">
           <p>{error}</p>
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() =>
-              void (phase === "generating" ? generate() : advance(answers))
-            }
-          >
+          <button type="button" disabled={busy} onClick={() => void retry()}>
             다시 시도
           </button>
         </div>

@@ -3,10 +3,10 @@
 import { CircleUserRound } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useLayoutEffect, useState } from "react";
+import { confirmLeave, useAppNavigation } from "@/hooks/use-app-navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { Auth } from "./auth";
 import { Modal } from "./modal";
-import { confirmLeave, useAppNavigation } from "./navigation";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { user, loading, loggedIn, logout } = useAuth();

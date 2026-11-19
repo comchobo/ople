@@ -31,6 +31,12 @@ module.exports = {
       to: { path: "^(app|components|hooks)/" },
     },
     {
+      name: "hooks-may-not-import-ui",
+      severity: "error",
+      from: { path: "^hooks/" },
+      to: { path: "^(app|components)/" },
+    },
+    {
       name: "api-core-runtime-is-private",
       severity: "error",
       from: { pathNot: "^api/" },
