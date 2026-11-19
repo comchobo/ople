@@ -1,6 +1,7 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { expect, it, vi } from "vitest";
-import { type Planner, savePlanner } from "@/lib/api";
+import type { Planner } from "@/api/core";
+import { savePlanner } from "@/api/planners";
 import { AuthProvider, useAuth } from "./use-auth";
 
 const user = { id: "u", name: "사용자", email: "hello@example.com" };

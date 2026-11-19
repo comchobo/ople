@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { expect, it, vi } from "vitest";
-import type { Piece } from "@/lib/api";
+import type { Piece } from "@/api/core";
 import { Timeline } from "./timeline";
 
 it("길게 누른 활동을 월 단위로 옮기고 60개월 경계를 지킨다", () => {

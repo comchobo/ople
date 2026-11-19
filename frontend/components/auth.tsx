@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { api, type User } from "@/lib/api";
+import { googleLoginUrl, login, signup, verifyEmail } from "@/api/auth";
+import type { User } from "@/api/core";
 import { Modal } from "./modal";
 
 export function Auth({
@@ -27,7 +28,7 @@ export function Auth({
     setBusy(true);
     setError("");
     try {
-      await api("/auth/signup", { email, password });
+      await signup(email, password);
       setMode("verify");
       setCooldown(60);
     } catch (cause) {
@@ -42,10 +43,9 @@ export function Auth({
     setBusy(true);
     setError("");
     try {
-      const user = await api<User>(
-        mode === "verify" ? "/auth/verify" : "/auth/login",
-        mode === "verify" ? { email, code } : { email, password },
-      );
+      const user = await (mode === "verify"
+        ? verifyEmail(email, code)
+        : login(email, password));
       loggedIn(user);
     } catch (cause) {
       setError((cause as Error).message);
@@ -64,7 +64,7 @@ export function Auth({
       }
       close={close}
     >
-      <a className="button wide google-login" href="/api/auth/google">
+      <a className="button wide google-login" href={googleLoginUrl}>
         <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
           <path
             fill="#4285F4"

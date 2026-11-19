@@ -12,6 +12,36 @@
     "enabled": true,
     "indentStyle": "space"
   },
+  "overrides": [
+    {
+      "includes": ["**/*.{js,jsx,ts,tsx,cjs,mjs}", "!api/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedGlobals": {
+              "level": "error",
+              "options": {
+                "deniedGlobals": {
+                  "fetch": "Use a feature API function from api/."
+                }
+              }
+            }
+          },
+          "nursery": {
+            "noJsRestrictedProperties": {
+              "level": "error",
+              "options": {
+                "entries": [
+                  { "object": "globalThis", "property": "fetch" },
+                  { "object": "window", "property": "fetch" }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
   "linter": {
     "enabled": true,
     "rules": {

@@ -19,10 +19,25 @@ module.exports = {
       to: { path: "^app/" },
     },
     {
-      name: "lib-may-not-import-app-or-components",
+      name: "lib-must-remain-domain-agnostic",
       severity: "error",
       from: { path: "^lib/" },
-      to: { path: "^(app|components)/" },
+      to: { path: "^(api|app|components|hooks)/" },
+    },
+    {
+      name: "api-may-not-import-ui",
+      severity: "error",
+      from: { path: "^api/" },
+      to: { path: "^(app|components|hooks)/" },
+    },
+    {
+      name: "api-core-runtime-is-private",
+      severity: "error",
+      from: { pathNot: "^api/" },
+      to: {
+        path: "^api/core\\.ts$",
+        dependencyTypesNot: ["type-only"],
+      },
     },
   ],
   options: {

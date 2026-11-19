@@ -2,8 +2,8 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { expect, it, vi } from "vitest";
+import type { Planner } from "@/api/core";
 import { AuthProvider } from "@/hooks/use-auth";
-import type { Planner } from "@/lib/api";
 import { AppShell } from "./app-shell";
 import { Ople } from "./ople";
 

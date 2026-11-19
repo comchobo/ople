@@ -2,7 +2,7 @@
 
 import { Pencil } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import type { Piece } from "@/lib/api";
+import type { Piece } from "@/api/core";
 
 type Drag = {
   id: string;
