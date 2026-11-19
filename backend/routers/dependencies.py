@@ -1,6 +1,7 @@
 from typing import Annotated
+from uuid import UUID
 
-from fastapi import Cookie, Depends
+from fastapi import Cookie, Depends, Header
 from sqlmodel import Session
 
 from db import session
@@ -15,3 +16,6 @@ def user_dependency(db: DB, ople_session: Annotated[str | None, Cookie()] = None
 
 
 CurrentUser = Annotated[User, Depends(user_dependency)]
+
+
+PlannerCopyKey = Annotated[UUID, Header(alias="Idempotency-Key")]
