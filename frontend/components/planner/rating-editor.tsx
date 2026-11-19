@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Plan, ScoreKey } from "@/api/core";
-import { Modal } from "./modal";
+import { Modal } from "@/components/modal";
 
 const ratingLabels: Record<ScoreKey, string> = {
   resources: "자원",

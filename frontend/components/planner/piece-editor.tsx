@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Category, Piece } from "@/api/core";
-import { Modal } from "./modal";
+import { Modal } from "@/components/modal";
 
 const categories: Record<Category, string> = {
   work: "일",

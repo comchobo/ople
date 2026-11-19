@@ -1,4 +1,4 @@
-import { PlannerBoardScreen } from "@/components/planner-board-screen";
+import { PlannerBoardScreen } from "@/components/planner/planner-board-screen";
 
 export default async function Page({
   params,

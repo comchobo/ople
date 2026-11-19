@@ -1,4 +1,4 @@
-import { PlannersScreen } from "@/components/planners-screen";
+import { PlannersScreen } from "@/components/planner/planners-screen";
 
 export default function Page() {
   return <PlannersScreen />;
