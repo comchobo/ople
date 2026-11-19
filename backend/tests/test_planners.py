@@ -5,9 +5,12 @@ from fastapi import HTTPException
 from pydantic import ValidationError
 from sqlmodel import select
 
-from models.entities import Generation, Planner, User
-from schemas.domain import Plans
-from services import planners
+from models.generations import Generation
+from models.planners import Planner
+from models.users import User
+from schemas.planners import Plans
+from services import generations
+from services.ownership import owned
 
 
 def test_schema_rejects_overflow_duplicate_ids_and_invalid_scores(plans_data):
@@ -39,9 +42,9 @@ def test_ownership_is_enforced(db, plans_data):
     planner = Planner(user_id=user.id, name="계획", plans=plans_data["plans"])
     db.add(planner)
     db.commit()
-    assert planners.owned(db, Planner, planner.id, user.id).id == planner.id
+    assert owned(db, Planner, planner.id, user.id).id == planner.id
     with pytest.raises(HTTPException) as denied:
-        planners.owned(db, Planner, planner.id, "other")
+        owned(db, Planner, planner.id, "other")
     assert denied.value.status_code == 404
 
 
@@ -52,18 +55,18 @@ def test_generation_failure_retry_and_idempotent_completion(db, database, monkey
     job = Generation(user_id=user.id, payload={"summary": "나의 이야기"})
     db.add(job)
     db.commit()
-    monkeypatch.setattr(planners, "engine", database)
+    monkeypatch.setattr(generations, "engine", database)
     generator = Mock(
         side_effect=[RuntimeError("provider failure"), Plans.model_validate(plans_data)]
     )
-    monkeypatch.setattr(planners, "generate_plans", generator)
-    failed = planners.run_generation(job.id, user.id)
+    monkeypatch.setattr(generations, "generate_plans", generator)
+    failed = generations.run_generation(job.id, user.id)
     assert failed.status == "failed"
-    done = planners.run_generation(job.id, user.id)
+    done = generations.run_generation(job.id, user.id)
     assert done.status == "completed" and done.planner_id
-    again = planners.run_generation(job.id, user.id)
+    again = generations.run_generation(job.id, user.id)
     assert again.planner_id == done.planner_id
     assert generator.call_count == 2
     assert len(db.exec(select(Planner)).all()) == 1
     with pytest.raises(HTTPException):
-        planners.run_generation(job.id, "other")
+        generations.run_generation(job.id, "other")

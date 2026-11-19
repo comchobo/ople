@@ -7,6 +7,10 @@
 - Give each module, function, and component one responsibility and one reason to change.
 - Do not add new architectural layers without the user's explicit request.
 
+## Backend
+
+- Keep `utils/` domain-agnostic.
+
 ## Frontend
 
 - Keep `lib/` domain-agnostic.

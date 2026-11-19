@@ -1,48 +1,25 @@
-import hashlib
 import secrets
 from datetime import timedelta
 
-import boto3
-from argon2 import PasswordHasher
-from argon2.exceptions import VerificationError
 from fastapi import HTTPException
 from sqlmodel import Session, select
 
-from models.entities import LoginSession, Signup, User, now
-from utils.config import required
-
-hasher = PasswordHasher()
-
-
-def digest(value: str) -> str:
-    return hashlib.sha256(value.encode()).hexdigest()
+from models.auth import Signup
+from models.users import User
+from services.mail import send_code
+from services.passwords import check_password, hasher
+from utils.clock import now
 
 
 def normalize(email: str) -> str:
     return email.strip().lower()
 
 
-def check_password(encoded: str | None, password: str) -> bool:
-    try:
-        return encoded is not None and hasher.verify(encoded, password)
-    except VerificationError:
-        return False
-
-
-def send_code(email: str, code: str):
-    client = boto3.client("sesv2", region_name=required("AWS_REGION"))
-    client.send_email(
-        FromEmailAddress=required("SES_FROM_EMAIL"),
-        Destination={"ToAddresses": [email]},
-        Content={
-            "Simple": {
-                "Subject": {"Data": "Ople 가입 인증번호", "Charset": "UTF-8"},
-                "Body": {
-                    "Text": {"Data": f"인증번호: {code}\n10분 동안 유효합니다.", "Charset": "UTF-8"}
-                },
-            }
-        },
-    )
+def login(db: Session, email: str, password: str) -> User:
+    user = db.exec(select(User).where(User.email == normalize(email))).first()
+    if not user or not check_password(user.password_hash, password):
+        raise HTTPException(401, "이메일 또는 비밀번호가 올바르지 않습니다.")
+    return user
 
 
 def start_signup(db: Session, email: str, password: str):
@@ -88,41 +65,4 @@ def verify_signup(db: Session, email: str, code: str) -> User:
     db.add(user)
     db.delete(pending)
     db.commit()
-    return user
-
-
-def google_user(db: Session, sub: str, email: str, name: str) -> User:
-    user = db.exec(select(User).where(User.google_sub == sub)).first()
-    if user:
-        return user
-    email = normalize(email)
-    user = db.exec(select(User).where(User.email == email).with_for_update()).first()
-    if user and user.google_sub and user.google_sub != sub:
-        raise HTTPException(409, "이미 다른 Google 계정이 연결되어 있습니다.")
-    if not user:
-        user = User(email=email, name=name[:100] or email.split("@")[0])
-    user.google_sub = sub
-    db.add(user)
-    db.commit()
-    return user
-
-
-def create_session(db: Session, user: User) -> str:
-    token = secrets.token_urlsafe(32)
-    db.add(
-        LoginSession(
-            token_hash=digest(token), user_id=user.id, expires_at=now() + timedelta(days=30)
-        )
-    )
-    db.commit()
-    return token
-
-
-def current_user(db: Session, token: str | None) -> User:
-    login = db.get(LoginSession, digest(token or ""))
-    if not login or login.expires_at <= now():
-        raise HTTPException(401, "로그인이 필요합니다.")
-    user = db.get(User, login.user_id)
-    if not user:
-        raise HTTPException(401, "로그인이 필요합니다.")
     return user

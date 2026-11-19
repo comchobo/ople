@@ -38,10 +38,22 @@ target-version = "py313"
 line-length = 100
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B"]
+select = ["E", "F", "I", "UP", "B", "TID251"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"httpx".msg = "Use external service SDKs only within services/."
+"httpx2".msg = "Use external service SDKs only within services/."
+"boto3".msg = "Use external service SDKs only within services/."
+"botocore".msg = "Use external service SDKs only within services/."
+"authlib".msg = "Use external service SDKs only within services/."
+
+[tool.ruff.lint.per-file-ignores]
+"services/**" = ["TID251"]
+"tests/**" = ["TID251"]
 
 [tool.importlinter]
 root_packages = ["routers", "services", "schemas", "models", "utils"]
+include_external_packages = true
 
 [[tool.importlinter.contracts]]
 name = "Backend layer direction"
@@ -53,3 +65,9 @@ layers = [
     "models",
     "utils",
 ]
+
+[[tool.importlinter.contracts]]
+name = "Utilities stay application-agnostic"
+type = "forbidden"
+source_modules = ["utils"]
+forbidden_modules = ["db", "config"]

@@ -1,24 +1,13 @@
 from unittest.mock import Mock
 
-import pytest
-from fastapi.testclient import TestClient
-
-from db import session
-from main import app
-from models.entities import Planner, Recording
-from services import auth
-
-
-@pytest.fixture
-def client(db):
-    app.dependency_overrides[session] = lambda: db
-    yield TestClient(app)
-    app.dependency_overrides.clear()
+from models.planners import Planner
+from models.recordings import Recording
+from services import google, sessions
 
 
 def authenticated(client, db):
-    user = auth.google_user(db, "google", "hello@example.com", "이름")
-    client.cookies.set("ople_session", auth.create_session(db, user))
+    user = google.google_user(db, "google", "hello@example.com", "이름")
+    client.cookies.set("ople_session", sessions.create_session(db, user))
     return user
 
 
@@ -42,23 +31,23 @@ def test_planner_save_delete_and_user_isolation(client, db, plans_data):
     result = client.put(f"/api/planners/{planner.id}", json={"name": "수정", **plans_data})
     assert result.status_code == 200 and result.json()["name"] == "수정"
     assert len(client.get("/api/planners").json()) == 1
-    other = auth.google_user(db, "other", "other@example.com", "다른 사용자")
-    client.cookies.set("ople_session", auth.create_session(db, other))
+    other = google.google_user(db, "other", "other@example.com", "다른 사용자")
+    client.cookies.set("ople_session", sessions.create_session(db, other))
     assert (
         client.put(f"/api/planners/{planner.id}", json={"name": "침입", **plans_data}).status_code
         == 404
     )
     assert client.delete(f"/api/planners/{planner.id}").status_code == 404
-    client.cookies.set("ople_session", auth.create_session(db, user))
+    client.cookies.set("ople_session", sessions.create_session(db, user))
     assert client.delete(f"/api/planners/{planner.id}").status_code == 200
 
 
 def test_audio_is_retained_and_only_metadata_returned(client, db, monkeypatch, tmp_path):
-    from routers import api
+    from services import recording_files, recordings
 
     user = authenticated(client, db)
-    monkeypatch.setattr(api, "RECORDINGS_DIR", tmp_path)
-    monkeypatch.setattr(api.providers, "transcribe", Mock(return_value="응답입니다"))
+    monkeypatch.setattr(recording_files, "RECORDINGS_DIR", tmp_path)
+    monkeypatch.setattr(recordings, "transcribe", Mock(return_value="응답입니다"))
     response = client.post(
         "/api/interview/recording",
         files={"audio": ("voice.webm", b"audio", "audio/webm")},

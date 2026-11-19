@@ -1,13 +1,11 @@
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints, model_validator
+from pydantic import Field, StringConstraints, model_validator
+
+from schemas.common import StrictModel
 
 Title = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)]
 Text = Annotated[str, StringConstraints(max_length=2000)]
-
-
-class StrictModel(BaseModel):
-    model_config = ConfigDict(extra="forbid")
 
 
 class Piece(StrictModel):
@@ -64,42 +62,3 @@ class Plans(StrictModel):
 
 class PlannerUpdate(Plans):
     name: Title
-
-
-class Credentials(StrictModel):
-    email: EmailStr
-    password: str = Field(min_length=8, max_length=128)
-
-
-class Verify(StrictModel):
-    email: EmailStr
-    code: str = Field(pattern=r"^\d{6}$")
-
-
-class Question(StrictModel):
-    question: str = Field(min_length=1, max_length=1000)
-
-
-class Summary(StrictModel):
-    summary: str = Field(min_length=1, max_length=8000)
-
-
-class Answer(StrictModel):
-    question: str = Field(min_length=1, max_length=1000)
-    answer: str = Field(min_length=1, max_length=12000)
-    recording_id: str
-
-
-class Interview(StrictModel):
-    interview_id: str = Field(min_length=1, max_length=100)
-    answers: list[Answer] = Field(max_length=10)
-
-
-class Generate(Interview):
-    summary: str = Field(min_length=1, max_length=8000)
-
-    @model_validator(mode="after")
-    def complete(self):
-        if len(self.answers) != 10:
-            raise ValueError("10개의 답변이 필요합니다.")
-        return self
