@@ -10,6 +10,7 @@ const planner: Planner = {
   id: "p",
   name: "나의 계획",
   created_at: "2026-11-17T00:00:00",
+  is_favorite: false,
   plans: [
     "현재 방향을 발전시키는 계획",
     "다른 방향을 탐색하는 계획",

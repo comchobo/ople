@@ -3,13 +3,17 @@
 import type { Planner } from "@/api/core";
 import { formatDate } from "@/lib/date";
 
+import { PlannerFavoriteButton } from "./planner-favorite-button";
+
 export function PlannerList({
   planners,
   open,
   rename,
   remove,
+  setFavorite,
 }: {
   planners: Planner[];
+  setFavorite: (id: string, value: boolean) => Promise<void>;
   open: (id: string) => void;
   rename: (planner: Planner) => void;
   remove: (id: string) => Promise<void>;
@@ -23,6 +27,7 @@ export function PlannerList({
               className="flex items-center justify-between gap-6 border-b border-[#d4d4d4] py-[22px]"
               key={planner.id}
             >
+              <PlannerFavoriteButton planner={planner} save={setFavorite} />
               <div className="min-w-0 flex-1">
                 <h2 className="text-xl leading-[1.45] tracking-[-0.5px] [font-weight:650]">
                   <button

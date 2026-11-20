@@ -18,6 +18,7 @@ export function PlannersScreen() {
     error: plannersError,
     refresh: refreshPlanners,
     change,
+    setFavorite,
     remove,
   } = usePlanners(user);
   const {
@@ -88,6 +89,7 @@ export function PlannersScreen() {
               open={(id) => void move(`/planners/${encodeURIComponent(id)}`)}
               rename={setRename}
               remove={remove}
+              setFavorite={setFavorite}
             />
             <footer className="flex shrink-0 items-center justify-between border-t border-[#d4d4d4] py-3 text-[13px] text-[#666]">
               <span>플래너는 계정에 저장됩니다.</span>

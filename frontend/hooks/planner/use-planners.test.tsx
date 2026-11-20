@@ -8,6 +8,7 @@ const planner: Planner = {
   id: "p",
   name: "기존 계획",
   created_at: "2026-11-17T00:00:00Z",
+  is_favorite: false,
   plans: [],
 };
 const json = (value: unknown) => new Response(JSON.stringify(value));
@@ -85,4 +86,42 @@ it("생성 작업 API가 아닌 플래너 API만 조회한다", async () => {
   const { result } = renderHook(() => usePlanners(user));
   await waitFor(() => expect(result.current.loading).toBe(false));
   expect(fetcher.mock.calls.map(([path]) => path)).toEqual(["/api/planners"]);
+});
+
+it("뒤늦은 목록 응답과 이전 이름 편집본이 저장된 별을 되돌리지 않는다", async () => {
+  const stale = deferred<Response>();
+  const favorite = deferred<Response>();
+  let reads = 0;
+  vi.spyOn(globalThis, "fetch").mockImplementation(async (path, options) => {
+    if (path === "/api/planners/p/favorite") return favorite.promise;
+    if (options?.method === "PUT") return json(planner);
+    return ++reads === 1 ? json([planner]) : stale.promise;
+  });
+  const { result } = renderHook(() => usePlanners(user));
+  await waitFor(() => expect(result.current.loading).toBe(false));
+  let refresh!: Promise<void>;
+  let save!: Promise<void>;
+  act(() => {
+    refresh = result.current.refresh();
+    save = result.current.setFavorite(planner.id, true);
+    result.current.change({ ...planner, name: "저장 중 변경" });
+  });
+  await waitFor(() => expect(reads).toBe(2));
+  await act(async () => {
+    favorite.resolve(json({ is_favorite: true }));
+    await save;
+  });
+  expect(result.current.planners[0]).toMatchObject({
+    name: "저장 중 변경",
+    is_favorite: true,
+  });
+  await act(async () => {
+    stale.resolve(json([{ ...planner, name: "저장 중 변경" }]));
+    await refresh;
+    result.current.change({ ...planner, name: "다음 이름" });
+  });
+  expect(result.current.planners[0]).toMatchObject({
+    name: "다음 이름",
+    is_favorite: true,
+  });
 });
