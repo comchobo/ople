@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import type { Planner } from "@/api/core";
@@ -131,10 +131,15 @@ describe("플래너 편집", () => {
         create={vi.fn()}
       />,
     );
-    await user.click(screen.getByRole("button", { name: "작은 실험 수정" }));
+    function timelineButton(name: RegExp) {
+      const track = document.getElementById("timeline-track");
+      if (!track) throw new Error("timeline missing");
+      return within(track).getByRole("button", { name });
+    }
+    await user.click(timelineButton(/작은 실험.*개월차부터/));
     await user.click(screen.getByRole("button", { name: "복제" }));
     expect(change.mock.calls[0][0].plans[0].pieces).toHaveLength(2);
-    await user.click(screen.getByRole("button", { name: "작은 실험 수정" }));
+    await user.click(timelineButton(/작은 실험.*개월차부터/));
     await user.click(screen.getByRole("button", { name: "삭제" }));
     expect(change.mock.calls[1][0].plans[0].pieces).toHaveLength(0);
   });

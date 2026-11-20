@@ -84,8 +84,8 @@ it("월 위치를 PNG에 반영하고 파일명을 정리해 다운로드한 뒤
   });
   expect(result.current.exporting).toBe(false);
   expect(result.current.error).toBe("");
-  expect(context.fillRect).toHaveBeenCalledWith(240, 43, 120, 44);
-  expect(context.fillText).toHaveBeenCalledWith("작은 실험", 246, 58);
+  expect(context.fillRect).toHaveBeenCalledWith(240, 44, 120, 44);
+  expect(context.fillText).toHaveBeenCalledWith("작은 실험", 250, 59);
   expect(createObjectURL).toHaveBeenCalledWith(blob);
   const anchor = click.mock.instances[0] as HTMLAnchorElement;
   expect(anchor.download).toBe("계획_A_B.png");

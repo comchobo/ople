@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import type { Category, Piece } from "@/api/core";
+import { Button } from "@/components/button";
+import { controlClass, Field } from "@/components/field";
 import { Modal } from "@/components/modal";
 
 const categories: Record<Category, string> = {
@@ -33,55 +35,48 @@ export function PieceEditor({
           save({ ...value, title: value.title.trim() });
         }}
       >
-        <label className="mt-4 mb-1.5 block text-[13px]" htmlFor="piece-title">
-          활동 제목
-        </label>
-        <input
-          className="block min-h-11 w-full rounded-[3px] border border-[#aaa] bg-white p-[11px] caret-[#222] focus:[outline:2px_solid_#555] focus:[outline-offset:1px]"
-          id="piece-title"
-          required
-          maxLength={100}
-          value={value.title}
-          onChange={(e) => setValue({ ...value, title: e.target.value })}
-        />
-        <label
-          className="mt-4 mb-1.5 block text-[13px]"
-          htmlFor="piece-description"
-        >
-          설명 (선택)
-        </label>
-        <textarea
-          className="block min-h-11 w-full rounded-[3px] border border-[#aaa] bg-white p-[11px] caret-[#222] focus:[outline:2px_solid_#555] focus:[outline-offset:1px]"
-          id="piece-description"
-          rows={3}
-          maxLength={2000}
-          value={value.description}
-          onChange={(e) => setValue({ ...value, description: e.target.value })}
-        />
-        <label className="mt-4 mb-1.5 block text-[13px]" htmlFor="category">
-          카테고리
-        </label>
-        <select
-          className="block min-h-11 w-full rounded-[3px] border border-[#aaa] bg-white p-[11px] caret-[#222] focus:[outline:2px_solid_#555] focus:[outline-offset:1px]"
-          id="category"
-          value={value.category}
-          onChange={(e) =>
-            setValue({ ...value, category: e.target.value as Category })
-          }
-        >
-          {Object.entries(categories).map(([key, label]) => (
-            <option key={key} value={key}>
-              {label}
-            </option>
-          ))}
-        </select>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="mt-4 mb-1.5 block text-[13px]" htmlFor="start">
-              시작 월
-            </label>
+        <Field label="활동 제목" htmlFor="piece-title">
+          <input
+            className={controlClass}
+            id="piece-title"
+            required
+            maxLength={100}
+            value={value.title}
+            onChange={(e) => setValue({ ...value, title: e.target.value })}
+          />
+        </Field>
+        <Field label="설명 (선택)" htmlFor="piece-description">
+          <textarea
+            className={controlClass}
+            id="piece-description"
+            rows={3}
+            maxLength={2000}
+            value={value.description}
+            onChange={(e) =>
+              setValue({ ...value, description: e.target.value })
+            }
+          />
+        </Field>
+        <Field label="카테고리" htmlFor="category">
+          <select
+            className={controlClass}
+            id="category"
+            value={value.category}
+            onChange={(e) =>
+              setValue({ ...value, category: e.target.value as Category })
+            }
+          >
+            {Object.entries(categories).map(([key, label]) => (
+              <option key={key} value={key}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <div className="mt-5 grid grid-cols-2 gap-3">
+          <Field label="시작 월" htmlFor="start" spacing={false}>
             <input
-              className="block min-h-11 w-full rounded-[3px] border border-[#aaa] bg-white p-[11px] caret-[#222] focus:[outline:2px_solid_#555] focus:[outline-offset:1px]"
+              className={controlClass}
               id="start"
               type="number"
               min={1}
@@ -100,13 +95,10 @@ export function PieceEditor({
                 });
               }}
             />
-          </div>
-          <div>
-            <label className="mt-4 mb-1.5 block text-[13px]" htmlFor="duration">
-              기간 (개월)
-            </label>
+          </Field>
+          <Field label="기간 (개월)" htmlFor="duration" spacing={false}>
             <input
-              className="block min-h-11 w-full rounded-[3px] border border-[#aaa] bg-white p-[11px] caret-[#222] focus:[outline:2px_solid_#555] focus:[outline-offset:1px]"
+              className={controlClass}
               id="duration"
               type="number"
               min={1}
@@ -117,36 +109,33 @@ export function PieceEditor({
                 setValue({ ...value, duration: Number(e.target.value) })
               }
             />
-          </div>
+          </Field>
         </div>
-        <div className="mt-6 flex justify-between gap-2 border-t border-[#d4d4d4] pt-4">
+        <div className="mt-7 flex flex-wrap items-center gap-2 border-t border-rule pt-4">
           {remove && (
-            <button
-              className="min-h-11 cursor-pointer rounded-[3px] border border-[#d4d4d4] bg-white px-3.5 py-[9px] leading-[1.4] hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45]"
-              type="button"
+            <Button
+              variant="danger"
+              className="px-2"
               onClick={() => {
                 if (window.confirm("이 활동을 삭제할까요?")) remove();
               }}
             >
               삭제
-            </button>
+            </Button>
           )}
           {duplicate && (
-            <button
-              className="min-h-11 cursor-pointer rounded-[3px] border border-[#d4d4d4] bg-white px-3.5 py-[9px] leading-[1.4] hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45]"
-              type="button"
-              onClick={duplicate}
-            >
+            <Button variant="secondary" onClick={duplicate}>
               복제
-            </button>
+            </Button>
           )}
-          <button
-            className="min-h-11 cursor-pointer rounded-[3px] border border-[#222] bg-[#222] px-3.5 py-[9px] leading-[1.4] text-white hover:border-[#999] hover:bg-[#444] hover:text-white focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45] ml-auto"
+          <Button
+            variant="primary"
+            className="ml-auto"
             type="submit"
             disabled={!value.title.trim()}
           >
             저장
-          </button>
+          </Button>
         </div>
       </form>
     </Modal>

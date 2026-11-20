@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Plan, ScoreKey } from "@/api/core";
+import { Button } from "@/components/button";
 import { Modal } from "@/components/modal";
 
 const ratingLabels: Record<ScoreKey, string> = {
@@ -23,13 +24,18 @@ export function RatingSummary({ scores }: { scores: Plan["scores"] }) {
       {Object.entries(ratingLabels).map(([key, label]) => (
         <div
           key={key}
-          className="border border-[#d4d4d4] p-2 text-[12px]"
+          className="border border-rule bg-paper-raised p-2.5 text-[12px]"
           data-score={key}
         >
-          {label} <strong>{scores[key as ScoreKey] ?? "미평가"}</strong>
-          <div className="mt-[7px] h-[3px] bg-[#eee]">
+          <div className="flex items-baseline justify-between gap-2">
+            {label}{" "}
+            <strong className="text-[16px] font-bold tracking-[-0.03em]">
+              {scores[key as ScoreKey] ?? "미평가"}
+            </strong>
+          </div>
+          <div className="mt-2 h-[3px] bg-paper-deep">
             <span
-              className="block h-full bg-[#777]"
+              className="block h-full bg-ink"
               style={{ width: `${(scores[key as ScoreKey] ?? 0) * 10}%` }}
             />
           </div>
@@ -57,19 +63,25 @@ export function RatingEditor({
   });
   return (
     <Modal title="자가평가" close={close}>
-      <p className="mb-5 text-[14px] text-[#555]">
+      <p className="mb-5 max-w-[42ch] text-[14px] leading-relaxed text-muted">
         AI의 평가가 아니라, 내가 느끼는 정도를 표시합니다.
       </p>
       {Object.entries(ratingLabels).map(([key, label]) => (
-        <div className="mt-[18px] border-t border-[#ddd] pt-4" key={key}>
-          <label className="text-[14px] font-semibold" htmlFor={`score-${key}`}>
-            {label} · {scores[key as ScoreKey]}
-          </label>
-          <p className="mt-[3px] mb-2 text-[12px] text-[#666]">
+        <div className="mt-5 border-t border-rule pt-4" key={key}>
+          <div className="flex items-baseline justify-between gap-3">
+            <label
+              className="text-[15px] font-semibold"
+              htmlFor={`score-${key}`}
+            >
+              {label} · {scores[key as ScoreKey]}
+            </label>
+            <span className="font-mono text-[11px] text-muted">/ 10</span>
+          </div>
+          <p className="mt-1 mb-2 text-[12px] leading-relaxed text-muted">
             {ratingHelp[key as ScoreKey]}
           </p>
           <input
-            className="min-h-11 w-full accent-[#333] focus:[outline:2px_solid_#555] focus:[outline-offset:1px]"
+            className="min-h-11 w-full accent-b focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ink"
             id={`score-${key}`}
             type="range"
             min={0}
@@ -82,21 +94,17 @@ export function RatingEditor({
           />
         </div>
       ))}
-      <div className="mt-6 flex justify-between gap-2 border-t border-[#d4d4d4] pt-4">
-        <button
-          className="min-h-11 cursor-pointer rounded-[3px] border border-[#d4d4d4] bg-white px-3.5 py-[9px] leading-[1.4] hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45]"
-          type="button"
-          onClick={() => save({})}
-        >
+      <div className="mt-7 flex flex-wrap items-center gap-2 border-t border-rule pt-4">
+        <Button variant="secondary" onClick={() => save({})}>
           평가 초기화
-        </button>
-        <button
-          type="button"
-          className="min-h-11 cursor-pointer rounded-[3px] border border-[#222] bg-[#222] px-3.5 py-[9px] leading-[1.4] text-white hover:border-[#999] hover:bg-[#444] hover:text-white focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45] ml-auto"
+        </Button>
+        <Button
+          variant="primary"
+          className="ml-auto"
           onClick={() => save(scores)}
         >
           저장
-        </button>
+        </Button>
       </div>
     </Modal>
   );

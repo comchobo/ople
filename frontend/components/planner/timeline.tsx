@@ -1,10 +1,36 @@
 "use client";
 
-import { Pencil } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import type { Piece } from "@/api/core";
+import type { Category, Piece } from "@/api/core";
 
 type Adjustment = "move" | "start" | "end";
+
+const categoryStyles: Record<
+  Category,
+  { edge: string; soft: string; dot: string }
+> = {
+  work: {
+    edge: "border-l-work",
+    soft: "bg-work-soft",
+    dot: "bg-work",
+  },
+  creative: {
+    edge: "border-l-creative",
+    soft: "bg-creative-soft",
+    dot: "bg-creative",
+  },
+  relation: {
+    edge: "border-l-relation",
+    soft: "bg-relation-soft",
+    dot: "bg-relation",
+  },
+  rest: {
+    edge: "border-l-rest",
+    soft: "bg-rest-soft",
+    dot: "bg-rest",
+  },
+};
+
 const clamp = (value: number, min: number, max: number) =>
   Math.max(min, Math.min(max, value));
 
@@ -145,16 +171,16 @@ export function Timeline({
   }
   return (
     <div
-      className="overflow-x-auto overscroll-x-contain border border-[#bbb] bg-white [touch-action:pan-x_pan-y]"
+      className="overflow-x-auto overscroll-x-contain border border-rule-strong bg-paper-raised [touch-action:pan-x_pan-y]"
       onPointerDown={(event) => {
         if (event.target === event.currentTarget) setSelected(null);
       }}
     >
-      <div id="timeline-track" ref={track}>
-        <div className="grid h-[38px] grid-cols-5 border-b border-[#ccc] text-[11px] text-[#555]">
+      <div id="timeline-track" ref={track} className="min-w-[600px]">
+        <div className="grid h-10 grid-cols-5 border-b border-rule-strong bg-paper-deep/60 font-mono text-[10px] tracking-[0.06em] text-muted uppercase">
           {[1, 2, 3, 4, 5].map((year) => (
             <span
-              className="border-l border-[#ddd] px-[7px] py-2.5 first:border-l-0"
+              className="border-l border-rule px-2 py-2.5 first:border-l-0"
               key={year}
             >
               {year}년차
@@ -163,27 +189,31 @@ export function Timeline({
         </div>
         {pieces.map((original) => {
           const piece = preview?.id === original.id ? preview : original;
+          const style = categoryStyles[piece.category];
           return (
             <div
-              className="relative h-[54px] border-b border-[#e5e5e5] bg-[repeating-linear-gradient(to_right,transparent_0,transparent_calc(20%_-_1px),#eee_calc(20%_-_1px),#eee_20%)] last:border-b-0"
+              className="relative h-14 border-b border-rule bg-[repeating-linear-gradient(to_right,transparent_0,transparent_calc(20%_-_1px),#e4ded2_calc(20%_-_1px),#e4ded2_20%)] last:border-b-0"
               key={piece.id}
               onPointerDown={(event) => {
                 if (event.target === event.currentTarget) setSelected(null);
               }}
             >
               <div
-                className={
+                className={[
+                  "absolute top-[6px] h-11 min-w-0 rounded-[1px] border border-l-[3px] border-rule-strong select-none",
+                  style.edge,
+                  style.soft,
                   selected === piece.id
-                    ? "absolute top-[5px] z-[3] h-11 min-w-0 rounded-[2px] border-2 border-[#222] bg-[#ddd] select-none [touch-action:none]"
-                    : "absolute top-[5px] h-11 min-w-0 rounded-[2px] border border-[#999] bg-[#ececec] select-none [touch-action:pan-y]"
-                }
+                    ? "z-[3] ring-2 ring-ink ring-offset-1 ring-offset-paper-raised [touch-action:none]"
+                    : "[touch-action:pan-x_pan-y] hover:border-ink",
+                ].join(" ")}
                 style={{
                   left: `${(piece.start / 60) * 100}%`,
                   width: `${(piece.duration / 60) * 100}%`,
                 }}
               >
                 <button
-                  className={`block h-full w-full min-h-0 overflow-hidden rounded-none border-0 bg-transparent pt-[5px] pr-[27px] pb-1 pl-1.5 text-left text-xs leading-[1.4] text-ellipsis whitespace-nowrap hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] ${selected === piece.id ? "cursor-grab" : "cursor-pointer"}`}
+                  className={`block h-full w-full min-h-0 overflow-hidden rounded-none border-0 bg-transparent pt-1.5 pr-2 pb-1 pl-2 text-left text-[11px] leading-[1.35] text-ellipsis whitespace-nowrap text-ink hover:bg-paper-deep/60 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ink ${selected === piece.id ? "cursor-grab" : "cursor-pointer"}`}
                   type="button"
                   onPointerDown={(event) => begin(event, original, "move")}
                   onClick={() => {
@@ -191,25 +221,22 @@ export function Timeline({
                     suppressedClick.current = false;
                   }}
                 >
+                  <span
+                    aria-hidden="true"
+                    className={`mr-1.5 inline-block size-1.5 rounded-full align-middle ${style.dot}`}
+                  />
                   {piece.title}
-                  <small className="block text-[10px] leading-[1.1] text-[#555]">
+                  <small className="block text-[10px] leading-[1.2] text-ink-soft">
                     {piece.start + 1}개월차부터 · {piece.duration}개월
                   </small>
-                </button>
-                <button
-                  className={`absolute top-0 h-[42px] w-7 min-h-0 cursor-pointer rounded-none border-0 bg-[rgba(255,255,255,0.5)] p-0 text-sm leading-[1.4] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] ${selected === piece.id ? "right-[15px]" : "right-0"}`}
-                  type="button"
-                  aria-label={`${piece.title} 수정`}
-                  onClick={() => edit(original)}
-                >
-                  <Pencil className="size-[15px]" />
+                  <span className="sr-only"> 수정</span>
                 </button>
                 {selected === piece.id &&
                   (["start", "end"] as const).map((mode) => (
                     <button
                       key={mode}
                       type="button"
-                      className={`absolute -top-1 -bottom-1 z-[4] w-6 min-h-0 cursor-pointer rounded-[3px] border border-[#333] bg-white p-0 [touch-action:none] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] after:absolute after:top-[13px] after:bottom-[13px] after:left-[9px] after:w-0.5 after:bg-[#777] after:content-[''] ${mode === "start" ? "-left-2" : "-right-2"}`}
+                      className={`absolute -top-1 -bottom-1 z-[4] flex w-11 min-h-0 cursor-pointer items-center justify-center rounded-[1px] border border-ink bg-paper-raised p-0 [touch-action:none] hover:bg-paper-deep focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ink ${mode === "start" ? "-left-5" : "-right-5"}`}
                       aria-label={`${piece.title} ${mode === "start" ? "시작" : "종료"} 조절`}
                       onPointerDown={(event) => begin(event, original, mode)}
                       onKeyDown={(event) => {
@@ -224,7 +251,9 @@ export function Timeline({
                           ),
                         );
                       }}
-                    />
+                    >
+                      <span className="h-5 w-0.5 bg-ink" />
+                    </button>
                   ))}
               </div>
             </div>

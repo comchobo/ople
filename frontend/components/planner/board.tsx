@@ -3,12 +3,27 @@
 import { Pencil } from "lucide-react";
 import { useState } from "react";
 import type { Piece, Plan, Planner } from "@/api/core";
+import { Button } from "@/components/button";
+import { Notice } from "@/components/notice";
 import { useTimelineExport } from "@/hooks/planner/use-timeline-export";
 import { formatDate } from "@/lib/date";
 import { PieceEditor } from "./piece-editor";
 import { PlanEditor } from "./plan-editor";
 import { RatingEditor, RatingSummary } from "./rating-editor";
 import { Timeline } from "./timeline";
+
+const categoryDots = {
+  work: "bg-work",
+  creative: "bg-creative",
+  relation: "bg-relation",
+  rest: "bg-rest",
+} as const;
+
+const accents = [
+  { text: "text-a", border: "border-a", soft: "bg-a-soft" },
+  { text: "text-b", border: "border-b", soft: "bg-b-soft" },
+  { text: "text-c", border: "border-c", soft: "bg-c-soft" },
+] as const;
 
 export function Board({
   planner,
@@ -40,34 +55,27 @@ export function Board({
   }
   return (
     <>
-      <div className="mb-[18px] flex shrink-0 items-center justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4 border-b border-ink pb-5">
         <div className="min-w-0">
-          <h1 className="mb-1.5 text-[26px] leading-[1.35] tracking-[-1px] [font-weight:650] text-balance [overflow-wrap:anywhere]">
+          <h1 className="text-[clamp(1.9rem,4vw,3rem)] leading-[1.05] font-extrabold tracking-[-0.04em] [overflow-wrap:anywhere]">
             {planner.name}
           </h1>
-          <p className="text-[12px] text-[#666]">
+          <p className="mt-2 text-[12px] text-muted">
             {formatDate(planner.created_at)}
           </p>
         </div>
-        <div className="flex shrink-0 gap-2">
-          <button
-            className="min-h-11 cursor-pointer rounded-[3px] border border-[#d4d4d4] bg-white px-3.5 py-[9px] leading-[1.4] hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45]"
-            type="button"
-            onClick={list}
-          >
+        <div className="flex shrink-0 flex-wrap gap-2">
+          <Button variant="secondary" onClick={list}>
             내 플래너
-          </button>
-          <button
-            className="min-h-11 cursor-pointer rounded-[3px] border border-[#d4d4d4] bg-white px-3.5 py-[9px] leading-[1.4] hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45]"
-            type="button"
-            onClick={create}
-          >
+          </Button>
+          <Button variant="secondary" onClick={create}>
             새 플래너
-          </button>
+          </Button>
         </div>
       </div>
+
       <div
-        className="mb-6 grid shrink-0 grid-cols-3 border-b border-[#333]"
+        className="mt-2 grid shrink-0 grid-cols-3 border-b border-ink"
         role="tablist"
         aria-label="플랜 선택"
       >
@@ -79,28 +87,36 @@ export function Board({
             role="tab"
             aria-selected={active === index}
             aria-controls="plan-panel"
-            className={`min-h-11 cursor-pointer rounded-none border-0 bg-white p-[13px] leading-[1.4] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45] ${active === index ? "text-[#222] [font-weight:650] [box-shadow:inset_0_-3px_#222]" : "text-[#666]"}`}
+            className={`min-h-11 cursor-pointer border-0 border-t-2 bg-transparent px-2 py-4 text-left text-[12px] leading-snug transition-colors focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ink md:px-3 md:text-[13px] ${
+              active === index
+                ? `${accents[index]?.border ?? "border-rule"} bg-paper-raised font-bold text-ink`
+                : "border-transparent text-muted hover:text-ink"
+            }`}
             onClick={() => {
               setActive(index);
               close();
             }}
           >
-            {String.fromCharCode(65 + index)} · {item.kind}
+            <span className="font-sans text-[10px] font-bold tracking-[0.08em]">
+              {String.fromCharCode(65 + index)} ·
+            </span>{" "}
+            {item.kind}
           </button>
         ))}
       </div>
+
       <div
-        className="grid min-h-0 flex-1 grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-8"
+        className="grid min-h-0 flex-1 gap-8 pt-7 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)] lg:gap-12"
         role="tabpanel"
         id="plan-panel"
         aria-labelledby={`tab-${active}`}
       >
-        <section className="-ml-2 min-h-0 min-w-0 overflow-auto px-2 pb-5 [scrollbar-color:#aaa_#f3f3f3] [scrollbar-width:thin]">
-          <div className="flex items-center justify-between gap-3 pb-4">
-            <h2 className="text-base leading-[1.45] tracking-normal [font-weight:650]">
+        <section className="min-w-0">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 pb-4">
+            <h2 className="text-[20px] font-bold tracking-[-0.03em]">
               5년의 타임라인
             </h2>
-            <span className="text-[12px] text-[#666]">
+            <span className="text-[11px] text-muted">
               길게 눌러 이동 · 양 끝으로 기간 조절
             </span>
           </div>
@@ -110,9 +126,43 @@ export function Board({
             change={(pieces) => update({ ...plan, pieces })}
             edit={setPiece}
           />
-          <button
-            type="button"
-            className="min-h-11 cursor-pointer rounded-[3px] border border-[#d4d4d4] bg-white px-3.5 py-[9px] leading-[1.4] hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45] mt-3.5"
+          <p className="mt-2 text-[10px] text-muted md:hidden">
+            가로로 넘겨 5년을 봅니다.
+          </p>
+          {plan.pieces.length > 0 && (
+            <div className="mt-6">
+              <p className="folio mb-2">활동 목록</p>
+              <ul className="m-0 list-none border-t border-rule p-0">
+                {plan.pieces.map((item) => (
+                  <li key={item.id}>
+                    <button
+                      type="button"
+                      className="flex min-h-11 w-full flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-rule bg-transparent py-3 text-left hover:bg-paper-raised focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ink"
+                      onClick={() => setPiece(item)}
+                    >
+                      <span className="flex min-w-0 items-baseline gap-2">
+                        <span
+                          aria-hidden="true"
+                          className={`size-1.5 shrink-0 rounded-full ${categoryDots[item.category]}`}
+                        />
+                        <span className="text-[13px] leading-snug font-semibold [overflow-wrap:anywhere]">
+                          {item.title}
+                        </span>
+                      </span>
+                      <span className="flex shrink-0 items-center gap-2 font-mono text-[10px] text-muted">
+                        {item.start + 1}개월차부터 · {item.duration}개월
+                        <span className="sr-only"> 수정</span>
+                        <Pencil aria-hidden="true" className="size-3.5" />
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <Button
+            variant="secondary"
+            className="mt-4"
             onClick={() =>
               setPiece({
                 id: crypto.randomUUID(),
@@ -125,44 +175,46 @@ export function Board({
             }
           >
             + 활동 추가
-          </button>
+          </Button>
         </section>
-        <aside className="min-h-0 min-w-0 overflow-auto pr-2 pb-5 pl-0 [scrollbar-color:#aaa_#f3f3f3] [scrollbar-width:thin]">
-          <p className="mb-[5px] text-[12px] text-[#666]">{plan.kind}</p>
-          <div className="mb-2 flex items-start gap-2">
-            <h2 className="min-w-0 flex-1 pt-[5px] text-xl leading-[1.45] tracking-[-0.5px] [font-weight:650] [overflow-wrap:anywhere]">
+
+        <aside className="min-w-0 border-t border-ink pt-5 lg:border-t-0 lg:border-l lg:border-rule lg:pt-0 lg:pl-10">
+          <div className="mb-3 flex items-start gap-3">
+            <h2 className="min-w-0 flex-1 text-[24px] leading-[1.25] font-bold tracking-[-0.04em] [overflow-wrap:anywhere] md:text-[28px]">
               {plan.title}
             </h2>
-            <button
-              className="inline-grid min-h-11 w-11 shrink-0 cursor-pointer place-items-center rounded-[3px] border border-[#d4d4d4] bg-white p-0 leading-[1.4] hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45]"
-              type="button"
+            <Button
+              variant="icon"
+              className="shrink-0"
               aria-label="플랜 수정"
               onClick={() => setEditing("plan")}
             >
-              <Pencil className="size-[15px]" />
-            </button>
+              <Pencil className="size-4" />
+            </Button>
           </div>
-          <p className="mb-5 whitespace-pre-wrap text-sm leading-[1.8] text-[#555] [overflow-wrap:anywhere]">
+          <p className="whitespace-pre-wrap text-[15px] leading-[1.85] text-ink-soft [overflow-wrap:anywhere]">
             {plan.description}
           </p>
-          <section className="mt-5 border-t border-[#d4d4d4] pt-4">
-            <div className="flex items-center justify-between gap-2">
-              <h3 className="text-base leading-[1.6] [font-weight:650]">
+
+          <section className="mt-7 border-t border-rule pt-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="text-[18px] font-bold tracking-[-0.02em]">
                 자가평가
               </h3>
-              <button
-                type="button"
-                className="min-h-11 cursor-pointer rounded-[3px] border border-transparent bg-transparent p-2 leading-[1.4] underline underline-offset-4 hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45]"
+              <Button
+                variant="quiet"
+                className="px-2 text-[12px]"
                 onClick={() => setEditing("rating")}
               >
                 평가하기
-              </button>
+              </Button>
             </div>
             <RatingSummary scores={plan.scores} />
           </section>
-          <button
-            type="button"
-            className="min-h-11 cursor-pointer rounded-[3px] border border-[#d4d4d4] bg-white px-3.5 py-[9px] leading-[1.4] hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45] mt-6 w-full"
+
+          <Button
+            variant="secondary"
+            className="mt-7 w-full"
             disabled={exporting}
             onClick={() => {
               void download(
@@ -172,19 +224,25 @@ export function Board({
             }}
           >
             {exporting ? "이미지 생성 중…" : "타임라인 PNG 저장"}
-          </button>
-          {error && <p role="alert">{error}</p>}
+          </Button>
+          {error && (
+            <div className="mt-4">
+              <Notice tone="error">{error}</Notice>
+            </div>
+          )}
         </aside>
       </div>
-      <footer className="flex shrink-0 items-center justify-between border-t border-[#d4d4d4] py-3 text-[13px] text-[#666]">
+
+      <footer className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-rule pt-4 text-[12px] text-muted">
         <span>서로 다른 가능성을 나란히 탐색하세요.</span>
         <a
-          className="focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px]"
+          className="inline-flex min-h-11 items-center underline decoration-rule-strong underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ink"
           href="https://ople.ink"
         >
           Ople
         </a>
       </footer>
+
       {piece && (
         <PieceEditor
           piece={piece}
