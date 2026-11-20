@@ -1,14 +1,20 @@
 export function InterviewSteps({ current }: { current: number }) {
   return (
-    <nav className="mb-7" aria-label="플래너 만들기 단계">
-      <ol className="m-0 grid list-none grid-cols-3 gap-1.5 p-0">
+    <nav className="mb-8 border-y border-ink" aria-label="플래너 만들기 단계">
+      <ol className="m-0 grid list-none grid-cols-3 p-0">
         {["인터뷰", "답변 정리", "플래너 생성"].map((label, i) => (
           <li
             key={label}
             aria-current={i === current ? "step" : undefined}
-            className={`flex items-center justify-center gap-2 whitespace-nowrap border px-1 py-3 text-[13px] ${i === current ? "border-[#222] bg-[#222] text-white [font-weight:650]" : "border-[#d4d4d4] bg-[#f3f3f3]"}`}
+            className={`flex min-h-11 items-center gap-2 border-l border-rule px-2 py-3 text-[11px] first:border-l-0 md:gap-3 md:px-3 md:text-[12px] ${
+              i === current
+                ? "border-t-2 border-t-c bg-paper-raised font-bold text-ink"
+                : "text-muted"
+            }`}
           >
-            <span>{i + 1}</span>
+            <span className="font-sans text-[10px] font-bold tracking-[0.08em] tabular-nums">
+              {String(i + 1).padStart(2, "0")}
+            </span>
             {label}
           </li>
         ))}

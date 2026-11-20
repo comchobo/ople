@@ -1,6 +1,8 @@
 "use client";
 
 import { Mic, Pause, Play, RotateCcw, Send } from "lucide-react";
+import { Button } from "@/components/button";
+import { Notice } from "@/components/notice";
 import { useRecorder } from "@/hooks/interview/use-recorder";
 
 export function Recorder({
@@ -22,41 +24,51 @@ export function Recorder({
     reset,
     send,
   } = useRecorder(submit);
+  const recording = state === "recording";
   return (
-    <aside className="overflow-auto border-l border-[#d4d4d4] py-7 pl-7 text-center">
-      <div className="flex items-center justify-center gap-2 text-[13px]">
-        <span
-          className={`size-[7px] rounded-full border border-[#555] ${state === "recording" ? "bg-[#333]" : ""}`}
-        />
-        {busy
-          ? "답변 처리 중"
-          : state === "recording"
-            ? "녹음 중"
-            : state === "paused"
-              ? "일시정지"
-              : "녹음 준비"}
+    <aside className="h-fit border border-ink bg-paper-raised p-5 md:p-6">
+      <div className="flex items-center justify-between gap-3 border-b border-rule pb-3">
+        <p className="folio">Recorder</p>
+        <p className="flex items-center gap-2 text-[12px] text-ink-soft">
+          <span
+            className={`size-2 rounded-full ${
+              recording
+                ? "animate-pulse bg-c motion-reduce:animate-none"
+                : state === "paused"
+                  ? "bg-ink"
+                  : "border border-rule-strong"
+            }`}
+          />
+          {busy
+            ? "답변 처리 중"
+            : recording
+              ? "녹음 중"
+              : state === "paused"
+                ? "일시정지"
+                : "녹음 준비"}
+        </p>
       </div>
       <p
-        className="my-6 text-[44px] tracking-[1px] tabular-nums"
+        className="my-6 text-center font-mono text-[44px] tracking-[0.02em] tabular-nums"
         role="timer"
         aria-label="녹음 시간"
       >
         {String(Math.floor(seconds / 60)).padStart(2, "0")}:
         {String(seconds % 60).padStart(2, "0")}
       </p>
-      <div className="flex min-h-[88px] items-center justify-center gap-5">
-        <button
-          type="button"
-          className="inline-grid size-12 shrink-0 cursor-pointer place-items-center rounded-full border border-[#d4d4d4] bg-white p-0 leading-[1.4] hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45] [&_svg]:size-[22px]"
+      <div className="flex min-h-[88px] items-center justify-center gap-4">
+        <Button
+          variant="icon"
+          className="size-12 rounded-full"
           aria-label="다시 녹음"
           disabled={busy || state === "idle"}
           onClick={reset}
         >
-          <RotateCcw />
-        </button>
-        <button
-          type="button"
-          className="inline-grid size-[72px] shrink-0 cursor-pointer place-items-center rounded-full border border-[#222] bg-[#222] p-0 leading-[1.4] text-white hover:border-[#999] hover:bg-[#444] hover:text-white focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45] [&_svg]:size-7"
+          <RotateCcw className="size-5" />
+        </Button>
+        <Button
+          variant="primary"
+          className="size-[68px] rounded-full p-0"
           aria-label={
             state === "idle"
               ? "녹음 시작"
@@ -72,35 +84,32 @@ export function Recorder({
           }}
         >
           {state === "idle" ? (
-            <Mic />
+            <Mic className="size-6" />
           ) : state === "recording" ? (
-            <Pause />
+            <Pause className="size-6" />
           ) : (
-            <Play />
+            <Play className="size-6" />
           )}
-        </button>
-        <button
-          type="button"
-          className="inline-grid size-12 shrink-0 cursor-pointer place-items-center rounded-full border border-[#d4d4d4] bg-white p-0 leading-[1.4] hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45] [&_svg]:size-[22px]"
+        </Button>
+        <Button
+          variant="icon"
+          className="size-12 rounded-full"
           aria-label="답변 제출"
           disabled={busy || state !== "paused" || seconds < 1 || oversized}
           onClick={send}
         >
-          <Send />
-        </button>
+          <Send className="size-5" />
+        </Button>
       </div>
-      <p className="mt-6 text-[12px] text-[#666]">
+      <p className="mt-6 border-t border-rule pt-3 text-center text-[11px] leading-relaxed text-muted">
         문항당 최대 3분 · 20MB
         <br />
         잠시 멈춘 뒤 답변을 제출해주세요.
       </p>
       {error && (
-        <p
-          className="mt-6 border border-[#555] bg-[#f0f0f0] p-3.5"
-          role="alert"
-        >
-          {error}
-        </p>
+        <div className="mt-4">
+          <Notice tone="error">{error}</Notice>
+        </div>
       )}
     </aside>
   );
