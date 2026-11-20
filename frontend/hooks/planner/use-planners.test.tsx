@@ -1,6 +1,7 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { expect, it, vi } from "vitest";
 import type { Planner, User } from "@/api/core";
+import { flushPlannerSaves } from "@/api/planners";
 import { usePlanners } from "./use-planners";
 
 const user: User = { id: "a", name: "사용자", email: "a@example.com" };
@@ -117,4 +118,41 @@ it("진행 중 생성만 폴링하고 완료 후와 언마운트 시 타이머�
   } finally {
     vi.useRealTimers();
   }
+});
+
+it("자동 저장 실패 후에도 로컬 편집을 유지하고 새 편집 저장 성공으로 회복한다", async () => {
+  let fail = true;
+  const fetcher = vi
+    .spyOn(globalThis, "fetch")
+    .mockImplementation(async (path, options) => {
+      if (options?.method === "PUT") {
+        return fail
+          ? new Response(JSON.stringify({ detail: "자동 저장 실패" }), {
+              status: 500,
+            })
+          : json({ ...planner, name: "다시 편집한 이름" });
+      }
+      return json(path === "/api/generations" ? [] : [planner]);
+    });
+  const { result } = renderHook(() => usePlanners(user));
+  await waitFor(() => expect(result.current.loading).toBe(false));
+  act(() => {
+    result.current.change({ ...planner, name: "저장되지 않은 이름" });
+  });
+  await expect(flushPlannerSaves(planner.id)).rejects.toThrow("자동 저장 실패");
+  expect(result.current.planners[0].name).toBe("저장되지 않은 이름");
+
+  fail = false;
+  act(() => {
+    result.current.change({ ...planner, name: "다시 편집한 이름" });
+  });
+  await expect(flushPlannerSaves(planner.id)).resolves.toBeUndefined();
+  expect(result.current.planners[0].name).toBe("다시 편집한 이름");
+  expect(fetcher).toHaveBeenLastCalledWith(
+    "/api/planners/p",
+    expect.objectContaining({
+      method: "PUT",
+      body: JSON.stringify({ name: "다시 편집한 이름", plans: [] }),
+    }),
+  );
 });
