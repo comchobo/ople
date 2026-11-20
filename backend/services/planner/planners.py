@@ -24,3 +24,10 @@ def update_planner(db: Session, user_id: str, planner_id: str, body: PlannerUpda
 def delete_planner(db: Session, user_id: str, planner_id: str):
     db.delete(owned(db, Planner, planner_id, user_id))
     db.commit()
+
+
+def set_favorite(db: Session, user_id: str, planner_id: str, is_favorite: bool):
+    planner = owned(db, Planner, planner_id, user_id)
+    planner.is_favorite = is_favorite
+    db.commit()
+    return {"is_favorite": planner.is_favorite}
