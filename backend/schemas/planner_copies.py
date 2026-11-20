@@ -40,3 +40,9 @@ class PlannerCopyErrorCode(StrEnum):
 class PlannerCopyError(StrictModel):
     detail: str
     code: PlannerCopyErrorCode
+
+
+class PlannerCopyInputError(StrictModel):
+    """FastAPI validation errors retain their standard detail array."""
+
+    detail: list[dict]

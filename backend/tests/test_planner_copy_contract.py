@@ -67,7 +67,7 @@ def test_request_cannot_supply_copy_contents_or_identity(field):
 
 @pytest.fixture
 def contract_client(plans_data):
-    # Only a test transport: the production duplicate route is a later implementation step.
+    # Isolate schema and header behavior; production routing is covered in test_planner_copies_api.
     app = FastAPI()
     received = []
     planner = Planner(
