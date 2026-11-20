@@ -12,6 +12,11 @@
     "enabled": true,
     "indentStyle": "space"
   },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
   "plugins": [
     {
       "path": "./biome-plugins/no-use-client-in-app.grit",
@@ -19,6 +24,16 @@
     }
   ],
   "overrides": [
+    {
+      "includes": ["app/globals.css"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noImportantStyles": "off"
+          }
+        }
+      }
+    },
     {
       "includes": ["**/*.{js,jsx,ts,tsx,cjs,mjs}", "!api/**"],
       "linter": {

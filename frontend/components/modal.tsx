@@ -1,6 +1,8 @@
 "use client";
 
+import { X } from "lucide-react";
 import { type ReactNode, useEffect, useRef } from "react";
+import { Button } from "./button";
 
 export function Modal({
   title,
@@ -22,7 +24,7 @@ export function Modal({
   return (
     <dialog
       ref={ref}
-      className="m-auto max-h-[calc(100dvh_-_48px)] w-[560px] max-w-[calc(100%_-_48px)] rounded-[7px] border border-[#999] bg-white p-0 text-[#222] overscroll-contain backdrop:bg-black/30"
+      className="m-auto max-h-[calc(100dvh-1.5rem)] w-[calc(100%-1.5rem)] overflow-y-auto rounded-sheet border border-ink bg-paper-raised p-0 text-ink shadow-sheet md:max-h-[calc(100dvh-3rem)] md:w-[min(560px,calc(100%-3rem))]"
       onCancel={close}
       onKeyDown={(event) => {
         if (event.key === "Escape") close();
@@ -32,19 +34,19 @@ export function Modal({
       }}
       aria-label={title}
     >
-      <div className="p-6">
-        <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-xl leading-[1.45] tracking-[-0.5px] [font-weight:650]">
+      <div className="flex flex-col p-6 sm:p-7">
+        <div className="mb-6 flex items-start justify-between gap-4 border-b border-rule pb-4">
+          <h2 className="text-[28px] leading-tight font-bold tracking-[-0.04em]">
             {title}
           </h2>
-          <button
-            type="button"
-            className="inline-grid min-h-11 w-11 shrink-0 cursor-pointer place-items-center rounded-[3px] border border-[#d4d4d4] bg-white p-0 leading-[1.4] hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45]"
+          <Button
+            variant="icon"
+            className="shrink-0"
             onClick={close}
             aria-label="닫기"
           >
-            ×
-          </button>
+            <X aria-hidden="true" className="size-4" />
+          </Button>
         </div>
         {children}
       </div>

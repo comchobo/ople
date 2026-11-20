@@ -14,13 +14,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko">
-      <body className="m-0 grid h-dvh place-items-center bg-[#eaeaea] text-[15px] leading-[1.6] text-[#222] break-keep [font-family:'Pretendard_Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,Roboto,'Helvetica_Neue','Segoe_UI','Apple_SD_Gothic_Neo','Noto_Sans_KR','Malgun_Gothic','Apple_Color_Emoji','Segoe_UI_Emoji','Segoe_UI_Symbol',sans-serif] selection:bg-[#222] selection:text-white">
+      <body className="min-h-dvh bg-paper text-ink selection:bg-ink selection:text-paper">
         <AuthProvider>
           <Navigation />
-          <div
-            id="app"
-            className="m-auto flex h-dvh w-[min(100%,1194px)] flex-col overflow-hidden border border-[#d4d4d4] bg-white"
-          >
+          <div id="app" className="flex min-h-dvh w-full flex-col bg-paper">
             <SiteHeader />
             {children}
             <SiteFooter />
