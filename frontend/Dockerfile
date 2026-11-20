@@ -9,8 +9,6 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --store-dir=/pnpm/store
 
-COPY . .
-
 EXPOSE 3000
 
 CMD ["pnpm", "dev", "-H", "0.0.0.0", "-p", "3000"]

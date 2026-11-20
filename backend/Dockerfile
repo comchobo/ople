@@ -13,8 +13,6 @@ WORKDIR /app
 COPY backend/pyproject.toml backend/uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen
 
-COPY backend/ .
-
 EXPOSE 8000
 
 CMD ["uv", "run", "uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
