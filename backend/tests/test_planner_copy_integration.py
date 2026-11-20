@@ -10,14 +10,18 @@ from sqlmodel import Session, select
 
 from db import session
 from main import app
+from models.generations import Generation
 from models.planner_copies import PlannerCopyRecord
 from models.planners import Planner
 from models.users import User
 from services.auth.sessions import create_session
+from services.planner import generations
 
 
 @pytest.fixture
-def integration_api(migrated_postgres, plans_data):
+def integration_api(migrated_postgres, plans_data, monkeypatch):
+    # Lifespan recovery uses the module engine instead of the session dependency.
+    monkeypatch.setattr(generations, "engine", migrated_postgres)
     with Session(migrated_postgres, expire_on_commit=False) as db:
         user = User(email="copy-integration@example.com", name="검증 사용자")
         db.add(user)
@@ -165,3 +169,27 @@ def test_concurrent_http_requests_keep_names_unique_and_same_key_creates_once(
     assert len(listed(new_client())) == 1 + expected
     with Session(database) as reader:
         assert len(reader.exec(select(PlannerCopyRecord)).all()) == expected
+
+
+def test_startup_recovery_uses_the_same_isolated_schema_as_http_requests(integration_api):
+    new_client, source_id, database = integration_api
+    with Session(database, expire_on_commit=False) as db:
+        source = db.get(Planner, source_id)
+        assert source is not None
+        job = Generation(user_id=source.user_id, status="running", payload={})
+        db.add(job)
+        db.commit()
+        job_id = job.id
+
+    response = new_client().get("/api/generations")
+    assert response.status_code == 200
+    assert len(response.json()) == 1
+    recovered = response.json()[0]
+    assert recovered["id"] == job_id
+    assert recovered["status"] == "failed"
+    assert recovered["error"] == "서버 재시작으로 중단되었습니다. 다시 시도해주세요."
+    with Session(database) as db:
+        saved = db.get(Generation, job_id)
+        assert saved is not None
+        assert saved.status == "failed"
+        assert saved.error == recovered["error"]
