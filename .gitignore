@@ -232,3 +232,9 @@ playwright-report/
 # macOS
 .DS_Store
 .localized
+# Impeccable working material (durable surfaces and design.json stay tracked)
+.impeccable/mocks/
+.impeccable/questions/
+.impeccable/review/
+.impeccable/briefs/
+.impeccable/mock-server.log

@@ -1,0 +1,468 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-20T03:31:41.617406+00:00",
+  "title": "Design System: Ople",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Warm Paper",
+        "canonical": "#f3efe6",
+        "tonalRamp": [
+          "#5c5b57",
+          "#73726f",
+          "#8a8986",
+          "#a1a09e",
+          "#b8b8b5",
+          "#cfcfcd",
+          "#e6e6e4",
+          "#fdfdfc"
+        ]
+      },
+      "paper-raised": {
+        "role": "neutral",
+        "displayName": "Raised Paper",
+        "canonical": "#fbf9f3",
+        "tonalRamp": [
+          "#5f5f5c",
+          "#767673",
+          "#8c8c8a",
+          "#a3a3a1",
+          "#babab8",
+          "#d1d1cf",
+          "#e7e7e6",
+          "#fefefd"
+        ]
+      },
+      "paper-deep": {
+        "role": "neutral",
+        "displayName": "Deep Paper",
+        "canonical": "#e9e3d6",
+        "tonalRamp": [
+          "#595651",
+          "#706e69",
+          "#888581",
+          "#9f9d99",
+          "#b6b4b1",
+          "#cdccc9",
+          "#e5e3e1",
+          "#fcfbf9"
+        ]
+      },
+      "ink": {
+        "role": "primary",
+        "displayName": "Archive Ink",
+        "canonical": "#1b1a17",
+        "tonalRamp": [
+          "#0a0a09",
+          "#282828",
+          "#474746",
+          "#656565",
+          "#848483",
+          "#a2a2a2",
+          "#c1c1c0",
+          "#dfdfdf"
+        ]
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Ink Soft",
+        "canonical": "#454239",
+        "tonalRamp": [
+          "#1a1916",
+          "#373633",
+          "#545351",
+          "#71706e",
+          "#8e8e8b",
+          "#ababa8",
+          "#c8c8c6",
+          "#e5e5e3"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted Graphite",
+        "canonical": "#6b675d",
+        "tonalRamp": [
+          "#292723",
+          "#45433f",
+          "#605f5b",
+          "#7c7b77",
+          "#979694",
+          "#b3b2b0",
+          "#cececc",
+          "#eaeae8"
+        ]
+      },
+      "faint": {
+        "role": "neutral",
+        "displayName": "Faint",
+        "canonical": "#8a8578",
+        "tonalRamp": [
+          "#34332e",
+          "#4f4e49",
+          "#696864",
+          "#84837f",
+          "#9f9e9b",
+          "#bab9b6",
+          "#d4d3d1",
+          "#efeeec"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Rule",
+        "canonical": "#d8d2c5",
+        "tonalRamp": [
+          "#52504b",
+          "#6a6864",
+          "#82807c",
+          "#9a9895",
+          "#b2b1ad",
+          "#cac9c6",
+          "#e2e1de",
+          "#faf9f7"
+        ]
+      },
+      "rule-strong": {
+        "role": "neutral",
+        "displayName": "Strong Rule",
+        "canonical": "#b8b1a2",
+        "tonalRamp": [
+          "#46433e",
+          "#5f5c58",
+          "#787671",
+          "#918f8b",
+          "#aaa8a5",
+          "#c3c1bf",
+          "#dcdbd8",
+          "#f5f4f2"
+        ]
+      },
+      "a": {
+        "role": "secondary",
+        "displayName": "Olive A",
+        "canonical": "#5c6b4f",
+        "tonalRamp": [
+          "#23291e",
+          "#3f453b",
+          "#5b6057",
+          "#777c74",
+          "#949790",
+          "#b0b3ad",
+          "#cccec9",
+          "#e8eae6"
+        ]
+      },
+      "a-soft": {
+        "role": "secondary",
+        "displayName": "Olive Wash",
+        "canonical": "#e4e7dc",
+        "tonalRamp": [
+          "#575854",
+          "#6e6f6c",
+          "#868783",
+          "#9d9e9b",
+          "#b5b6b3",
+          "#cccdcb",
+          "#e4e5e2",
+          "#fbfcfa"
+        ]
+      },
+      "b": {
+        "role": "secondary",
+        "displayName": "Cobalt B",
+        "canonical": "#2f4f8f",
+        "tonalRamp": [
+          "#121e36",
+          "#303b50",
+          "#4d576b",
+          "#6b7485",
+          "#8990a0",
+          "#a7adba",
+          "#c4c9d5",
+          "#e2e6ef"
+        ]
+      },
+      "b-soft": {
+        "role": "secondary",
+        "displayName": "Cobalt Wash",
+        "canonical": "#dfe4ef",
+        "tonalRamp": [
+          "#55575b",
+          "#6d6e72",
+          "#848689",
+          "#9c9da0",
+          "#b4b5b8",
+          "#cccccf",
+          "#e3e4e6",
+          "#fbfbfd"
+        ]
+      },
+      "c": {
+        "role": "tertiary",
+        "displayName": "Persimmon C",
+        "canonical": "#b24e30",
+        "tonalRamp": [
+          "#441e12",
+          "#5d3b30",
+          "#76574d",
+          "#8f746b",
+          "#a99089",
+          "#c2ada7",
+          "#dbc9c4",
+          "#f4e6e2"
+        ]
+      },
+      "c-soft": {
+        "role": "tertiary",
+        "displayName": "Persimmon Wash",
+        "canonical": "#f0ded5",
+        "tonalRamp": [
+          "#5b5451",
+          "#726c69",
+          "#898381",
+          "#a09b99",
+          "#b8b3b1",
+          "#cfcbc9",
+          "#e6e2e1",
+          "#fdfaf9"
+        ]
+      },
+      "work": {
+        "role": "data",
+        "displayName": "Work Cobalt",
+        "canonical": "#2f4f8f",
+        "tonalRamp": [
+          "#121e36",
+          "#303b50",
+          "#4d576b",
+          "#6b7485",
+          "#8990a0",
+          "#a7adba",
+          "#c4c9d5",
+          "#e2e6ef"
+        ]
+      },
+      "creative": {
+        "role": "data",
+        "displayName": "Creative Persimmon",
+        "canonical": "#b24e30",
+        "tonalRamp": [
+          "#441e12",
+          "#5d3b30",
+          "#76574d",
+          "#8f746b",
+          "#a99089",
+          "#c2ada7",
+          "#dbc9c4",
+          "#f4e6e2"
+        ]
+      },
+      "relation": {
+        "role": "data",
+        "displayName": "Relation Olive",
+        "canonical": "#5c6b4f",
+        "tonalRamp": [
+          "#23291e",
+          "#3f453b",
+          "#5b6057",
+          "#777c74",
+          "#949790",
+          "#b0b3ad",
+          "#cccec9",
+          "#e8eae6"
+        ]
+      },
+      "rest": {
+        "role": "data",
+        "displayName": "Rest Ochre",
+        "canonical": "#8a6a3f",
+        "tonalRamp": [
+          "#342818",
+          "#4f4435",
+          "#695f52",
+          "#847b6f",
+          "#9f978d",
+          "#bab3aa",
+          "#d4cec7",
+          "#efeae4"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Home thesis and the largest page openings."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Planner name, policy title, and primary page headings."
+      },
+      "heading": {
+        "displayName": "Heading",
+        "purpose": "Section headings and modal titles."
+      },
+      "deck": {
+        "displayName": "Deck",
+        "purpose": "Song Myung decks, interview introductions, summaries, and the policy lede."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Interface copy and planner description."
+      },
+      "ui": {
+        "displayName": "UI",
+        "purpose": "Buttons, tabs, and dense controls."
+      },
+      "field": {
+        "displayName": "Field",
+        "purpose": "Inputs, selects, and textareas."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Folios, issue metadata, and panel labels; never a kicker above a heading."
+      },
+      "reading": {
+        "displayName": "Reading",
+        "purpose": "The policy article and other long-form reading pages."
+      }
+    },
+    "shadows": [
+      {
+        "name": "sheet",
+        "value": "0 24px 60px rgba(27, 26, 23, 0.12)",
+        "purpose": "The only shadow; modal sheets that protect a task."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state",
+        "value": "150ms cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Color and border transitions on controls; reduced-motion collapses to instant."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "page",
+        "value": "1200px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one action that starts or completes a task.",
+      "html": "<button class=\"ds-btn ds-btn-primary\" type=\"button\">나의 플래너 시작하기</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 12px 16px; border-radius: 2px; border: 1px solid transparent; font: 600 14px/1.2 \"Pretendard Variable\", Pretendard, sans-serif; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), border-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 3px; } .ds-btn-primary { background: var(--color-ink); color: var(--color-paper); border-color: var(--color-ink); } .ds-btn-primary:hover { background: var(--color-ink-soft); border-color: var(--color-ink-soft); }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Adjacent actions, export, and row-level choices.",
+      "html": "<button class=\"ds-btn ds-btn-secondary\" type=\"button\">타임라인 PNG 저장</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 12px 16px; border-radius: 2px; border: 1px solid transparent; font: 600 14px/1.2 \"Pretendard Variable\", Pretendard, sans-serif; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), border-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 3px; } .ds-btn-secondary { background: var(--color-paper-raised); color: var(--color-ink); border-color: var(--color-faint); } .ds-btn-secondary:hover { border-color: var(--color-ink); background: var(--color-paper-deep); }"
+    },
+    {
+      "name": "Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "A quiet paper input with a visible boundary and a 44px target.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">이메일</span><input class=\"ds-input\" type=\"email\" placeholder=\"hello@example.com\" /></label>",
+      "css": ".ds-field { display: block; font: 400 15px/1.6 \"Pretendard Variable\", Pretendard, sans-serif; color: var(--color-ink); } .ds-field-label { display: block; margin-bottom: 6px; font: 600 12px/1.3 \"Pretendard Variable\", Pretendard, sans-serif; color: var(--color-ink-soft); } .ds-input { display: block; width: 100%; min-height: 44px; box-sizing: border-box; padding: 10px 14px; border: 1px solid var(--color-faint); border-radius: 2px; background: var(--color-paper-raised); color: var(--color-ink); font: inherit; caret-color: var(--color-ink); } .ds-input::placeholder { color: var(--color-muted); } .ds-input:focus { border-color: var(--color-ink); } .ds-input:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 1px; }"
+    },
+    {
+      "name": "Error Notice",
+      "kind": "custom",
+      "refersTo": "notice-error",
+      "description": "A full-bordered tinted notice; no side stripe.",
+      "html": "<div class=\"ds-notice\" role=\"alert\">처리하지 못했습니다. 다시 시도해주세요.</div>",
+      "css": ".ds-notice { padding: 12px 16px; border: 1px solid color-mix(in srgb, var(--color-c) 40%, transparent); border-radius: 2px; background: color-mix(in srgb, var(--color-c-soft) 50%, transparent); color: var(--color-ink); font: 400 14px/1.6 \"Pretendard Variable\", Pretendard, sans-serif; }"
+    },
+    {
+      "name": "Timeline Bar",
+      "kind": "custom",
+      "refersTo": "timeline-bar",
+      "description": "The data mark for one activity on the five-year chronology.",
+      "html": "<div class=\"ds-bar\"><span class=\"ds-bar-dot\"></span><span class=\"ds-bar-body\"><strong>주말 창작 활동</strong><span>10개월차부터 · 18개월</span></span></div>",
+      "css": ".ds-bar { display: flex; align-items: center; box-sizing: border-box; min-height: 44px; padding: 6px 8px; border: 1px solid var(--color-rule-strong); border-left: 3px solid var(--color-work); border-radius: 1px; background: var(--color-work-soft); color: var(--color-ink); font: 400 11px/1.35 \"Pretendard Variable\", Pretendard, sans-serif; } .ds-bar-dot { width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: var(--color-work); flex: none; } .ds-bar-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; } .ds-bar-body strong { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-bar-body span { font-size: 10px; color: var(--color-ink-soft); }"
+    },
+    {
+      "name": "Rating Meter",
+      "kind": "custom",
+      "refersTo": "rating-meter",
+      "description": "One self-rating axis as a quiet data cell.",
+      "html": "<div class=\"ds-rating\"><div class=\"ds-rating-head\"><span>자원</span><strong>7</strong></div><div class=\"ds-rating-track\"><span style=\"width: 70%\"></span></div></div>",
+      "css": ".ds-rating { padding: 10px; border: 1px solid var(--color-rule); border-radius: 2px; background: var(--color-paper-raised); color: var(--color-ink); font: 400 12px/1.4 \"Pretendard Variable\", Pretendard, sans-serif; } .ds-rating-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; } .ds-rating-head strong { font-size: 16px; font-weight: 700; letter-spacing: -0.03em; } .ds-rating-track { height: 3px; margin-top: 8px; background: var(--color-paper-deep); } .ds-rating-track span { display: block; height: 100%; background: var(--color-ink); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Possible Lives Quarterly",
+    "overview": "Ople reads as a quarterly of possible lives, not a productivity dashboard. The page is a spread: warm paper, ink, an asymmetric editorial grid, and a chronology that behaves like the feature well of a cultural magazine. The product's three futures and its five-year timeline are the content and the ornament; no scene, photograph, or mascot is needed to carry the world. The system is quiet by construction: large Korean grotesque headlines do the announcing; Song Myung carries the decks, pull quotes, and the policy article's reading voice; hairline rules, folio metadata, and small data marks do the separating. A/B/C are a fixed color grammar, never a decorative accent. The app keeps standard web controls so the private work of editing a life stays legible.",
+    "keyCharacteristics": [
+      "Warm paper ground with archive ink; flat surfaces and hairline rules.",
+      "A 12-column asymmetric grid with a 7/5 hero, 4/8 feature, 5/7 method, and 1.7/1 planner spread.",
+      "Pretendard for display and interface; Song Myung for decks, pull quotes, and the policy body.",
+      "Three plan roles: olive A, cobalt B, persimmon C; a separate category data palette for work, creative, relation, and rest.",
+      "The five-year chronology is the signature component and the main visual proof."
+    ],
+    "rules": [
+      {
+        "name": "The Three Futures Rule",
+        "body": "Olive, cobalt, and persimmon identify A, B, and C. They do not become generic decoration, gradients, or page backgrounds.",
+        "section": "colors"
+      },
+      {
+        "name": "The Paper Rule",
+        "body": "The ground is warm paper. No literal scene, photographic hero, gradient text, glass, or soft chrome stands in for the editorial material.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Voices Rule",
+        "body": "Pretendard carries navigation, headlines, controls, and working copy. Song Myung carries decks, pull quotes, and the policy article. Never set the main headline in the serif.",
+        "section": "typography"
+      },
+      {
+        "name": "The No Kicker Rule",
+        "body": "A heading carries its own weight. Do not add a small uppercase eyebrow above a heading; keep labels for folios, panels, lists, and navigation.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-By-Default Rule",
+        "body": "Surfaces are flat at rest. Elevation appears only when a modal protects a task; a card shadow never substitutes for a hairline.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use the warm paper ground, archive ink, and 1px rules to carry structure.",
+      "Do keep olive A, cobalt B, and persimmon C for plan identity and data, not decoration.",
+      "Do set decks, pull quotes, and the policy body in Song Myung; keep headlines and controls in Pretendard.",
+      "Do make the five-year chronology the hero and use the activity index to make short bars readable.",
+      "Do label example data as example and keep the app's real controls standard.",
+      "Do preserve 44px targets, visible focus, the sticky-header scroll offset, and the reduced-motion reset."
+    ],
+    "donts": [
+      "Don't add a kicker or eyebrow above a heading.",
+      "Don't introduce literal scenes, photography, gradients, glass, or chrome as a stand-in for the editorial material.",
+      "Don't use cards, nested cards, hard offset shadows, or one-sided side stripes on boxes.",
+      "Don't use Unicode glyphs or emoji as an icon system; use the drawn icons.",
+      "Don't push display tracking past -0.04em or set the main headline in the serif.",
+      "Don't use monospace for labels that are not measurement or data."
+    ]
+  }
+}
