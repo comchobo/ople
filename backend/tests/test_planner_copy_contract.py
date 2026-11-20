@@ -57,7 +57,7 @@ def test_invalid_name_is_rejected_with_a_field_error(name, error_type):
     assert error["type"] == error_type
 
 
-@pytest.mark.parametrize("field", ["plans", "user_id", "id"])
+@pytest.mark.parametrize("field", ["plans", "user_id", "id", "is_favorite"])
 def test_request_cannot_supply_copy_contents_or_identity(field):
     with pytest.raises(ValidationError) as invalid:
         PlannerCopyRequest.model_validate({field: "client supplied"})
@@ -99,6 +99,7 @@ def test_http_contract_parses_key_and_serializes_public_response(contract_client
         "id": COPY_ID,
         "name": "응답 검증용",
         "created_at": "2026-11-19T12:00:00Z",
+        "is_favorite": False,
         "plans": plans_data["plans"],
     }
 
@@ -151,6 +152,7 @@ def test_response_reuses_abc_order_and_score_validation(plans_data):
         "id": COPY_ID,
         "name": "사본",
         "created_at": "2026-11-19T12:00:00Z",
+        "is_favorite": False,
         **plans_data,
     }
     plans_data["plans"].reverse()

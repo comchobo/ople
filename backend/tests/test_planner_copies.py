@@ -214,3 +214,11 @@ def test_building_copy_does_not_attach_or_save_it_and_persisted_data_is_independ
         another.delete(saved_source)
         another.commit()
         assert another.get(Planner, copy_id) is not None
+
+
+@pytest.mark.parametrize("favorite", [False, True])
+def test_build_copy_clears_favorite_without_changing_source(plans_data, favorite):
+    source = Planner(user_id="owner", name="원본", plans=plans_data["plans"], is_favorite=favorite)
+    copied = build_planner_copy(source, PlannerCopyRequest(), [source.name])
+    assert copied.is_favorite is False
+    assert source.is_favorite is favorite

@@ -73,6 +73,7 @@ def build_planner_copy(
         user_id=source.user_id,
         name=name,
         plans=plans,
+        is_favorite=False,
         created_at=created_at,
         updated_at=created_at,
     )

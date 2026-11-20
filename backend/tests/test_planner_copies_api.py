@@ -62,7 +62,7 @@ def test_copy_api_returns_public_saved_copy_and_list_includes_it(client, db, sou
     response = post_copy(client, source.id, {}, key)
     assert response.status_code == 201
     body = response.json()
-    assert set(body) == {"id", "name", "created_at", "plans"}
+    assert set(body) == {"id", "name", "created_at", "plans", "is_favorite"}
     assert UUID(body["id"]).version == 4
     assert body["id"] != source.id
     assert body["name"] == "원본(사본)"
@@ -307,3 +307,56 @@ def test_openapi_documents_actual_copy_endpoint_and_both_422_shapes(client):
         "PlannerCopyError",
         "PlannerCopyInputError",
     }
+
+
+@pytest.mark.parametrize("favorite", [False, True])
+@pytest.mark.parametrize("body", [{}, {"name": "직접 정한 사본"}])
+def test_copy_clears_favorite_in_response_database_and_list(client, db, source, favorite, body):
+    source.is_favorite = favorite
+    db.add(source)
+    db.commit()
+    source_id = source.id
+    key = uuid4()
+
+    first = post_copy(client, source_id, body, key)
+    assert first.status_code == 201
+    copied = first.json()
+    assert copied["is_favorite"] is False
+    replay = post_copy(client, source_id, body, key)
+    assert replay.status_code == 201
+    assert replay.json() == copied
+
+    db.expire_all()
+    assert db.get(Planner, source_id).is_favorite is favorite
+    assert db.get(Planner, copied["id"]).is_favorite is False
+    listed = {item["id"]: item for item in client.get("/api/planners").json()}
+    assert listed[source_id]["is_favorite"] is favorite
+    assert listed[copied["id"]]["is_favorite"] is False
+
+
+def test_copy_rejects_client_supplied_favorite(client, db, source):
+    response = post_copy(client, source.id, {"is_favorite": True})
+    assert response.status_code == 422
+    assert response.json()["detail"][0]["loc"] == ["body", "is_favorite"]
+    assert len(db.exec(select(Planner)).all()) == 1
+    assert db.exec(select(PlannerCopyRecord)).all() == []
+
+
+def test_replaying_copy_does_not_reset_a_favorite_changed_after_creation(client, db, source):
+    key = uuid4()
+    first = post_copy(client, source.id, {}, key)
+    assert first.status_code == 201
+    copied_id = first.json()["id"]
+    copied = db.get(Planner, copied_id)
+    assert copied is not None
+    copied.is_favorite = True
+    db.add(copied)
+    db.commit()
+
+    replay = post_copy(client, source.id, {}, key)
+    assert replay.status_code == 201
+    assert replay.json()["id"] == copied_id
+    assert replay.json()["is_favorite"] is True
+    db.expire_all()
+    assert db.get(Planner, copied_id).is_favorite is True
+    assert len(db.exec(select(Planner)).all()) == 2

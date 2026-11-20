@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import StrEnum
 from uuid import UUID
 
-from pydantic import ConfigDict, field_validator
+from pydantic import ConfigDict, Field, field_validator
 
 from schemas.common import StrictModel
 from schemas.planners import Plans, Title
@@ -27,6 +27,7 @@ class PlannerCopyResponse(Plans):
     id: UUID
     name: Title
     created_at: datetime
+    is_favorite: bool = Field(strict=True)
 
 
 class PlannerCopyErrorCode(StrEnum):

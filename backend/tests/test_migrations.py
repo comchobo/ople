@@ -5,7 +5,7 @@ from datetime import timedelta
 from uuid import uuid4
 
 import pytest
-from sqlalchemy import inspect
+from sqlalchemy import inspect, text
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select
 
@@ -212,11 +212,13 @@ def test_copy_record_migration_downgrade_and_upgrade_preserve_existing_planners(
 
     migrate(migrated_postgres, "downgrade", "0002")
     assert "plannercopyrecord" not in inspect(migrated_postgres).get_table_names()
+    # Query only columns that exist at revision 0002.
     with Session(migrated_postgres) as db:
-        source = db.get(Planner, source_id)
-        assert source is not None
-        assert source.name == "기존 원본"
-        assert source.plans == plans_data["plans"]
+        source_name, source_plans = db.exec(
+            select(Planner.name, Planner.plans).where(Planner.id == source_id)
+        ).one()
+        assert source_name == "기존 원본"
+        assert source_plans == plans_data["plans"]
 
     migrate(migrated_postgres, "upgrade", "head")
     with Session(migrated_postgres) as db:
@@ -224,3 +226,49 @@ def test_copy_record_migration_downgrade_and_upgrade_preserve_existing_planners(
         source = db.get(Planner, source_id)
         assert source is not None
         assert source.plans == plans_data["plans"]
+
+
+def test_favorite_migration_initializes_existing_rows_and_preserves_planner_data(
+    migrated_postgres, plans_data
+):
+    with Session(migrated_postgres, expire_on_commit=False) as db:
+        user = User(email="favorite-migration@example.com", name="owner")
+        db.add(user)
+        db.commit()
+        source = Planner(
+            user_id=user.id, name="기존 플래너", plans=plans_data["plans"], is_favorite=True
+        )
+        db.add(source)
+        db.commit()
+        source_id = source.id
+
+    migrate(migrated_postgres, "downgrade", "0003")
+    assert "is_favorite" not in {
+        column["name"] for column in inspect(migrated_postgres).get_columns("planner")
+    }
+    migrate(migrated_postgres, "upgrade", "head")
+    column = next(
+        column
+        for column in inspect(migrated_postgres).get_columns("planner")
+        if column["name"] == "is_favorite"
+    )
+    assert column["nullable"] is False
+    with Session(migrated_postgres) as db:
+        source = db.get(Planner, source_id)
+        assert source is not None
+        assert source.is_favorite is False
+        assert source.name == "기존 플래너"
+        assert source.plans == plans_data["plans"]
+        new_id = str(uuid4())
+        db.connection().execute(
+            text(
+                "INSERT INTO planner (id, user_id, name, plans, created_at, updated_at) "
+                "SELECT :new_id, user_id, name, plans, created_at, updated_at "
+                "FROM planner WHERE id = :source_id"
+            ),
+            {"new_id": new_id, "source_id": source_id},
+        )
+        db.commit()
+        saved = db.get(Planner, new_id)
+        assert saved is not None
+        assert saved.is_favorite is False
