@@ -19,7 +19,7 @@ export function HomeScreen() {
     proceed();
   }, [pending, loading, proceed]);
   return (
-    <main className="min-h-0 flex-1 overflow-hidden p-0 [scrollbar-color:#aaa_#f3f3f3] [scrollbar-width:thin]">
+    <main className="flex-1">
       <Intro
         start={() => {
           if (loading) setPending(true);
