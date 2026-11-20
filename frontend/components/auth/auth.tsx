@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import { googleLoginUrl, login, signup, verifyEmail } from "@/api/auth";
 import type { User } from "@/api/core";
+import { Button, buttonClass } from "@/components/button";
+import { controlClass, Field } from "@/components/field";
 import { Modal } from "@/components/modal";
+import { Notice } from "@/components/notice";
 
 export function Auth({
   close,
@@ -65,7 +68,7 @@ export function Auth({
       close={close}
     >
       <a
-        className="flex min-h-11 w-full cursor-pointer items-center justify-center gap-2.5 rounded-[3px] border border-[#d4d4d4] bg-white px-3.5 py-[9px] text-center leading-[1.4] no-underline hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px]"
+        className={buttonClass("secondary", "w-full gap-2.5 no-underline")}
         href={googleLoginUrl}
       >
         <svg
@@ -93,28 +96,26 @@ export function Auth({
         </svg>
         Google로 계속하기
       </a>
-      <p className="mt-6 text-[#666]">또는 이메일로 계속하기</p>
+      <p className="mt-5 border-t border-rule pt-4 text-[13px] text-muted">
+        또는 이메일로 계속하기
+      </p>
       <form onSubmit={submit}>
-        <label className="mt-4 mb-1.5 block text-[13px]" htmlFor="email">
-          이메일
-        </label>
-        <input
-          className="block min-h-11 w-full rounded-[3px] border border-[#aaa] bg-white p-[11px] caret-[#222] focus:[outline:2px_solid_#555] focus:[outline-offset:1px]"
-          id="email"
-          type="email"
-          autoComplete="email"
-          required
-          value={email}
-          disabled={mode === "verify"}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <Field label="이메일" htmlFor="email">
+          <input
+            className={controlClass}
+            id="email"
+            type="email"
+            autoComplete="email"
+            required
+            value={email}
+            disabled={mode === "verify"}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </Field>
         {mode !== "verify" ? (
-          <>
-            <label className="mt-4 mb-1.5 block text-[13px]" htmlFor="password">
-              비밀번호
-            </label>
+          <Field label="비밀번호" htmlFor="password">
             <input
-              className="block min-h-11 w-full rounded-[3px] border border-[#aaa] bg-white p-[11px] caret-[#222] focus:[outline:2px_solid_#555] focus:[outline-offset:1px]"
+              className={controlClass}
               id="password"
               type="password"
               minLength={8}
@@ -126,45 +127,42 @@ export function Auth({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-          </>
+          </Field>
         ) : (
           <>
-            <p className="mt-6 text-[12px]">
+            <p className="mt-5 text-[12px] leading-relaxed text-muted">
               메일로 전송한 인증번호를 10분 안에 입력해주세요.
             </p>
-            <label className="mt-4 mb-1.5 block text-[13px]" htmlFor="code">
-              인증번호
-            </label>
-            <input
-              className="block min-h-11 w-full rounded-[3px] border border-[#aaa] bg-white p-[11px] caret-[#222] focus:[outline:2px_solid_#555] focus:[outline-offset:1px]"
-              id="code"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              pattern="[0-9]{6}"
-              required
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-            />
-            <button
-              className="min-h-11 cursor-pointer rounded-[3px] border border-transparent bg-transparent p-2 leading-[1.4] underline underline-offset-4 hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45]"
-              type="button"
+            <Field label="인증번호" htmlFor="code">
+              <input
+                className={controlClass}
+                id="code"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                pattern="[0-9]{6}"
+                required
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+              />
+            </Field>
+            <Button
+              variant="quiet"
+              className="mt-3 px-0 text-[12px]"
               disabled={busy || cooldown > 0}
               onClick={sendCode}
             >
               인증번호 재발송{cooldown > 0 ? ` (${cooldown}초)` : ""}
-            </button>
+            </Button>
           </>
         )}
         {error && (
-          <p
-            role="alert"
-            className="mt-6 border border-[#555] bg-[#f0f0f0] p-3.5"
-          >
-            {error}
-          </p>
+          <div className="mt-5">
+            <Notice tone="error">{error}</Notice>
+          </div>
         )}
-        <button
-          className="mt-6 w-full min-h-11 cursor-pointer rounded-[3px] border border-[#222] bg-[#222] px-3.5 py-[9px] leading-[1.4] text-white hover:border-[#999] hover:bg-[#444] hover:text-white focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45]"
+        <Button
+          variant="primary"
+          className="mt-6 w-full"
           disabled={busy}
           type="submit"
         >
@@ -175,18 +173,18 @@ export function Auth({
               : mode === "signup"
                 ? "인증번호 받기"
                 : "인증하고 가입하기"}
-        </button>
+        </Button>
       </form>
-      <button
-        className="mt-6 min-h-11 cursor-pointer rounded-[3px] border border-transparent bg-transparent p-2 leading-[1.4] underline underline-offset-4 hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45]"
-        type="button"
+      <Button
+        variant="quiet"
+        className="mt-4 self-start px-0 text-[12px]"
         onClick={() => {
           setMode(mode === "login" ? "signup" : "login");
           setError("");
         }}
       >
         {mode === "login" ? "이메일로 회원가입" : "로그인으로 돌아가기"}
-      </button>
+      </Button>
     </Modal>
   );
 }
