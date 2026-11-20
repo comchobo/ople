@@ -5,11 +5,10 @@ from datetime import timedelta
 from uuid import uuid4
 
 import pytest
-from sqlalchemy import inspect, text
+from sqlalchemy import inspect
 from sqlalchemy.exc import IntegrityError
-from sqlmodel import Session, create_engine, select
+from sqlmodel import Session, select
 
-from db import engine
 from models.auth import LoginSession, OAuthAttempt, Signup
 from models.generations import Generation
 from models.planner_copies import PlannerCopyRecord
@@ -30,22 +29,6 @@ def migrate(database, direction, revision):
         capture_output=True,
     )
     assert result.returncode == 0, result.stdout + result.stderr
-
-
-@pytest.fixture
-def migrated_postgres():
-    schema = "test_" + uuid4().hex
-    with engine.begin() as connection:
-        connection.execute(text(f'CREATE SCHEMA "{schema}"'))
-    url = engine.url.update_query_dict({"options": f"-csearch_path={schema}"})
-    migrated = create_engine(url)
-    try:
-        migrate(migrated, "upgrade", "head")
-        yield migrated
-    finally:
-        migrated.dispose()
-        with engine.begin() as connection:
-            connection.execute(text(f'DROP SCHEMA "{schema}" CASCADE'))
 
 
 def test_migrated_postgres_supports_all_split_models_and_foreign_keys(

@@ -1,9 +1,15 @@
 from collections.abc import Collection
 from copy import deepcopy
+from uuid import UUID
 
+from fastapi import HTTPException
 from pydantic import TypeAdapter, ValidationError
+from sqlalchemy.exc import SQLAlchemyError
+from sqlmodel import Session, select
 
+from models.planner_copies import PlannerCopyRecord
 from models.planners import Planner
+from models.users import User
 from schemas.planner_copies import PlannerCopyErrorCode, PlannerCopyRequest
 from schemas.planners import Title
 from utils.clock import now
@@ -70,3 +76,75 @@ def build_planner_copy(
         created_at=created_at,
         updated_at=created_at,
     )
+
+
+def _replay_copy(
+    db: Session,
+    record: PlannerCopyRecord,
+    source_id: str,
+    request: PlannerCopyRequest,
+) -> Planner:
+    if record.source_planner_id != source_id or record.requested_name != request.name:
+        raise PlannerCopyError(
+            PlannerCopyErrorCode.IDEMPOTENCY_KEY_CONFLICT,
+            "같은 요청 번호에 다른 요청 내용을 사용할 수 없습니다.",
+        )
+    copied = db.exec(
+        select(Planner)
+        .where(Planner.id == record.copy_planner_id, Planner.user_id == record.user_id)
+        .execution_options(populate_existing=True)
+    ).first()
+    if copied is None:
+        raise PlannerCopyError(PlannerCopyErrorCode.COPY_DELETED, "복제된 플래너가 삭제되었습니다.")
+    return copied
+
+
+def duplicate_planner(
+    db: Session,
+    user_id: str,
+    source_id: str,
+    request_key: UUID,
+    request: PlannerCopyRequest,
+) -> Planner:
+    """Commit one copy and its request record together, or replay a completed request."""
+    try:
+        user = db.exec(select(User).where(User.id == user_id).with_for_update()).first()
+        if user is None:
+            raise HTTPException(401, "로그인이 필요합니다.")
+
+        record = db.get(PlannerCopyRecord, (user_id, request_key))
+        if record is not None:
+            copied = _replay_copy(db, record, source_id, request)
+        else:
+            source = db.exec(
+                select(Planner)
+                .where(Planner.id == source_id, Planner.user_id == user_id)
+                .execution_options(populate_existing=True)
+            ).first()
+            if source is None:
+                raise HTTPException(404, "항목을 찾을 수 없습니다.")
+            names = db.exec(select(Planner.name).where(Planner.user_id == user_id)).all()
+            copied = build_planner_copy(source, request, names)
+            db.add_all(
+                [
+                    copied,
+                    PlannerCopyRecord(
+                        user_id=user_id,
+                        request_key=request_key,
+                        source_planner_id=source_id,
+                        requested_name=request.name,
+                        copy_planner_id=copied.id,
+                    ),
+                ]
+            )
+        db.commit()
+        return copied
+    except SQLAlchemyError as error:
+        db.rollback()
+        raise PlannerCopyError(
+            PlannerCopyErrorCode.COPY_FAILED,
+            "플래너를 복제하지 못했습니다. 다시 시도해주세요.",
+        ) from error
+    except Exception:
+        db.rollback()
+        raise
