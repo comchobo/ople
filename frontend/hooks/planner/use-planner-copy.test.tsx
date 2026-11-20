@@ -319,3 +319,50 @@ it("언마운트 후 늦은 응답과 기존 실행 함수를 무시한다", asy
   expect(await retry()).toBeUndefined();
   expect(fetcher).toHaveBeenCalledTimes(1);
 });
+
+it("이름 입력 취소는 요청을 버리고 다음 복제에는 새 키를 사용한다", async () => {
+  const fetcher = vi
+    .spyOn(globalThis, "fetch")
+    .mockResolvedValueOnce(
+      json({ detail: "길이가 초과됩니다.", code: "COPY_NAME_TOO_LONG" }, 422),
+    )
+    .mockResolvedValueOnce(json(copied, 201));
+  const { result } = renderHook(() => usePlannerCopy(user));
+  await act(async () => {
+    await result.current.start(source.id);
+  });
+  act(() => {
+    result.current.cancelNameInput();
+  });
+  expect(result.current.status).toBe("idle");
+  await act(async () => {
+    await result.current.retry();
+    await result.current.submitName("다른 이름");
+  });
+  expect(fetcher).toHaveBeenCalledTimes(1);
+  await act(async () => {
+    await result.current.start(source.id);
+  });
+  expect(requestKey(fetcher.mock.calls[1][1])).not.toBe(
+    requestKey(fetcher.mock.calls[0][1]),
+  );
+});
+
+it("생성 여부가 불확실한 실패는 이름 입력 취소로 요청 키를 버리지 않는다", async () => {
+  const fetcher = vi
+    .spyOn(globalThis, "fetch")
+    .mockRejectedValueOnce(new TypeError("offline"))
+    .mockResolvedValueOnce(json(copied, 201));
+  const { result } = renderHook(() => usePlannerCopy(user));
+  await act(async () => {
+    await result.current.start(source.id);
+  });
+  act(() => {
+    result.current.cancelNameInput();
+  });
+  expect(result.current.canRetry).toBe(true);
+  await act(async () => {
+    await result.current.retry();
+  });
+  expect(fetcher.mock.calls[1]).toEqual(fetcher.mock.calls[0]);
+});

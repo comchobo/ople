@@ -6,10 +6,12 @@ export function Modal({
   title,
   close,
   children,
+  dismissible = true,
 }: {
   title: string;
   close: () => void;
   children: ReactNode;
+  dismissible?: boolean;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -22,12 +24,18 @@ export function Modal({
   return (
     <dialog
       ref={ref}
-      onCancel={close}
+      onCancel={(event) => {
+        event.preventDefault();
+        if (dismissible) close();
+      }}
       onKeyDown={(event) => {
-        if (event.key === "Escape") close();
+        if (event.key === "Escape") {
+          event.preventDefault();
+          if (dismissible) close();
+        }
       }}
       onClick={(event) => {
-        if (event.target === event.currentTarget) close();
+        if (dismissible && event.target === event.currentTarget) close();
       }}
       aria-label={title}
     >
@@ -39,6 +47,7 @@ export function Modal({
             className="icon-button"
             onClick={close}
             aria-label="닫기"
+            disabled={!dismissible}
           >
             ×
           </button>

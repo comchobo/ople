@@ -182,6 +182,20 @@ export function usePlannerCopy(user: User | null) {
     return run(request);
   }
 
+  function cancelNameInput() {
+    if (
+      !active.current ||
+      account.current !== userId ||
+      busy.current ||
+      failure.current?.stage !== "copying" ||
+      !isPlannerCopyNameError(failure.current.error)
+    )
+      return;
+    operation.current = null;
+    failure.current = null;
+    setState(initialState);
+  }
+
   return {
     ...state,
     pending: state.status === "saving" || state.status === "copying",
@@ -195,5 +209,6 @@ export function usePlannerCopy(user: User | null) {
     start,
     retry,
     submitName,
+    cancelNameInput,
   };
 }
