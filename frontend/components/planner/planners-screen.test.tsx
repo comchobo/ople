@@ -45,6 +45,7 @@ function sample(): Planner {
     id: "p",
     name: "나의 계획",
     created_at: "2026-11-17T00:00:00Z",
+    is_favorite: false,
     plans: [
       "현재 방향을 발전시키는 계획",
       "다른 방향을 탐색하는 계획",
@@ -210,4 +211,45 @@ it("실패한 생성 작업을 같은 작업 ID로 재시도하고 완성된 플
     "/api/generations/job/run",
     expect.objectContaining({ method: "POST" }),
   );
+});
+
+it("별 버튼은 저장 확인을 기다리고 실패한 요청을 다시 시도한다", async () => {
+  let finish!: (response: Response) => void;
+  const writes: unknown[] = [];
+  vi.spyOn(globalThis, "fetch").mockImplementation(async (path, options) => {
+    if (path === "/api/auth/me") return json({ id: "u", name: "사용자" });
+    if (path === "/api/generations") return json([]);
+    if (path === "/api/planners")
+      return json([{ ...sample(), is_favorite: false }]);
+    if (path === "/api/planners/p/favorite" && options?.method === "PUT") {
+      writes.push(JSON.parse(String(options.body)));
+      return new Promise<Response>((resolve) => {
+        finish = resolve;
+      });
+    }
+    throw Error(String(path));
+  });
+  const user = userEvent.setup();
+  render(<Application />);
+  const button = await screen.findByRole("button", {
+    name: "나의 계획 즐겨찾기",
+    pressed: false,
+  });
+  button.focus();
+  await user.keyboard("{Enter}");
+  expect(button).toBeDisabled();
+  expect(button).toHaveAttribute("aria-pressed", "false");
+  await user.click(button);
+  expect(writes).toEqual([{ is_favorite: true }]);
+  await act(async () => finish(new Response("{}", { status: 500 })));
+  expect(await screen.findByRole("alert")).toBeVisible();
+  expect(button).toBeEnabled();
+  await user.click(button);
+  await act(async () => finish(json({ is_favorite: true })));
+  expect(button).toHaveAttribute("aria-pressed", "true");
+  expect(screen.queryByRole("alert")).toBeNull();
+  await user.click(button);
+  await act(async () => finish(json({ is_favorite: false })));
+  expect(button).toHaveAttribute("aria-pressed", "false");
+  expect(writes.at(-1)).toEqual({ is_favorite: false });
 });

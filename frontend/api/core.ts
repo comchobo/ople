@@ -20,6 +20,7 @@ export type Planner = {
   id: string;
   name: string;
   created_at: string;
+  is_favorite: boolean;
   plans: Plan[];
 };
 export type Job = {

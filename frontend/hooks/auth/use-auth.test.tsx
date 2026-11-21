@@ -62,6 +62,7 @@ it("미로그인 응답 후 로딩을 종료하고 저장 완료 뒤에 로그�
     id: "p",
     name: "계획",
     created_at: "",
+    is_favorite: false,
     plans: [],
   } satisfies Planner);
   await waitFor(() =>

@@ -21,14 +21,36 @@ def test_migrated_postgres_supports_all_split_models_and_foreign_keys(plans_data
         connection.execute(text(f'CREATE SCHEMA "{schema}"'))
     url = engine.url.update_query_dict({"options": f"-csearch_path={schema}"})
     migrated = create_engine(url)
-    try:
+
+    def upgrade(target):
         result = subprocess.run(
-            [sys.executable, "-m", "alembic", "upgrade", "head"],
+            [sys.executable, "-m", "alembic", "upgrade", target],
             env={**os.environ, "DATABASE_URL": url.render_as_string(hide_password=False)},
             text=True,
             capture_output=True,
         )
         assert result.returncode == 0, result.stdout + result.stderr
+
+    try:
+        upgrade("0002")
+        with migrated.begin() as connection:
+            connection.execute(
+                text("""INSERT INTO "user" (id,email,name) VALUES ('u','old@example.com','기존')""")
+            )
+            connection.execute(
+                text("""INSERT INTO planner (id,user_id,name,plans,created_at,updated_at)
+                VALUES ('p','u','이전 계획','[]',now(),now())""")
+            )
+        upgrade("head")
+        with migrated.begin() as connection:
+            assert (
+                connection.execute(
+                    text("SELECT is_favorite FROM planner WHERE id='p'")
+                ).scalar_one()
+                is False
+            )
+            connection.execute(text("DELETE FROM planner WHERE id='p'"))
+            connection.execute(text("""DELETE FROM "user" WHERE id='u'"""))
         inspector = inspect(migrated)
         assert set(inspector.get_table_names()) == {
             "alembic_version",

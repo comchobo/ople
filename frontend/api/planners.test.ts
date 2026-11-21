@@ -11,6 +11,7 @@ const planner: Planner = {
   id: "p",
   name: "처음",
   created_at: "2026-11-19",
+  is_favorite: false,
   plans: [],
 };
 

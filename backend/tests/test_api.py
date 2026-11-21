@@ -75,3 +75,34 @@ def test_audio_is_retained_and_only_metadata_returned(client, db, monkeypatch, t
         ).status_code
         == 422
     )
+
+
+def test_favorite_is_owned_idempotent_and_independent_of_content(client, db, plans_data):
+    user = authenticated(client, db)
+    planner = Planner(user_id=user.id, name="원래 이름", plans=plans_data["plans"])
+    db.add(planner)
+    db.commit()
+    path = f"/api/planners/{planner.id}"
+    favorite = path + "/favorite"
+    assert client.get("/api/planners").json()[0]["is_favorite"] is False
+    for _ in range(2):
+        assert client.put(favorite, json={"is_favorite": True}).json() == {"is_favorite": True}
+    original = client.get("/api/planners").json()[0]
+    assert (original["name"], original["plans"]) == ("원래 이름", plans_data["plans"])
+    assert client.put(path, json={"name": "새 이름", **plans_data}).status_code == 200
+    assert client.get("/api/planners").json()[0]["is_favorite"] is True
+    other = google.google_user(db, "other", "other@example.com", "다른 사용자")
+    client.cookies.set("ople_session", sessions.create_session(db, other))
+    assert client.put(favorite, json={"is_favorite": False}).status_code == 404
+    client.cookies.clear()
+    assert client.put(favorite, json={"is_favorite": False}).status_code == 401
+    client.cookies.set("ople_session", sessions.create_session(db, user))
+    assert client.get("/api/planners").json()[0]["is_favorite"] is True
+    assert client.put(favorite, json={"is_favorite": False}).status_code == 200
+    db.expire_all()
+    saved = client.get("/api/planners").json()[0]
+    assert (saved["name"], saved["is_favorite"], saved["plans"]) == (
+        "새 이름",
+        False,
+        plans_data["plans"],
+    )

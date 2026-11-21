@@ -18,6 +18,7 @@ export function PlannersScreen() {
     error: plannersError,
     refresh: refreshPlanners,
     change,
+    setFavorite,
     remove,
   } = usePlanners(user);
   const {
@@ -88,6 +89,7 @@ export function PlannersScreen() {
               open={(id) => void move(`/planners/${encodeURIComponent(id)}`)}
               rename={setRename}
               remove={remove}
+              setFavorite={setFavorite}
             />
           </>
         )}

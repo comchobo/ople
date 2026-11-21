@@ -40,6 +40,7 @@ it("진행 중인 플래너 저장 API가 완료된 뒤 약관으로 이동한�
     id: "p",
     name: "수정한 플래너",
     created_at: "2026-11-19T00:00:00Z",
+    is_favorite: false,
     plans: [],
   };
   const saving = savePlanner(planner);
