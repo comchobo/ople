@@ -24,7 +24,7 @@ export function PlannerList({
         <ul className="m-0 min-h-0 flex-1 overflow-auto border-t border-[#d4d4d4] py-0 pr-2 pl-0">
           {planners.map((planner) => (
             <li
-              className="flex items-center justify-between gap-6 border-b border-[#d4d4d4] py-[22px]"
+              className="flex items-center justify-between gap-6 border-b border-[#d4d4d4] py-[22px] last:border-b-0"
               key={planner.id}
             >
               <PlannerFavoriteButton planner={planner} save={setFavorite} />
