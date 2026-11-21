@@ -48,8 +48,12 @@ services:
         condition: service_healthy
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     restart: unless-stopped
+    environment:
+      npm_config_store_dir: /root/.local/share/pnpm/store
     ports:
       - "3000:3000"
     volumes:
