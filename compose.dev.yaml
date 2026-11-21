@@ -1,5 +1,4 @@
-# docker compose -f compose.dev.yaml --env-file .env.dev up -d -V
-# 의존성 또는 Dockerfile 변경 시 --build를 추가합니다.
+# docker compose -f compose.dev.yaml --env-file .env.dev up -d --build -V
 services:
   db:
     image: postgres:17-alpine
