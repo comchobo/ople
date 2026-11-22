@@ -44,11 +44,11 @@ export function Interview({
               기존 플래너는 그대로 유지됩니다. 중단한 인터뷰는 이어할 수
               없습니다.
             </li>
+            <li>
+              녹음 원본은 서버에 영구 보관됩니다. 답변은 Cloudflare 음성 인식과
+              Ollama AI 생성에 사용됩니다.
+            </li>
           </ol>
-          <p className="border border-[#d4d4d4] bg-[#f3f3f3] p-3.5 text-center text-[13px]">
-            녹음 원본은 서버에 영구 보관됩니다. 답변은 Cloudflare 음성 인식과
-            Ollama AI 생성에 사용됩니다.
-          </p>
           <button
             className="mx-auto mt-6 block w-[240px] min-h-11 cursor-pointer rounded-[3px] border border-[#222] bg-[#222] px-3.5 py-[9px] leading-[1.4] text-white hover:border-[#999] hover:bg-[#444] hover:text-white focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45]"
             disabled={busy}
