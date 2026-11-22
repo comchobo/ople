@@ -215,6 +215,7 @@ it("실패한 생성 작업을 같은 작업 ID로 재시도하고 완성된 플
 
 it("별 버튼은 저장 확인을 기다리고 실패한 요청을 다시 시도한다", async () => {
   let finish!: (response: Response) => void;
+  let fail!: (error: Error) => void;
   const writes: unknown[] = [];
   vi.spyOn(globalThis, "fetch").mockImplementation(async (path, options) => {
     if (path === "/api/auth/me") return json({ id: "u", name: "사용자" });
@@ -223,7 +224,8 @@ it("별 버튼은 저장 확인을 기다리고 실패한 요청을 다시 시�
       return json([{ ...sample(), is_favorite: false }]);
     if (path === "/api/planners/p/favorite" && options?.method === "PUT") {
       writes.push(JSON.parse(String(options.body)));
-      return new Promise<Response>((resolve) => {
+      return new Promise<Response>((resolve, reject) => {
+        fail = reject;
         finish = resolve;
       });
     }
@@ -241,8 +243,10 @@ it("별 버튼은 저장 확인을 기다리고 실패한 요청을 다시 시�
   expect(button).toHaveAttribute("aria-pressed", "false");
   await user.click(button);
   expect(writes).toEqual([{ is_favorite: true }]);
-  await act(async () => finish(new Response("{}", { status: 500 })));
-  expect(await screen.findByRole("alert")).toBeVisible();
+  await act(async () => fail(new TypeError("Failed to fetch")));
+  expect(await screen.findByRole("alert")).toHaveTextContent(
+    "즐겨찾기를 저장하지 못했어요. 다시 시도해주세요.",
+  );
   expect(button).toBeEnabled();
   await user.click(button);
   await act(async () => finish(json({ is_favorite: true })));
@@ -253,3 +257,39 @@ it("별 버튼은 저장 확인을 기다리고 실패한 요청을 다시 시�
   expect(button).toHaveAttribute("aria-pressed", "false");
   expect(writes.at(-1)).toEqual({ is_favorite: false });
 });
+
+it.each([false, true])(
+  "즐겨찾기 값이 %s일 때 DB 거부를 토스트로 표시한다",
+  async (initial) => {
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (path) => {
+      if (path === "/api/auth/me") return json({ id: "u", name: "사용자" });
+      if (path === "/api/generations") return json([]);
+      if (path === "/api/planners")
+        return json([{ ...sample(), is_favorite: initial }]);
+      return new Response(JSON.stringify({ detail: "favorite_not_saved" }), {
+        status: 500,
+      });
+    });
+    render(<Application />);
+    const button = await screen.findByRole("button", {
+      name: "나의 계획 즐겨찾기",
+    });
+    vi.useFakeTimers();
+    try {
+      await act(async () => button.click());
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "즐겨찾기 변경이 저장되지 않았어요",
+      );
+      expect(button).toHaveAttribute("aria-pressed", String(initial));
+      expect(button).toBeEnabled();
+      act(() => vi.advanceTimersByTime(3000));
+      await act(async () => button.click());
+      act(() => vi.advanceTimersByTime(3999));
+      expect(screen.getByRole("alert")).toBeVisible();
+      act(() => vi.advanceTimersByTime(1));
+      expect(screen.queryByRole("alert")).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  },
+);
