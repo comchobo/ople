@@ -35,7 +35,9 @@ def test_rejected_favorite(client, db, database, planner_id, monkeypatch, failur
     assert response.json() == {"detail": "favorite_not_saved"}
     assert not db.in_transaction()
     with Session(database) as reader:
-        assert reader.get(Planner, planner_id).is_favorite is False
+        planner = reader.get(Planner, planner_id)
+        assert planner is not None
+        assert planner.is_favorite is False
 
 
 @pytest.mark.parametrize("failure", [errors.ConnectionFailure, errors.StatementCompletionUnknown])
@@ -50,4 +52,6 @@ def test_lost_commit_response(client, db, database, planner_id, monkeypatch, fai
     with pytest.raises(OperationalError):
         client.put(f"/api/planners/{planner_id}/favorite", json={"is_favorite": True})
     with Session(database) as reader:
-        assert reader.get(Planner, planner_id).is_favorite is True
+        planner = reader.get(Planner, planner_id)
+        assert planner is not None
+        assert planner.is_favorite is True
