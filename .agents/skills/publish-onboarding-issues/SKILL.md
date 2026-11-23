@@ -7,4 +7,4 @@ Publish two small, independent, one-day issues for junior teammates: verified fe
 
 Purpose: build product and code understanding, plus fundamentals, through hands-on implementation, testing, and review.
 
-Write each issue in Korean using `.github/ISSUE_TEMPLATE/issue.yml`; use "현재 동작", not "실제 동작".
+Write each issue in Korean using `.github/ISSUE_TEMPLATE/issue.yml`.
