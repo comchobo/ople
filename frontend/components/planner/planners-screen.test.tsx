@@ -240,6 +240,7 @@ it("별 버튼은 저장 확인을 기다리고 실패한 요청을 다시 시�
   button.focus();
   await user.keyboard("{Enter}");
   expect(button).toBeDisabled();
+  expect(screen.queryByText("저장 중…")).toBeNull();
   expect(button).toHaveAttribute("aria-pressed", "false");
   await user.click(button);
   expect(writes).toEqual([{ is_favorite: true }]);
@@ -253,6 +254,8 @@ it("별 버튼은 저장 확인을 기다리고 실패한 요청을 다시 시�
   expect(button).toHaveAttribute("aria-pressed", "true");
   expect(screen.queryByRole("alert")).toBeNull();
   await user.click(button);
+  expect(screen.queryByText("저장 중…")).toBeNull();
+  expect(button).toHaveAttribute("aria-pressed", "true");
   await act(async () => finish(json({ is_favorite: false })));
   expect(button).toHaveAttribute("aria-pressed", "false");
   expect(writes.at(-1)).toEqual({ is_favorite: false });

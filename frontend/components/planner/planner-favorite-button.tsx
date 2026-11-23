@@ -48,11 +48,6 @@ export function PlannerFavoriteButton({
       >
         <span aria-hidden="true">{planner.is_favorite ? "★" : "☆"}</span>
       </button>
-      {pending && (
-        <span role="status" className="text-xs text-[#666]">
-          저장 중…
-        </span>
-      )}
       {rejection > 0 && (
         <span
           role="alert"
