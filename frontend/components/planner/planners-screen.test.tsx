@@ -213,7 +213,7 @@ it("실패한 생성 작업을 같은 작업 ID로 재시도하고 완성된 플
   );
 });
 
-it("별 버튼은 저장 확인을 기다리고 실패한 요청을 다시 시도한다", async () => {
+it("별은 즉시 바뀌고 불확실한 저장은 같은 값으로 다시 시도한다", async () => {
   let finish!: (response: Response) => void;
   let fail!: (error: Error) => void;
   const writes: unknown[] = [];
@@ -241,21 +241,31 @@ it("별 버튼은 저장 확인을 기다리고 실패한 요청을 다시 시�
   await user.keyboard("{Enter}");
   expect(button).toBeDisabled();
   expect(screen.queryByText("저장 중…")).toBeNull();
-  expect(button).toHaveAttribute("aria-pressed", "false");
+  expect(button).toHaveAttribute("aria-pressed", "true");
   await user.click(button);
   expect(writes).toEqual([{ is_favorite: true }]);
   await act(async () => fail(new TypeError("Failed to fetch")));
-  expect(await screen.findByRole("alert")).toHaveTextContent(
-    "즐겨찾기를 저장하지 못했어요. 다시 시도해주세요.",
+  expect(writes).toEqual([{ is_favorite: true }, { is_favorite: true }]);
+  expect(screen.queryByRole("alert")).toBeNull();
+  await act(async () =>
+    finish(
+      new Response(JSON.stringify({ detail: "favorite_not_saved" }), {
+        status: 500,
+      }),
+    ),
   );
-  expect(button).toBeEnabled();
-  await user.click(button);
+  expect(button).toHaveAttribute("aria-pressed", "true");
+  expect(await screen.findByRole("alert")).toHaveTextContent(
+    "즐겨찾기 저장 여부를 확인할 수 없어요.",
+  );
+  await user.click(screen.getByRole("button", { name: "다시 시도" }));
+  expect(writes).toEqual(Array(3).fill({ is_favorite: true }));
   await act(async () => finish(json({ is_favorite: true })));
   expect(button).toHaveAttribute("aria-pressed", "true");
   expect(screen.queryByRole("alert")).toBeNull();
   await user.click(button);
   expect(screen.queryByText("저장 중…")).toBeNull();
-  expect(button).toHaveAttribute("aria-pressed", "true");
+  expect(button).toHaveAttribute("aria-pressed", "false");
   await act(async () => finish(json({ is_favorite: false })));
   expect(button).toHaveAttribute("aria-pressed", "false");
   expect(writes.at(-1)).toEqual({ is_favorite: false });
@@ -281,7 +291,7 @@ it.each([false, true])(
     try {
       await act(async () => button.click());
       expect(screen.getByRole("alert")).toHaveTextContent(
-        "즐겨찾기 변경이 저장되지 않았어요",
+        "즐겨찾기를 저장하지 못했어요.",
       );
       expect(button).toHaveAttribute("aria-pressed", String(initial));
       expect(button).toBeEnabled();
