@@ -168,16 +168,6 @@ export function PlannersScreen() {
               }
               newCopyId={newCopyId}
             />
-            <footer className="flex shrink-0 items-center justify-between border-t border-[#d4d4d4] py-3 text-[13px] text-[#666]">
-              <span>플래너는 계정에 저장됩니다.</span>
-              <button
-                type="button"
-                className="min-h-11 cursor-pointer rounded-[3px] border border-transparent bg-transparent p-2 leading-[1.4] hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45] underline underline-offset-4"
-                onClick={() => window.dispatchEvent(new Event("ople:logout"))}
-              >
-                로그아웃
-              </button>
-            </footer>
           </>
         )}
       </main>

@@ -1,11 +1,13 @@
-FROM ghcr.io/astral-sh/uv:python3.13-trixie
+FROM ghcr.io/astral-sh/uv:python3.13-trixie-slim
+
+ENV UV_LINK_MODE=copy
 
 WORKDIR /app
 
-COPY backend/pyproject.toml backend/uv.lock ./
-RUN uv sync --frozen
+COPY pyproject.toml uv.lock ./
 
-COPY backend/ .
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen
 
 EXPOSE 8000
 

@@ -40,8 +40,8 @@ body:
   - type: textarea
     id: expected-actual
     attributes:
-      label: 기대 동작 / 실제 동작
-      description: 기대한 동작과 실제로 일어난 동작을 비교해 주세요. (선택)
+      label: 기대 동작 / 현재 동작
+      description: 기대한 동작과 현재 동작을 비교해 주세요. (선택)
     validations:
       required: false
 

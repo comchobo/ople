@@ -28,7 +28,7 @@ export function PlannerList({
         <ul className="m-0 min-h-0 flex-1 overflow-auto border-t border-[#d4d4d4] py-0 pr-2 pl-0">
           {planners.map((planner) => (
             <li
-              className="flex items-center justify-between gap-6 border-b border-[#d4d4d4] py-[22px] data-[new-copy=true]:pl-3 data-[new-copy=true]:[box-shadow:inset_3px_0_0_#222] max-[600px]:flex-col max-[600px]:items-stretch max-[600px]:gap-3"
+              className="flex items-center justify-between gap-6 border-b border-[#d4d4d4] py-[22px] last:border-b-0 data-[new-copy=true]:pl-3 data-[new-copy=true]:[box-shadow:inset_3px_0_0_#222] max-[600px]:flex-col max-[600px]:items-stretch max-[600px]:gap-3"
               key={planner.id}
               aria-busy={copyingId === planner.id}
               data-new-copy={newCopyId === planner.id || undefined}

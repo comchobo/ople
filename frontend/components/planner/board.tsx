@@ -176,15 +176,6 @@ export function Board({
           {error && <p role="alert">{error}</p>}
         </aside>
       </div>
-      <footer className="flex shrink-0 items-center justify-between border-t border-[#d4d4d4] py-3 text-[13px] text-[#666]">
-        <span>서로 다른 가능성을 나란히 탐색하세요.</span>
-        <a
-          className="focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px]"
-          href="https://ople.ink"
-        >
-          Ople
-        </a>
-      </footer>
       {piece && (
         <PieceEditor
           piece={piece}

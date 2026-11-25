@@ -17,8 +17,8 @@ services:
 
   backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile.prod
+      context: ./backend
+      dockerfile: Dockerfile.prod
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
@@ -34,7 +34,7 @@ services:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       SES_FROM_EMAIL: ${SES_FROM_EMAIL}
-    command: sh -ec 'uv run alembic upgrade head && uv run uvicorn main:app --host 0.0.0.0 --port 8000'
+    command: sh -ec 'alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000'
     volumes:
       - ople-backend-recordings:/recordings
     depends_on:
