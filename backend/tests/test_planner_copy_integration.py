@@ -5,8 +5,7 @@ from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import delete
-from sqlmodel import Session, select
+from sqlmodel import Session, col, delete, select
 
 from db import engine
 from main import app
@@ -49,8 +48,8 @@ def integration_api(plans_data):
             client.close()
         with Session(engine) as db:
             for model in (LoginSession, PlannerCopyRecord, Planner):
-                db.execute(delete(model).where(model.user_id == user.id))
-            db.execute(delete(User).where(User.id == user.id))
+                db.exec(delete(model).where(col(model.user_id) == user.id))
+            db.exec(delete(User).where(col(User.id) == user.id))
             db.commit()
 
 
@@ -186,7 +185,7 @@ def test_concurrent_http_requests_keep_names_unique_and_same_key_creates_once(
         assert (
             len(
                 reader.exec(
-                    select(PlannerCopyRecord).where(PlannerCopyRecord.request_key.in_(keys))
+                    select(PlannerCopyRecord).where(col(PlannerCopyRecord.request_key).in_(keys))
                 ).all()
             )
             == expected

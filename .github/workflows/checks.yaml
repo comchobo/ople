@@ -25,6 +25,7 @@ jobs:
             uv run ruff check .
             uv run ruff format --check .
             uv run ty check
+            uv run alembic upgrade head
             uv run pytest tests
             uv run lint-imports
           '

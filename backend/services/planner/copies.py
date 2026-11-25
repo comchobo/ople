@@ -4,9 +4,8 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from pydantic import TypeAdapter, ValidationError
-from sqlalchemy import insert
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from sqlmodel import Session, select
+from sqlmodel import Session, insert, select
 
 from models.planner_copies import PlannerCopyRecord
 from models.planners import Planner, is_name_conflict
@@ -111,7 +110,7 @@ def duplicate_planner(
     try:
         copy_id = uid()
         try:
-            db.execute(
+            db.exec(
                 insert(PlannerCopyRecord).values(
                     user_id=user_id,
                     request_key=request_key,
