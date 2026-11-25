@@ -127,14 +127,15 @@ export function useRecorder(
         setState("paused");
         return;
       }
-      void submit(blob, Math.max(1, Math.min(secondsRef.current, RECORDING_LIMIT_SECONDS))).catch(
-        (cause) => {
-          if (mounted.current) {
-            setError((cause as Error).message);
-            setState("idle");
-          }
-        },
-      );
+      void submit(
+        blob,
+        Math.max(1, Math.min(secondsRef.current, RECORDING_LIMIT_SECONDS)),
+      ).catch((cause) => {
+        if (mounted.current) {
+          setError((cause as Error).message);
+          setState("idle");
+        }
+      });
     };
     value.stop();
   }
