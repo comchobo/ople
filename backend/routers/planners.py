@@ -77,7 +77,7 @@ class _PlannerCopyRoute(APIRoute):
         return handle
 
 
-def duplicate_planner(
+def duplicate_planner_endpoint(
     planner_id: str,
     body: PlannerCopyRequest,
     key: PlannerCopyKey,
@@ -89,7 +89,8 @@ def duplicate_planner(
 
 router.add_api_route(
     "/{planner_id}/duplicate",
-    duplicate_planner,
+    duplicate_planner_endpoint,
+    operation_id="duplicate_planner_api_planners__planner_id__duplicate_post",
     methods=["POST"],
     status_code=201,
     response_model=PlannerCopyResponse,

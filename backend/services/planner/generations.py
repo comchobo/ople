@@ -7,7 +7,7 @@ from sqlmodel import Session, col, select
 
 from db import engine
 from models.generations import Generation
-from models.planners import Planner
+from models.planners import Planner, is_name_conflict
 from models.users import User
 from schemas.generations import Generate
 from schemas.planners import KINDS, Plans
@@ -94,9 +94,21 @@ def run_generation(job_id: str, user_id: str):
             job = db.exec(select(Generation).where(Generation.id == job_id).with_for_update()).one()
             if job.attempt != attempt or job.status != "running":
                 return job
-            planner = Planner(user_id=user_id, name="새 플래너", plans=result.model_dump()["plans"])
-            db.add(planner)
-            db.flush()
+            number = 1
+            while True:
+                name = "새 플래너" if number == 1 else f"새 플래너 ({number})"
+                try:
+                    with db.begin_nested():
+                        planner = Planner(
+                            user_id=user_id, name=name, plans=result.model_dump()["plans"]
+                        )
+                        db.add(planner)
+                        db.flush()
+                    break
+                except IntegrityError as error:
+                    if not is_name_conflict(error):
+                        raise
+                    number += 1
             job.planner_id, job.status = planner.id, "completed"
             job.updated_at = now()
             db.add(job)

@@ -263,10 +263,10 @@ def test_favorite_migration_initializes_existing_rows_and_preserves_planner_data
         db.connection().execute(
             text(
                 "INSERT INTO planner (id, user_id, name, plans, created_at, updated_at) "
-                "SELECT :new_id, user_id, name, plans, created_at, updated_at "
+                "SELECT :new_id, user_id, :new_name, plans, created_at, updated_at "
                 "FROM planner WHERE id = :source_id"
             ),
-            {"new_id": new_id, "source_id": source_id},
+            {"new_id": new_id, "source_id": source_id, "new_name": "새 기본값 확인"},
         )
         db.commit()
         saved = db.get(Planner, new_id)

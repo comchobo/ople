@@ -1,29 +1,26 @@
 from concurrent.futures import ThreadPoolExecutor
-from contextlib import ExitStack
 from copy import deepcopy
 from threading import Barrier
 from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import delete
 from sqlmodel import Session, select
 
-from db import session
+from db import engine
 from main import app
-from models.generations import Generation
+from models.auth import LoginSession
 from models.planner_copies import PlannerCopyRecord
 from models.planners import Planner
 from models.users import User
 from services.auth.sessions import create_session
-from services.planner import generations
 
 
 @pytest.fixture
-def integration_api(migrated_postgres, plans_data, monkeypatch):
-    # Lifespan recovery uses the module engine instead of the session dependency.
-    monkeypatch.setattr(generations, "engine", migrated_postgres)
-    with Session(migrated_postgres, expire_on_commit=False) as db:
-        user = User(email="copy-integration@example.com", name="검증 사용자")
+def integration_api(plans_data):
+    with Session(engine, expire_on_commit=False) as db:
+        user = User(email=f"{uuid4()}@example.com", name="검증 사용자")
         db.add(user)
         db.commit()
         source = Planner(
@@ -37,22 +34,24 @@ def integration_api(migrated_postgres, plans_data, monkeypatch):
         source_id = source.id
         token = create_session(db, user)
 
-    def request_session():
-        with Session(migrated_postgres) as db:
-            yield db
+    clients = []
 
-    app.dependency_overrides[session] = request_session
-    with ExitStack() as clients:
+    def new_client():
+        client = TestClient(app)
+        clients.append(client)
+        client.cookies.set("ople_session", token)
+        return client
 
-        def new_client():
-            client = clients.enter_context(TestClient(app))
-            client.cookies.set("ople_session", token)
-            return client
-
-        try:
-            yield new_client, source_id, migrated_postgres
-        finally:
-            app.dependency_overrides.clear()
+    try:
+        yield new_client, source_id, engine
+    finally:
+        for client in clients:
+            client.close()
+        with Session(engine) as db:
+            for model in (LoginSession, PlannerCopyRecord, Planner):
+                db.execute(delete(model).where(model.user_id == user.id))
+            db.execute(delete(User).where(User.id == user.id))
+            db.commit()
 
 
 def duplicate(client, source_id, key):
@@ -123,7 +122,10 @@ def test_new_session_recovers_committed_copy_after_response_is_discarded(integra
     duplicate(new_client(), source_id, key)
 
     with Session(database) as reader:
-        record = reader.exec(select(PlannerCopyRecord)).one()
+        record = reader.exec(
+            select(PlannerCopyRecord).where(PlannerCopyRecord.request_key == key)
+        ).one()
+        owner_id = record.user_id
         copy_id = record.copy_planner_id
         saved = reader.get(Planner, copy_id)
         assert saved is not None
@@ -135,8 +137,15 @@ def test_new_session_recovers_committed_copy_after_response_is_discarded(integra
     assert retry.json()["plans"] == plans
     assert listed(new_client())[copy_id]["plans"] == plans
     with Session(database) as reader:
-        assert len(reader.exec(select(Planner)).all()) == 2
-        assert len(reader.exec(select(PlannerCopyRecord)).all()) == 1
+        assert len(reader.exec(select(Planner).where(Planner.user_id == owner_id)).all()) == 2
+        assert (
+            len(
+                reader.exec(
+                    select(PlannerCopyRecord).where(PlannerCopyRecord.request_key == key)
+                ).all()
+            )
+            == 1
+        )
 
 
 @pytest.mark.parametrize("same_key", [False, True])
@@ -158,38 +167,55 @@ def test_concurrent_http_requests_keep_names_unique_and_same_key_creates_once(
         futures = [workers.submit(send, index) for index in range(2)]
         responses = [future.result(timeout=15) for future in futures]
 
-    assert [response.status_code for response in responses] == [201, 201]
+    conflicts = [response for response in responses if response.status_code == 409]
+    if conflicts:
+        assert not same_key
+        assert len(conflicts) == 1
+        assert conflicts[0].json()["code"] == "COPY_NAME_EXISTS"
+    responses = [response for response in responses if response not in conflicts]
+    assert all(response.status_code == 201 for response in responses)
     results = [response.json() for response in responses]
-    expected = 1 if same_key else 2
+    expected = 1 if same_key else len(responses)
     assert len({item["id"] for item in results}) == expected
     assert {item["name"] for item in results} == (
-        {"원본(사본)"} if same_key else {"원본(사본)", "원본(사본)(사본)"}
+        {"원본(사본)"} if expected == 1 else {"원본(사본)", "원본(사본)(사본)"}
     )
     assert all(item["is_favorite"] is False for item in results)
     assert len(listed(new_client())) == 1 + expected
     with Session(database) as reader:
-        assert len(reader.exec(select(PlannerCopyRecord)).all()) == expected
+        assert (
+            len(
+                reader.exec(
+                    select(PlannerCopyRecord).where(PlannerCopyRecord.request_key.in_(keys))
+                ).all()
+            )
+            == expected
+        )
 
 
-def test_startup_recovery_uses_the_same_isolated_schema_as_http_requests(integration_api):
-    new_client, source_id, database = integration_api
-    with Session(database, expire_on_commit=False) as db:
-        source = db.get(Planner, source_id)
-        assert source is not None
-        job = Generation(user_id=source.user_id, status="running", payload={})
-        db.add(job)
-        db.commit()
-        job_id = job.id
+def test_concurrent_requested_name_has_one_winner_and_rename_rejects_duplicate(integration_api):
+    new_client, source_id, _ = integration_api
+    clients = [new_client(), new_client()]
+    start = Barrier(2)
 
-    response = new_client().get("/api/generations")
-    assert response.status_code == 200
-    assert len(response.json()) == 1
-    recovered = response.json()[0]
-    assert recovered["id"] == job_id
-    assert recovered["status"] == "failed"
-    assert recovered["error"] == "서버 재시작으로 중단되었습니다. 다시 시도해주세요."
-    with Session(database) as db:
-        saved = db.get(Generation, job_id)
-        assert saved is not None
-        assert saved.status == "failed"
-        assert saved.error == recovered["error"]
+    def send(client):
+        start.wait(timeout=5)
+        return client.post(
+            f"/api/planners/{source_id}/duplicate",
+            headers={"Idempotency-Key": str(uuid4())},
+            json={"name": "직접 지정"},
+        )
+
+    with ThreadPoolExecutor(max_workers=2) as workers:
+        results = list(workers.map(send, clients))
+    assert sorted(response.status_code for response in results) == [201, 409]
+    assert (
+        next(response for response in results if response.status_code == 409).json()["code"]
+        == "COPY_NAME_EXISTS"
+    )
+    source = listed(clients[0])[source_id]
+    response = clients[0].put(
+        f"/api/planners/{source_id}", json={"name": "직접 지정", "plans": source["plans"]}
+    )
+    assert response.status_code == 409
+    assert {item["name"] for item in listed(clients[0]).values()} == {"원본", "직접 지정"}

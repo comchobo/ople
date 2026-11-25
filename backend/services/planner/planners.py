@@ -1,6 +1,8 @@
+from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, col, select
 
-from models.planners import Planner
+from models.planners import Planner, is_name_conflict
 from schemas.planners import PlannerUpdate
 from services.ownership import owned
 from utils.clock import now
@@ -17,7 +19,13 @@ def update_planner(db: Session, user_id: str, planner_id: str, body: PlannerUpda
     planner.name, planner.plans = body.name, body.model_dump()["plans"]
     planner.updated_at = now()
     db.add(planner)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError as error:
+        db.rollback()
+        if is_name_conflict(error):
+            raise HTTPException(409, "이미 있는 이름입니다.") from error
+        raise
     return planner
 
 
