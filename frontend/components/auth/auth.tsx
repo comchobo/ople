@@ -17,7 +17,7 @@ export function Auth({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const VisibilityIcon = passwordVisible ? Eye : EyeOff;
+  const VisibilityIcon = passwordVisible ? EyeOff : Eye;
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
