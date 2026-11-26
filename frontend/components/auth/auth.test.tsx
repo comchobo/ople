@@ -4,6 +4,36 @@ import { describe, expect, it, vi } from "vitest";
 import { Auth } from "./auth";
 
 describe("이메일 인증", () => {
+  it("로그인과 회원가입에서 제출 없이 비밀번호를 확인하고 다시 숨긴다", async () => {
+    const fetcher = vi.spyOn(globalThis, "fetch");
+    const user = userEvent.setup();
+    render(<Auth close={vi.fn()} loggedIn={vi.fn()} />);
+    await user.type(screen.getByLabelText("이메일"), "hello@example.com");
+    await user.type(screen.getByLabelText("비밀번호"), "password123");
+
+    for (const next of ["이메일로 회원가입", "로그인으로 돌아가기"]) {
+      const field = screen.getByLabelText("비밀번호");
+      const show = screen.getByRole("button", { name: "비밀번호 보기" });
+      expect(field).toHaveAttribute("type", "password");
+      await user.click(field);
+      await user.tab();
+      expect(show).toHaveFocus();
+      await user.keyboard("{Enter}");
+      expect(field).toHaveAttribute("type", "text");
+      expect(field).toHaveValue("password123");
+      await user.click(screen.getByRole("button", { name: "비밀번호 숨기기" }));
+      expect(field).toHaveAttribute("type", "password");
+      expect(field).toHaveValue("password123");
+      await user.click(show);
+      await user.click(screen.getByRole("button", { name: next }));
+    }
+    expect(screen.getByLabelText("비밀번호")).toHaveAttribute(
+      "type",
+      "password",
+    );
+    expect(fetcher).not.toHaveBeenCalled();
+  });
+
   it("가입 메일을 요청하고 인증번호 확인 후 로그인한다", async () => {
     const fetcher = vi
       .spyOn(globalThis, "fetch")
@@ -22,6 +52,9 @@ describe("이메일 인증", () => {
     await user.type(screen.getByLabelText("비밀번호"), "password123");
     await user.click(screen.getByRole("button", { name: "인증번호 받기" }));
     await user.type(await screen.findByLabelText("인증번호"), "123456");
+    expect(
+      screen.queryByRole("button", { name: /비밀번호/ }),
+    ).not.toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /인증번호 재발송/ }),
     ).toBeDisabled();

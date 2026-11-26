@@ -1,5 +1,6 @@
 "use client";
 
+import { Eye, EyeOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import { googleLoginUrl, login, signup, verifyEmail } from "@/api/auth";
 import type { User } from "@/api/core";
@@ -15,6 +16,8 @@ export function Auth({
   const [mode, setMode] = useState<"login" | "signup" | "verify">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const VisibilityIcon = passwordVisible ? EyeOff : Eye;
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -113,19 +116,31 @@ export function Auth({
             <label className="mt-4 mb-1.5 block text-[13px]" htmlFor="password">
               비밀번호
             </label>
-            <input
-              className="block min-h-11 w-full rounded-[3px] border border-[#aaa] bg-white p-[11px] caret-[#222] focus:[outline:2px_solid_#555] focus:[outline-offset:1px]"
-              id="password"
-              type="password"
-              minLength={8}
-              maxLength={128}
-              autoComplete={
-                mode === "login" ? "current-password" : "new-password"
-              }
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div className="relative">
+              <input
+                className="block min-h-11 w-full rounded-[3px] border border-[#aaa] bg-white p-[11px] pr-12 caret-[#222] focus:[outline:2px_solid_#555] focus:[outline-offset:1px]"
+                id="password"
+                type={passwordVisible ? "text" : "password"}
+                minLength={8}
+                maxLength={128}
+                autoComplete={
+                  mode === "login" ? "current-password" : "new-password"
+                }
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                aria-label={
+                  passwordVisible ? "비밀번호 숨기기" : "비밀번호 보기"
+                }
+                className="absolute inset-y-0 right-0 flex w-11 cursor-pointer items-center justify-center rounded-[3px] text-[#222] focus-visible:outline-2 focus-visible:-outline-offset-4"
+                type="button"
+                onClick={() => setPasswordVisible((visible) => !visible)}
+              >
+                <VisibilityIcon aria-hidden="true" size={20} />
+              </button>
+            </div>
           </>
         ) : (
           <>
@@ -181,6 +196,7 @@ export function Auth({
         className="mt-6 min-h-11 cursor-pointer rounded-[3px] border border-transparent bg-transparent p-2 leading-[1.4] underline underline-offset-4 hover:border-[#999] hover:bg-[#f3f3f3] focus-visible:[outline:2px_solid_#222] focus-visible:[outline-offset:3px] disabled:cursor-default disabled:opacity-[0.45]"
         type="button"
         onClick={() => {
+          setPasswordVisible(false);
           setMode(mode === "login" ? "signup" : "login");
           setError("");
         }}
