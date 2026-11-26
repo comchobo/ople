@@ -138,15 +138,20 @@ describe("음성 인터뷰", () => {
     expect(screen.queryByText(/초 남음/)).toBeNull();
     tick(1);
     expect(screen.getByText("30초 남음")).toBeVisible();
+    expect(screen.getByRole("timer")).toHaveClass("motion-safe:animate-pulse");
     tick(17);
     fireEvent.click(button("일시정지"));
     tick(10);
     expect(screen.getByRole("timer")).toHaveTextContent("02:47");
     expect(screen.getByText("13초 남음")).toBeVisible();
+    expect(screen.getByRole("timer")).not.toHaveClass(
+      "motion-safe:animate-pulse",
+    );
     expect(button("답변 제출")).toBeEnabled();
     fireEvent.click(button("녹음 계속"));
     tick(12);
     expect(screen.getByText("1초 남음")).toBeVisible();
+    expect(screen.getByRole("timer")).toHaveClass("motion-safe:animate-pulse");
     tick(1);
     let dialog = screen.getByRole("dialog");
     fireEvent.click(within(dialog).getByRole("button", { name: "다시 녹음" }));

@@ -47,7 +47,7 @@ export function Recorder({
               : "녹음 준비"}
       </div>
       <p
-        className={`mt-6 text-[44px] tracking-[1px] tabular-nums ${warning ? "text-red-800" : ""} ${warning && state === "recording" ? "motion-safe:animate-[recording-warning_2.4s_ease-in-out_infinite]" : ""}`}
+        className={`mt-6 text-[44px] tracking-[1px] tabular-nums ${warning ? "text-red-800" : ""} ${warning && state === "recording" ? "motion-safe:animate-pulse" : ""}`}
         role="timer"
         aria-label="녹음 시간"
       >
