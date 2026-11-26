@@ -6,6 +6,7 @@ import {
   deletePlanner,
   flushSaves,
   listPlanners,
+  saveFavorite,
   savePlanner,
 } from "@/api/planners";
 
@@ -16,6 +17,7 @@ export function usePlanners(user: User | null) {
   const version = useRef(0);
   const revision = useRef(0);
   const localEdits = useRef(new Map<string, number>());
+  const favoriteEdits = useRef(new Map<string, number>());
   const refresh = useCallback(async () => {
     const account = version.current;
     await flushSaves();
@@ -23,11 +25,17 @@ export function usePlanners(user: User | null) {
     const values = await listPlanners();
     if (account !== version.current) return;
     setPlanners((current) =>
-      values.map((value) =>
-        (localEdits.current.get(value.id) ?? 0) > started
-          ? (current.find((item) => item.id === value.id) ?? value)
-          : value,
-      ),
+      values.map((value) => {
+        const previous = current.find((item) => item.id === value.id);
+        if (!previous) return value;
+        const edited = (localEdits.current.get(value.id) ?? 0) > started;
+        const starred = (favoriteEdits.current.get(value.id) ?? 0) > started;
+        return {
+          ...value,
+          ...(edited && { name: previous.name, plans: previous.plans }),
+          is_favorite: starred ? previous.is_favorite : value.is_favorite,
+        };
+      }),
     );
   }, []);
   useEffect(() => {
@@ -35,6 +43,7 @@ export function usePlanners(user: User | null) {
     setPlanners([]);
     setError("");
     localEdits.current.clear();
+    favoriteEdits.current.clear();
     setLoading(true);
     if (user) {
       void refresh()
@@ -52,9 +61,24 @@ export function usePlanners(user: User | null) {
   function change(value: Planner) {
     localEdits.current.set(value.id, ++revision.current);
     setPlanners((current) =>
-      current.map((item) => (item.id === value.id ? value : item)),
+      current.map((item) =>
+        item.id === value.id
+          ? { ...item, name: value.name, plans: value.plans }
+          : item,
+      ),
     );
     void savePlanner(value);
+  }
+  async function setFavorite(id: string, isFavorite: boolean) {
+    const account = version.current;
+    const saved = await saveFavorite(id, isFavorite);
+    if (account !== version.current) return;
+    favoriteEdits.current.set(id, ++revision.current);
+    setPlanners((current) =>
+      current.map((item) =>
+        item.id === id ? { ...item, is_favorite: saved.is_favorite } : item,
+      ),
+    );
   }
   async function remove(id: string) {
     const account = version.current;
@@ -73,6 +97,7 @@ export function usePlanners(user: User | null) {
     setError,
     refresh,
     change,
+    setFavorite,
     remove,
   };
 }

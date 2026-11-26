@@ -62,3 +62,7 @@ class Plans(StrictModel):
 
 class PlannerUpdate(Plans):
     name: Title
+
+
+class PlannerFavorite(StrictModel):
+    is_favorite: bool = Field(strict=True)

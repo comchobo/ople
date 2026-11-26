@@ -14,3 +14,6 @@ class Planner(SQLModel, table=True):
     created_at: datetime = Field(default_factory=now)
     updated_at: datetime = Field(default_factory=now)
     plans: list[dict] = Field(sa_column=json_column())
+    is_favorite: bool = Field(
+        default=False, nullable=False, sa_column_kwargs={"server_default": "false"}
+    )

@@ -32,3 +32,11 @@ export function savePlanner(planner: Planner) {
 export async function flushSaves() {
   while (saves.size) await Promise.all([...saves.values()]);
 }
+
+export function saveFavorite(id: string, isFavorite: boolean) {
+  return api<Pick<Planner, "is_favorite">>(
+    `/planners/${encodeURIComponent(id)}/favorite`,
+    { is_favorite: isFavorite },
+    "PUT",
+  );
+}
