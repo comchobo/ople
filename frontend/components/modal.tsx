@@ -1,24 +1,26 @@
 "use client";
 
-import { type ReactNode, useEffect, useRef } from "react";
+import { type ReactNode, type RefObject, useEffect, useRef } from "react";
 
 export function Modal({
   title,
   close,
   children,
+  returnFocusRef,
 }: {
   title: string;
   close: () => void;
   children: ReactNode;
+  returnFocusRef?: RefObject<HTMLElement | null>;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
     ref.current?.showModal();
     return () => {
-      previous?.focus();
+      (returnFocusRef?.current ?? previous)?.focus();
     };
-  }, []);
+  }, [returnFocusRef]);
   return (
     <dialog
       ref={ref}

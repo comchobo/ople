@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
+export const RECORDING_LIMIT_SECONDS = 180;
+const MAX_RECORDING_BYTES = 20 * 1024 * 1024;
+
 function stopMedia(stream: MediaStream | null) {
   stream?.getTracks().forEach((track) => {
     track.stop();
@@ -14,6 +17,7 @@ export function useRecorder(
   const [state, setState] = useState<"idle" | "recording" | "paused">("idle");
   const [seconds, setSeconds] = useState(0);
   const [error, setError] = useState("");
+  const [oversized, setOversized] = useState(false);
   const [starting, setStarting] = useState(false);
   const recorder = useRef<MediaRecorder | null>(null);
   const stream = useRef<MediaStream | null>(null);
@@ -32,9 +36,10 @@ export function useRecorder(
   useEffect(() => {
     if (state !== "recording") return;
     const timer = setInterval(() => {
+      if (secondsRef.current >= RECORDING_LIMIT_SECONDS) return;
       secondsRef.current += 1;
       setSeconds(secondsRef.current);
-      if (secondsRef.current >= 180) {
+      if (secondsRef.current >= RECORDING_LIMIT_SECONDS) {
         recorder.current?.pause();
         setState("paused");
       }
@@ -67,15 +72,18 @@ export function useRecorder(
       const value = new MediaRecorder(media, { mimeType: mime });
       chunks.current = [];
       size.current = 0;
+      setOversized(false);
       secondsRef.current = 0;
       setSeconds(0);
       value.ondataavailable = (event) => {
+        if (recorder.current !== value || !mounted.current) return;
         if (event.data.size) {
           chunks.current.push(event.data);
           size.current += event.data.size;
         }
-        if (size.current > 20 * 1024 * 1024 && value.state === "recording") {
-          value.pause();
+        if (size.current > MAX_RECORDING_BYTES) {
+          setOversized(true);
+          if (value.state === "recording") value.pause();
           setState("paused");
           setError("20MB를 초과했습니다. 다시 녹음해주세요.");
         }
@@ -100,6 +108,7 @@ export function useRecorder(
     if (recorder.current?.state !== "inactive") recorder.current?.stop();
     stopMedia(stream.current);
     recorder.current = null;
+    setOversized(false);
     chunks.current = [];
     secondsRef.current = 0;
     setSeconds(0);
@@ -112,19 +121,21 @@ export function useRecorder(
     value.onstop = () => {
       stopMedia(stream.current);
       const blob = new Blob(chunks.current, { type: value.mimeType });
-      if (blob.size > 20 * 1024 * 1024) {
+      if (blob.size > MAX_RECORDING_BYTES) {
         setError("20MB를 초과했습니다. 다시 녹음해주세요.");
-        setState("idle");
+        setOversized(true);
+        setState("paused");
         return;
       }
-      void submit(blob, Math.max(1, Math.min(secondsRef.current, 180))).catch(
-        (cause) => {
-          if (mounted.current) {
-            setError((cause as Error).message);
-            setState("idle");
-          }
-        },
-      );
+      void submit(
+        blob,
+        Math.max(1, Math.min(secondsRef.current, RECORDING_LIMIT_SECONDS)),
+      ).catch((cause) => {
+        if (mounted.current) {
+          setError((cause as Error).message);
+          setState("idle");
+        }
+      });
     };
     value.stop();
   }
@@ -133,6 +144,7 @@ export function useRecorder(
     setState("paused");
   }
   function resume() {
+    if (secondsRef.current >= RECORDING_LIMIT_SECONDS || oversized) return;
     recorder.current?.resume();
     setState("recording");
   }
@@ -141,7 +153,7 @@ export function useRecorder(
     seconds,
     error,
     starting,
-    oversized: size.current > 20 * 1024 * 1024,
+    oversized,
     start,
     pause,
     resume,

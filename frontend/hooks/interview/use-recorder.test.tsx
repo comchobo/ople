@@ -52,9 +52,11 @@ it("3분 제한에서 자동으로 일시정지하고 언마운트 시 마이크
   expect(result.current.seconds).toBe(180);
   expect(FakeRecorder.current.pause).toHaveBeenCalledOnce();
   act(() => {
+    result.current.resume();
     vi.advanceTimersByTime(5000);
   });
   expect(result.current.seconds).toBe(180);
+  expect(result.current.state).toBe("paused");
   unmount();
   expect(stop).toHaveBeenCalled();
 });
