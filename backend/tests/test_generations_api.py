@@ -51,11 +51,13 @@ def test_generation_creation_run_retry_and_user_isolation(
     assert client.get("/api/generations").json() == [created.json()]
     failed = client.post(url + "/run").json()
     assert failed["status"] == "failed" and failed["error"]
+    db.add(Planner(user_id=signed_in.id, name="새 플래너", plans=[]))
+    db.commit()
     completed = client.post(url + "/run").json()
     assert completed["status"] == "completed" and completed["planner_id"]
     assert client.post(url + "/run").json() == completed
     assert generator.call_count == 2
-    assert len(db.exec(select(Planner)).all()) == 1
+    assert db.get(Planner, completed["planner_id"]).name == "새 플래너 (2)"
 
     other = User(email="other@example.com", name="다른 사용자")
     db.add(other)

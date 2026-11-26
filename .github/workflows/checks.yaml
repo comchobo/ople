@@ -12,7 +12,7 @@ jobs:
   checks:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Configure environment
         run: cp .env.example .env.dev
       - name: Build services
@@ -25,6 +25,7 @@ jobs:
             uv run ruff check .
             uv run ruff format --check .
             uv run ty check
+            uv run alembic upgrade head
             uv run pytest tests
             uv run lint-imports
           '
