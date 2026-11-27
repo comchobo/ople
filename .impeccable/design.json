@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-26",
+  "title": "Ople · 오디세이 플래너 디자인 명세",
+  "extensions": {
+    "colorMeta": {
+      "paper": {"role": "neutral", "displayName": "책상 바탕", "canonical": "#f7f6ef"},
+      "page": {"role": "neutral", "displayName": "노트 종이", "canonical": "#fffcf2"},
+      "ink": {"role": "neutral", "displayName": "본문 먹색", "canonical": "#292e2a"},
+      "dim": {"role": "neutral", "displayName": "보조 설명", "canonical": "#5e655e"},
+      "rule": {"role": "neutral", "displayName": "구획선", "canonical": "#c9c9bb"},
+      "blue": {"role": "primary", "displayName": "주 행동", "canonical": "#28488e"},
+      "blue-hover": {"role": "primary", "displayName": "주 행동 호버", "canonical": "#203c78"},
+      "focus": {"role": "primary", "displayName": "키보드 초점선", "canonical": "#466ab8"},
+      "plan-one": {"role": "secondary", "displayName": "첫 번째 플랜 잉크", "canonical": "#314da0"},
+      "plan-two": {"role": "secondary", "displayName": "두 번째 플랜 잉크", "canonical": "#97602d"},
+      "plan-three": {"role": "secondary", "displayName": "세 번째 플랜 잉크", "canonical": "#3b6e57"}
+    },
+    "typographyMeta": {
+      "body": {"displayName": "안내와 조작", "purpose": "로컬 Pretendard 가변 글꼴. 본문 16px/1.55를 기준으로 한다."},
+      "headline": {"displayName": "홈 제목", "purpose": "Pretendard 680. 강조 구절에는 남색과 손으로 그은 듯한 밑줄을 쓴다."},
+      "plan-title": {"displayName": "펼침면의 제목", "purpose": "Pen은 로컬 나눔손글씨 펜의 CSS 이름이다. 편집지의 한글 획은 이 폰트가 아닌 SVG 경로다."}
+    },
+    "breakpoints": [
+      {"name": "mobile-max", "value": "630px"},
+      {"name": "tablet-max", "value": "900px"}
+    ],
+    "shadows": [
+      {"name": "folio-stack", "value": "2px 5px 0 -2px #e9e6d8,2px 6px 0 -2px #bdbfae,4px 9px 0 -3px #eeebdf,4px 10px 0 -3px #c6c5b9,0 15px 32px -22px #32382e55", "purpose": "겹친 종이 단면과 책상 위의 그림자. 열별 카드가 아니라 한 권의 외곽에 적용한다."}
+    ],
+    "motion": [
+      {"name": "voice-speaking", "value": "breathe 2s ease-in-out infinite alternate", "purpose": "질문 낭독"},
+      {"name": "voice-listening", "value": "breathe 1.2s ease-in-out infinite alternate", "purpose": "답변 녹음"},
+      {"name": "voice-processing", "value": "breathe 3s ease-in-out infinite alternate", "purpose": "전사 또는 생성 대기"},
+      {"name": "voice-reduced-motion", "value": "none", "purpose": "prefers-reduced-motion: reduce이면 타원을 정지한다."}
+    ]
+  },
+  "components": [
+    {
+      "name": "주 행동", "kind": "button", "refersTo": "button-primary",
+      "description": "홈에서는 예시를 본 뒤 자신의 노트를 시작하는 버튼이다.",
+      "html": "<button class=\"ds-primary\">내 플래너 시작하기 <svg aria-hidden=\"true\" viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12h15m-6-6 6 6-6 6\"/></svg></button>",
+      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:16px;min-height:48px;padding:11px 20px;border:0;border-radius:5px;background:var(--blue,#28488e);color:white;font:625 16px/1.55 Pretendard,sans-serif;cursor:pointer}.ds-primary:hover{background:#203c78}.ds-primary:focus-visible{outline:3px solid #466ab8;outline-offset:4px}.ds-primary:disabled{opacity:.48;cursor:default}@media(max-width:630px){.ds-primary{min-height:44px;font-size:14px}}"
+    },
+    {
+      "name": "이메일 입력", "kind": "input", "refersTo": "auth-input",
+      "description": "라벨과 브라우저의 이메일 형식 검사를 사용하는 로컬 로그인 첫 단계다.",
+      "html": "<label class=\"ds-label\" for=\"ds-email\">이메일 주소</label><input class=\"ds-field\" id=\"ds-email\" type=\"email\" required autocomplete=\"email\" placeholder=\"name@example.com\">",
+      "css": ".ds-label{display:block;margin:25px 0 6px;font:600 16px/1.55 Pretendard,sans-serif;color:var(--ink,#292e2a)}.ds-field{width:100%;box-sizing:border-box;border:1px solid #909588;border-radius:4px;background:#fffefa;padding:12px;color:var(--ink,#292e2a);font:16px/1.55 Pretendard,sans-serif}.ds-field:focus-visible{outline:3px solid #466ab8;outline-offset:4px}"
+    },
+    {
+      "name": "한 권의 세 플랜", "kind": "custom", "refersTo": "folio",
+      "description": "하나의 제본과 같은 폭의 세 열을 공유한다. 모바일에서는 같은 순서의 세 행이다.",
+      "html": "<section class=\"ds-folio\" aria-label=\"완성 예시\"><h2>서윤의 오디세이 플래너</h2><div class=\"ds-leaves\"><article><small>첫 번째 플랜</small><h3>사람과 이야기를 잇는 작은 출판사를 연다</h3></article><article><small>두 번째 플랜</small><h3>반죽을 빚으며 동네의 아침을 여는 사람</h3></article><article><small>세 번째 플랜</small><h3>산을 걸으며 사라지는 풍경을 그림으로 남긴다</h3></article></div></section>",
+      "css": ".ds-folio{position:relative;background:var(--page,#fffcf2);border:1px solid #bcbeaf;border-radius:3px 9px 8px 3px;box-shadow:2px 5px 0 -2px #e9e6d8,2px 6px 0 -2px #bdbfae,4px 9px 0 -3px #eeebdf,4px 10px 0 -3px #c6c5b9,0 15px 32px -22px #32382e55;padding:0 clamp(22px,3vw,48px) 0 clamp(42px,4.6vw,72px)}.ds-folio:before{content:'';position:absolute;inset:0 auto 0 0;width:24px;border-right:1px solid #c5c5b7;background:radial-gradient(ellipse 3px 4px at 10px 28px,#8b8c80 30%,#c9c7b9 58%,transparent 83%) 0 0/100% 42px}.ds-folio h2{margin:0;padding:20px 0;border-bottom:1.5px solid #898e80;font:clamp(26px,2.4vw,38px)/1.05 Pen,cursive}.ds-leaves{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:25px 0 28px}.ds-leaves article{padding:0 clamp(16px,2.25vw,37px);color:#314da0}.ds-leaves article+article{border-left:1px dashed #c7c7b9;color:#97602d}.ds-leaves article:last-child{color:#3b6e57}.ds-leaves small{font:620 14px/1.55 Pretendard,sans-serif}.ds-leaves h3{font:clamp(28px,2.85vw,44px)/1.09 Pen,cursive;letter-spacing:-.025em;margin:8px 0}@media(max-width:900px){.ds-leaves article{padding-inline:15px}}@media(max-width:630px){.ds-folio{padding:0 15px 0 24px}.ds-folio:before{width:11px;background-position:-5px 0}.ds-leaves{display:block;padding:0}.ds-leaves article{padding:15px 0}.ds-leaves article+article{border-left:0;border-top:1px dashed var(--rule,#c9c9bb)}.ds-leaves h3{font-size:27px}}"
+    },
+    {
+      "name": "플랜 선택", "kind": "nav",
+      "description": "현재 플랜을 이름, 밑줄과 aria-current로 함께 구분한다.",
+      "html": "<nav class=\"ds-tabs\" aria-label=\"플랜 선택\"><button aria-current=\"page\">첫 번째 플랜</button><button>두 번째 플랜</button><button>세 번째 플랜</button></nav>",
+      "css": ".ds-tabs{display:flex;flex-wrap:wrap;gap:6px;border-bottom:1px solid var(--rule,#c9c9bb)}.ds-tabs button{padding:10px 16px;background:transparent;border:0;color:var(--ink,#292e2a);font:16px/1.55 Pretendard,sans-serif;cursor:pointer}.ds-tabs [aria-current=page]{color:#314da0;border-bottom:3px solid currentColor;font-weight:650}.ds-tabs button:focus-visible{outline:3px solid #466ab8;outline-offset:4px}@media(max-width:630px){.ds-tabs button{padding:10px 8px;font-size:14px}}"
+    },
+    {
+      "name": "미평가 슬라이더", "kind": "input",
+      "description": "가운데 손잡이는 미평가의 표시 위치다. 실제 값 0과 구분한다.",
+      "html": "<div class=\"ds-rating\"><label for=\"ds-resource\">나의 자원</label><strong>미평가</strong><input id=\"ds-resource\" type=\"range\" min=\"0\" max=\"100\" value=\"50\" aria-valuetext=\"미평가\"><small>0</small><small>100</small></div>",
+      "css": ".ds-rating{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;font:16px/1.55 Pretendard,sans-serif;color:var(--ink,#292e2a)}.ds-rating label{font-weight:620}.ds-rating strong{font-size:14px;color:#314da0}.ds-rating input{width:100%;height:24px;margin:6px 0;opacity:.55;accent-color:#314da0}.ds-rating input:focus-visible{outline:3px solid #466ab8;outline-offset:4px}.ds-rating small{font-size:12px;color:var(--dim,#5e655e)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "책상 위에 펼친 한 권의 노트.",
+    "overview": "첫 화면은 사용법 설명이나 빈 양식이 아니라 편집자 서윤이 완성한 플래너다. 작은 출판사, 동네 빵집, 산길 그림책을 나란히 놓으면 세 가지 5년의 차이를 한눈에 읽을 수 있다. 첫 번째 플랜도 추천안이 아니다. 순서는 삶을 바라보는 관점만 구분한다.",
+    "keyCharacteristics": ["완성 예시", "한 권 안의 동일 폭 세 열", "한 플랜씩 읽고 편집하는 종이"],
+    "dos": ["첫 화면에서 세 삶의 완성 예시를 먼저 보여준다. 세 플랜의 면적·순번 표기·펼치기 조작을 동등하게 유지한다.", "작은 화면에서는 같은 노트를 행으로 접고 한 플랜씩 연다. 데스크톱 세 열을 그대로 축소하지 않는다.", "글로 보여 줄 상태 안내와 소리로만 주고받는 대화 내용을 구분한다."],
+    "donts": ["로컬 저장을 동기화로, 이메일 형식 확인을 인증으로, 미리보기의 저장 알림을 파일 생성으로 설명하지 않는다."]
+  }
+}
